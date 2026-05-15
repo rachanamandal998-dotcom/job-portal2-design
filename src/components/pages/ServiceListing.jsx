@@ -35,6 +35,7 @@ export default function ServiceList() {
       description: "Professional home cleaning service",
       bookings: 12,
       rating: 4.8,
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
     },
     {
       id: 2,
@@ -43,6 +44,7 @@ export default function ServiceList() {
       description: "Expert plumbing repairs",
       bookings: 8,
       rating: 4.6,
+      image: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=400&q=80",
     },
     {
       id: 3,
@@ -51,6 +53,7 @@ export default function ServiceList() {
       description: "Electrical maintenance and repair",
       bookings: 10,
       rating: 4.9,
+      image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400&q=80",
     },
   ]);
 
@@ -79,12 +82,14 @@ export default function ServiceList() {
   ]);
 
   const handleAddService = (data) => {
-    setServices((prev) => [...prev, {...data, id: Date.now(), bookings: 0, rating: 0 }]);
+    setServices((prev) => [
+      ...prev,
+      { ...data, id: Date.now(), bookings: 0, rating: 0 },
+    ]);
     setFormOpen(false);
     setModalOpen(false);
   };
 
-  // Calculate stats
   const bookingStats = {
     Pending: bookings.filter((b) => b.status === "pending").length,
     Confirmed: bookings.filter((b) => b.status === "confirmed").length,
@@ -93,15 +98,14 @@ export default function ServiceList() {
   };
 
   const completed = bookings.filter((b) => b.status === "completed").length;
-
   const completionRate =
     bookings.length > 0
- ? Math.round((completed / bookings.length) * 100)
+      ? Math.round((completed / bookings.length) * 100)
       : 0;
 
   const avgRating =
     services.length > 0
- ? (
+      ? (
           services.reduce((a, s) => a + s.rating, 0) / services.length
         ).toFixed(1)
       : "0.0";
@@ -109,22 +113,16 @@ export default function ServiceList() {
   const totalBookings = Object.values(bookingStats).reduce((a, b) => a + b, 0);
 
   return (
-    <DashboardShell> {/* FIX 1: Wrap entire page so navbar shows */}
-      <div className="service-page" style={{ paddingTop: '2px' }}>
+    <DashboardShell>
+      <div className="service-page" style={{ paddingTop: "2px" }}>
         <div className="container">
+
           {/* Page Header */}
           <div className="page-header">
             <h1 className="page-title">Hi, Rachana!</h1>
             <p className="page-subtitle">Manage your service listings</p>
-
             <span className="verified-badge">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path
                   d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
                   strokeWidth="2"
@@ -142,17 +140,13 @@ export default function ServiceList() {
             </span>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Circles */}
           <div className="action-circles">
-            <button
-              className="action-circle-btn primary"
-              onClick={() => setFormOpen(true)}
-            >
+            <button className="action-circle-btn primary" onClick={() => setFormOpen(true)}>
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
                   <Plus size={32} strokeWidth={3} />
                 </div>
-
                 <h3 className="circle-label">Add Service</h3>
                 <p className="circle-sublabel">Create listing</p>
               </div>
@@ -161,16 +155,10 @@ export default function ServiceList() {
             <button className="action-circle-btn">
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
-                  <Eye
-                    size={32}
-                    strokeWidth={3}
-                    style={{ color: "#f97316" }}
-                  />
+                  <Eye size={32} strokeWidth={3} style={{ color: "#f97316" }} />
                 </div>
-
                 <h3 className="circle-label">View Services</h3>
                 <p className="circle-sublabel">Manage all</p>
-
                 <span className="circle-badge">{services.length}</span>
               </div>
             </button>
@@ -178,16 +166,10 @@ export default function ServiceList() {
             <button className="action-circle-btn">
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
-                  <Calendar
-                    size={32}
-                    strokeWidth={3}
-                    style={{ color: "#f97316" }}
-                  />
+                  <Calendar size={32} strokeWidth={3} style={{ color: "#f97316" }} />
                 </div>
-
                 <h3 className="circle-label">Track Bookings</h3>
                 <p className="circle-sublabel">Updates</p>
-
                 <span className="circle-badge">{bookings.length}</span>
               </div>
             </button>
@@ -195,13 +177,8 @@ export default function ServiceList() {
             <button className="action-circle-btn">
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
-                  <Store
-                    size={32}
-                    strokeWidth={3}
-                    style={{ color: "#f97316" }}
-                  />
+                  <Store size={32} strokeWidth={3} style={{ color: "#f97316" }} />
                 </div>
-
                 <h3 className="circle-label">Open Store</h3>
                 <p className="circle-sublabel">Showcase</p>
               </div>
@@ -212,7 +189,6 @@ export default function ServiceList() {
           <div className="booking-stats-section">
             <div className="overview-header">
               <h2 className="overview-title">Booking Overview</h2>
-
               <span className="overview-badge">{totalBookings} Total</span>
             </div>
 
@@ -227,29 +203,20 @@ export default function ServiceList() {
                     Completed: "#22c55e",
                     Cancelled: "#ef4444",
                   };
-
                   return (
                     <div key={key} className="stat-row">
                       <div className="stat-header">
                         <div className="stat-label">
-                          <span
-                            className="stat-dot"
-                            style={{
-                              background: colors[key],
-                            }}
-                          />
-
+                          <span className="stat-dot" style={{ background: colors[key] }} />
                           {key}
                         </div>
-
                         <span className="stat-value">{value}</span>
                       </div>
-
                       <div className="stat-bar-bg">
                         <div
                           className="stat-bar"
                           style={{
-                            width: `${totalBookings > 0? (value / totalBookings) * 100 : 0}%`,
+                            width: `${totalBookings > 0 ? (value / totalBookings) * 100 : 0}%`,
                             background: colors[key],
                           }}
                         />
@@ -264,42 +231,23 @@ export default function ServiceList() {
           {/* Quick Stats */}
           <div className="quick-stats">
             <div className="stat-card">
-              <div className="stat-icon">
-                <Calendar size={24} />
-              </div>
-
+              <div className="stat-icon"><Calendar size={24} /></div>
               <div className="stat-value">{bookings.length}</div>
-
               <div className="stat-label-text">Total Bookings</div>
             </div>
-
             <div className="stat-card">
-              <div className="stat-icon">
-                <Wrench size={24} />
-              </div>
-
+              <div className="stat-icon"><Wrench size={24} /></div>
               <div className="stat-value">{services.length}</div>
-
               <div className="stat-label-text">Active Services</div>
             </div>
-
             <div className="stat-card">
-              <div className="stat-icon">
-                <Star size={24} />
-              </div>
-
+              <div className="stat-icon"><Star size={24} /></div>
               <div className="stat-value">{avgRating}</div>
-
               <div className="stat-label-text">Avg. Rating</div>
             </div>
-
             <div className="stat-card">
-              <div className="stat-icon">
-                <TrendingUp size={24} />
-              </div>
-
+              <div className="stat-icon"><TrendingUp size={24} /></div>
               <div className="stat-value">{completionRate}%</div>
-
               <div className="stat-label-text">Completion Rate</div>
             </div>
           </div>
@@ -307,21 +255,14 @@ export default function ServiceList() {
           {/* Charts */}
           <ChartsSection bookings={bookings} services={services} />
 
-          {/* Bookings */}
+          {/* Bookings List */}
           <div className="products-section">
             <div className="section-header">
               <div>
                 <h2 className="section-title">My Bookings</h2>
-
-                <p className="section-subtitle">
-                  Latest bookings — manage and confirm them here.
-                </p>
+                <p className="section-subtitle">Latest bookings — manage and confirm them here.</p>
               </div>
-
-              <button
-                className="btn btn-primary"
-                onClick={() => setFormOpen(true)}
-              >
+              <button className="btn btn-primary" onClick={() => setFormOpen(true)}>
                 <Plus size={16} />
                 Add Service
               </button>
@@ -331,28 +272,14 @@ export default function ServiceList() {
               {bookings.map((booking) => (
                 <div key={booking.id} className="booking-item">
                   <div className="booking-info">
-                    <h3 className="booking-service-name">
-                      {booking.serviceName}
-                    </h3>
-
-                    <p className="booking-meta">
-                      {booking.customer} • {booking.date}
-                    </p>
+                    <h3 className="booking-service-name">{booking.serviceName}</h3>
+                    <p className="booking-meta">{booking.customer} • {booking.date}</p>
                   </div>
-
                   <div className={`booking-status ${booking.status}`}>
                     {booking.status === "pending" && <Clock size={14} />}
-
-                    {booking.status === "confirmed" && (
-                      <CheckCircle size={14} />
-                    )}
-
-                    {booking.status === "completed" && (
-                      <CheckCircle size={14} />
-                    )}
-
+                    {booking.status === "confirmed" && <CheckCircle size={14} />}
+                    {booking.status === "completed" && <CheckCircle size={14} />}
                     {booking.status === "cancelled" && <XCircle size={14} />}
-
                     {booking.status}
                   </div>
                 </div>
@@ -360,36 +287,38 @@ export default function ServiceList() {
             </div>
           </div>
 
-          {/* Services */}
+          {/* Services Grid */}
           <div className="products-section">
             <div className="section-header">
               <div>
                 <h2 className="section-title">My Services</h2>
-
-                <p className="section-subtitle">
-                  Manage your services with a polished view.
-                </p>
+                <p className="section-subtitle">Manage your services with a polished view.</p>
               </div>
             </div>
 
             <div className="services-grid">
               {services.map((service) => (
                 <div key={service.id} className="service-card">
-                  <div className="service-header">
-                    <h3 className="service-name">{service.name}</h3>
-
-                    <div className="service-price">${service.price}</div>
-                  </div>
-
-                  <p className="service-description">{service.description}</p>
-
-                  <div className="service-footer">
-                    <div className="service-meta">
-                      <span>{service.bookings} bookings</span>
-
-                      <div className="service-rating">
-                        <Star size={14} fill="#fbbf24" />
-                        {service.rating}
+                  {service.image && (
+                    <img
+                      src={service.image}
+                      alt={service.name}
+                      className="service-image"
+                    />
+                  )}
+                  <div className="service-body">
+                    <div className="service-header">
+                      <h3 className="service-name">{service.name}</h3>
+                      <div className="service-price">Rs {service.price}</div>
+                    </div>
+                    <p className="service-description">{service.description}</p>
+                    <div className="service-footer">
+                      <div className="service-meta">
+                        <span>{service.bookings} bookings</span>
+                        <div className="service-rating">
+                          <Star size={14} fill="#fbbf24" color="#fbbf24" />
+                          {service.rating}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -397,30 +326,31 @@ export default function ServiceList() {
               ))}
             </div>
           </div>
+
         </div>
+
+        <Modal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSubmit={handleAddService}
+          type="service"
+        />
+
+        <AnimatePresence>
+          {formOpen && (
+            <ListingFormModal
+              kind="service"
+              onClose={() => setFormOpen(false)}
+              onSubmit={handleAddService}
+            />
+          )}
+        </AnimatePresence>
       </div>
-
-      <Modal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleAddService}
-        type="service"
-      />
-
-      <AnimatePresence>
-        {formOpen && (
-          <ListingFormModal
-            kind="service"
-            onClose={() => setFormOpen(false)}
-            onSubmit={handleAddService}
-          />
-        )}
-      </AnimatePresence>
     </DashboardShell>
   );
 }
 
-// Donut Chart
+// ── Donut Chart ──
 function DonutChart({ stats }) {
   const colors = {
     Pending: "#fbbf24",
@@ -430,47 +360,30 @@ function DonutChart({ stats }) {
   };
 
   const total = Object.values(stats).reduce((a, b) => a + b, 0);
-
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
-
   let offset = 0;
 
   const segments = Object.entries(stats).map(([key, value]) => {
-    const percent = total > 0? value / total : 0;
-    const dash = percent * circumference;
-
+    const dash = (total > 0 ? value / total : 0) * circumference;
     const segment = {
-      key,
-      value,
+      key, value,
       color: colors[key],
       dasharray: `${dash} ${circumference - dash}`,
       offset: -offset,
     };
-
     offset += dash;
-
     return segment;
   });
 
   return (
     <div className="donut-container">
       <svg width="140" height="140" viewBox="0 0 120 120">
-        <circle
-          cx="60"
-          cy="60"
-          r={radius}
-          fill="none"
-          stroke="#f1f5f9"
-          strokeWidth="12"
-        />
-
+        <circle cx="60" cy="60" r={radius} fill="none" stroke="#f1f5f9" strokeWidth="12" />
         {segments.map((s) => (
           <circle
             key={s.key}
-            cx="60"
-            cy="60"
-            r={radius}
+            cx="60" cy="60" r={radius}
             fill="none"
             stroke={s.color}
             strokeWidth="12"
@@ -481,7 +394,6 @@ function DonutChart({ stats }) {
           />
         ))}
       </svg>
-
       <div className="donut-center">
         <div className="donut-number">{total}</div>
         <div className="donut-label">Bookings</div>
@@ -490,7 +402,7 @@ function DonutChart({ stats }) {
   );
 }
 
-// Charts Section - FIX 2: Remove DashboardShell wrapper here
+// ── Charts Section ──
 function ChartsSection({ bookings, services }) {
   const lineRef = useRef(null);
   const pieRef = useRef(null);
@@ -503,44 +415,30 @@ function ChartsSection({ bookings, services }) {
     const grid = "#f1f5f9";
     const tick = "#94a3b8";
 
-    // Destroy old charts before creating new ones
-    Object.values(chartsRef.current).forEach((chart) => chart?.destroy());
+    Object.values(chartsRef.current).forEach((c) => c?.destroy());
 
     if (lineRef.current) {
       chartsRef.current.line = new Chart(lineRef.current, {
         type: "line",
         data: {
           labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-          datasets: [
-            {
-              label: "Bookings",
-              data: [1, 3, 2, 5, 4, 6, 7],
-              borderColor: orange,
-              backgroundColor: orangeAlpha,
-              fill: true,
-              tension: 0.4,
-              borderWidth: 2,
-            },
-          ],
+          datasets: [{
+            label: "Bookings",
+            data: [1, 3, 2, 5, 4, 6, 7],
+            borderColor: orange,
+            backgroundColor: orangeAlpha,
+            fill: true,
+            tension: 0.4,
+            borderWidth: 2,
+          }],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
+          plugins: { legend: { display: false } },
           scales: {
-            x: {
-              grid: { color: grid },
-              ticks: { color: tick },
-            },
-            y: {
-              beginAtZero: true,
-              grid: { color: grid },
-              ticks: { color: tick },
-            },
+            x: { grid: { color: grid }, ticks: { color: tick } },
+            y: { beginAtZero: true, grid: { color: grid }, ticks: { color: tick } },
           },
         },
       });
@@ -551,28 +449,22 @@ function ChartsSection({ bookings, services }) {
         type: "doughnut",
         data: {
           labels: ["Pending", "Confirmed", "Completed", "Cancelled"],
-          datasets: [
-            {
-              data: [
-                bookings.filter((b) => b.status === "pending").length,
-                bookings.filter((b) => b.status === "confirmed").length,
-                bookings.filter((b) => b.status === "completed").length,
-                bookings.filter((b) => b.status === "cancelled").length,
-              ],
-              backgroundColor: ["#fbbf24", "#3b82f6", "#22c55e", "#ef4444"],
-              borderWidth: 2,
-              borderColor: "#fff",
-            },
-          ],
+          datasets: [{
+            data: [
+              bookings.filter((b) => b.status === "pending").length,
+              bookings.filter((b) => b.status === "confirmed").length,
+              bookings.filter((b) => b.status === "completed").length,
+              bookings.filter((b) => b.status === "cancelled").length,
+            ],
+            backgroundColor: ["#fbbf24", "#3b82f6", "#22c55e", "#ef4444"],
+            borderWidth: 2,
+            borderColor: "#fff",
+          }],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
+          plugins: { legend: { display: false } },
           cutout: "60%",
         },
       });
@@ -583,82 +475,54 @@ function ChartsSection({ bookings, services }) {
         type: "bar",
         data: {
           labels: services.map((s) => s.name),
-          datasets: [
-            {
-              label: "Revenue",
-              data: services.map((s) => Number(s.price) * s.bookings),
-              backgroundColor: services.map(
-                (_, i) => `rgba(249,115,22,${0.85 - i * 0.2})`
-              ),
-              borderRadius: 6,
-            },
-          ],
+          datasets: [{
+            label: "Revenue",
+            data: services.map((s) => Number(s.price) * s.bookings),
+            backgroundColor: services.map((_, i) => `rgba(249,115,22,${0.85 - i * 0.2})`),
+            borderRadius: 6,
+          }],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
+          plugins: { legend: { display: false } },
           scales: {
-            x: {
-              grid: { display: false },
-              ticks: { color: tick },
-            },
-            y: {
-              beginAtZero: true,
-              grid: { color: grid },
-              ticks: { color: tick },
-            },
+            x: { grid: { display: false }, ticks: { color: tick } },
+            y: { beginAtZero: true, grid: { color: grid }, ticks: { color: tick } },
           },
         },
       });
     }
 
     return () => {
-      Object.values(chartsRef.current).forEach((chart) => chart?.destroy());
+      Object.values(chartsRef.current).forEach((c) => c?.destroy());
     };
   }, [bookings, services]);
 
   return (
-    // FIX 2: Removed DashboardShell wrapper - it's already in parent
     <div className="charts-grid">
       <div className="chart-card">
         <div className="chart-header">
           <h3 className="chart-title">Weekly Booking Trend</h3>
-
           <p className="chart-subtitle">Bookings over the last 7 days</p>
         </div>
-
-        <div className="chart-container">
-          <canvas ref={lineRef} />
-        </div>
+        <div className="chart-container"><canvas ref={lineRef} /></div>
       </div>
 
       <div className="chart-card">
         <div className="chart-header">
           <h3 className="chart-title">Status Breakdown</h3>
-
           <p className="chart-subtitle">Current booking distribution</p>
         </div>
-
-        <div className="chart-container">
-          <canvas ref={pieRef} />
-        </div>
+        <div className="chart-container"><canvas ref={pieRef} /></div>
       </div>
 
       <div className="chart-card">
         <div className="chart-header">
           <h3 className="chart-title">Revenue By Service</h3>
-
           <p className="chart-subtitle">Top performing services</p>
         </div>
-
-        <div className="chart-container">
-          <canvas ref={barRef} />
-        </div>
+        <div className="chart-container"><canvas ref={barRef} /></div>
       </div>
     </div>
   );

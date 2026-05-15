@@ -135,7 +135,7 @@ export default function JobPortal() {
           {/* Action Circles */}
           <div className="action-circles">
             <button
-              className="action-circle-btn"
+              className="action-circle-btn primary"
               onClick={() => setModalOpen(true)}
             >
               <div className="action-circle-content">

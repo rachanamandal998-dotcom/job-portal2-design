@@ -101,21 +101,21 @@ export function DashboardShell({ children }) {
               className="ds-mobile-menu"
             >
               <NavItem
-                to="/job-portal"
+                to="/jobs"
                 icon={Briefcase}
                 label="Job Portal"
                 active={active === "job"}
                 onClick={() => setMenuOpen(false)}
               />
               <NavItem
-                to="/product-listing"
+                to="/products"
                 icon={Package}
                 label="Product Listing"
                 active={active === "product"}
                 onClick={() => setMenuOpen(false)}
               />
               <NavItem
-                to="/service-listing"
+                to="/services"
                 icon={Wrench}
                 label="Service Listing"
                 active={active === "service"}

@@ -32,7 +32,7 @@ export default function ProductList() {
     {
       id: 1,
       name: "Handmade Bag",
-      price: "29.99",
+      price: "2990",
       stock: 12,
       image:
         "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
@@ -40,7 +40,7 @@ export default function ProductList() {
     {
       id: 2,
       name: "Wooden Toy",
-      price: "14.50",
+      price: "1400",
       stock: 3,
       image:
         "https://images.unsplash.com/photo-1512436991641-6745cdb1723f",
@@ -48,7 +48,7 @@ export default function ProductList() {
     {
       id: 3,
       name: "Silk Scarf",
-      price: "19.00",
+      price: "1900",
       stock: 0,
       image:
         "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
@@ -351,7 +351,7 @@ export default function ProductList() {
                 <div className="product-info">
                   <h3 className="product-name">{product.name}</h3>
 
-                  <div className="product-price">${product.price}</div>
+                  <div className="product-price">Rs {product.price}</div>
 
                   <div className="product-stock">
                     {product.stock > 5 && (
