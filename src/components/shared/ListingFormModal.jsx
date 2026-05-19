@@ -88,7 +88,7 @@ export function ListingFormModal({ kind = "Product", onClose, onSubmit }) {
             <div className="lm-row">
               <div className={`lm-field ${focused === "price" ? "lm-field--focus" : ""} ${form.price ? "lm-field--filled" : ""}`}>
                 <label className="lm-label">
-                  <DollarSign size={13} /> Price <span>*</span>
+                Price <span>*</span>
                 </label>
                 <div className="lm-input-wrap">
                   <span className="lm-prefix">Rs.</span>
