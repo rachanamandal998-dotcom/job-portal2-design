@@ -1,37 +1,39 @@
 import { useState, useRef, useEffect } from "react";
 import {
-  Plus,
-  Eye,
-  Calendar,
-  Store,
-  Wrench,
-  Star,
-  TrendingUp,
-  Clock,
-  CheckCircle,
-  XCircle,
+  Plus, Eye, Calendar, Store, Wrench, Star, TrendingUp, Clock, CheckCircle, XCircle,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Chart from "chart.js/auto";
 import { Modal } from "../Modal";
 import "../styles/Global.css";
 import "../styles/ServiceListing.css";
 import { ListingFormModal } from "../shared/ListingFormModal";
-import {
-  DashboardShell,
-  Greeting,
-  SectionPanel,
-} from "../shared/DashboardShell";
-import { AnimatePresence } from "framer-motion";
+import { DashboardShell } from "../shared/DashboardShell";
 
-export default function ServiceList() {
+// Import analytics pages
+import ServiceAnalytics from "../pages/service/ServiceAnalytics";
+import BookingAnalytics from "../pages/service/BookingAnalytics";
+import ServiceStore from "../pages/service/ServiceStore";
+import RatingAnalytics from "../pages/service/RatingAnalytics";
+import CompletionAnalytics from "../pages/service/CompletionAnalytics";
+
+export default function ServiceListing() {
   const [modalOpen, setModalOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+
+  // ROUTING STATE
+  const [showServiceAnalytics, setShowServiceAnalytics] = useState(false);
+  const [showBookingAnalytics, setShowBookingAnalytics] = useState(false);
+  const [showServiceStore, setShowServiceStore] = useState(false);
+  const [showRatingAnalytics, setShowRatingAnalytics] = useState(false);
+  const [showCompletionAnalytics, setShowCompletionAnalytics] = useState(false);
 
   const [services, setServices] = useState([
     {
       id: 1,
       name: "House Cleaning",
       price: "120",
+      category: "Home",
       description: "Professional home cleaning service",
       bookings: 12,
       rating: 4.8,
@@ -41,6 +43,7 @@ export default function ServiceList() {
       id: 2,
       name: "Plumbing",
       price: "90",
+      category: "Repair",
       description: "Expert plumbing repairs",
       bookings: 8,
       rating: 4.6,
@@ -50,6 +53,7 @@ export default function ServiceList() {
       id: 3,
       name: "Electrical Repair",
       price: "150",
+      category: "Repair",
       description: "Electrical maintenance and repair",
       bookings: 10,
       rating: 4.9,
@@ -58,33 +62,15 @@ export default function ServiceList() {
   ]);
 
   const [bookings] = useState([
-    {
-      id: 1001,
-      serviceName: "House Cleaning",
-      customer: "John",
-      date: "May 10",
-      status: "pending",
-    },
-    {
-      id: 1002,
-      serviceName: "Plumbing",
-      customer: "Sarah",
-      date: "May 11",
-      status: "confirmed",
-    },
-    {
-      id: 1003,
-      serviceName: "Electrical Repair",
-      customer: "Mike",
-      date: "May 12",
-      status: "completed",
-    },
+    { id: 1001, serviceName: "House Cleaning", customer: "John", date: "May 10", status: "pending", revenue: 120 },
+    { id: 1002, serviceName: "Plumbing", customer: "Sarah", date: "May 11", status: "confirmed", revenue: 90 },
+    { id: 1003, serviceName: "Electrical Repair", customer: "Mike", date: "May 12", status: "completed", revenue: 150 },
   ]);
 
   const handleAddService = (data) => {
     setServices((prev) => [
-      ...prev,
-      { ...data, id: Date.now(), bookings: 0, rating: 0 },
+     ...prev,
+      {...data, id: Date.now(), bookings: 0, rating: 0 },
     ]);
     setFormOpen(false);
     setModalOpen(false);
@@ -98,23 +84,38 @@ export default function ServiceList() {
   };
 
   const completed = bookings.filter((b) => b.status === "completed").length;
-  const completionRate =
-    bookings.length > 0
-      ? Math.round((completed / bookings.length) * 100)
-      : 0;
-
-  const avgRating =
-    services.length > 0
-      ? (
-          services.reduce((a, s) => a + s.rating, 0) / services.length
-        ).toFixed(1)
-      : "0.0";
-
+  const completionRate = bookings.length > 0? Math.round((completed / bookings.length) * 100) : 0;
+  const avgRating = services.length > 0
+   ? (services.reduce((a, s) => a + s.rating, 0) / services.length).toFixed(1)
+    : "0.0";
   const totalBookings = Object.values(bookingStats).reduce((a, b) => a + b, 0);
+
+  // CONDITIONAL RENDERING - NAVIGATE TO PAGES
+  if (showServiceAnalytics) {
+    return <ServiceAnalytics services={services} bookings={bookings} onBack={() => setShowServiceAnalytics(false)} />;
+  }
+  if (showBookingAnalytics) {
+    return <BookingAnalytics services={services} bookings={bookings} onBack={() => setShowBookingAnalytics(false)} />;
+  }
+  if (showServiceStore) {
+    return <ServiceStore services={services} bookings={bookings} onBack={() => setShowServiceStore(false)} />;
+  }
+  if (showRatingAnalytics) {
+    return <RatingAnalytics services={services} onBack={() => setShowRatingAnalytics(false)} />;
+  }
+  if (showCompletionAnalytics) {
+    return <CompletionAnalytics bookings={bookings} services={services} onBack={() => setShowCompletionAnalytics(false)} />;
+  }
 
   return (
     <DashboardShell>
-      <div className="service-page" style={{ paddingTop: "2px" }}>
+      <motion.div
+        className="service-page"
+        style={{ paddingTop: "2px" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
         <div className="container">
 
           {/* Page Header */}
@@ -142,7 +143,12 @@ export default function ServiceList() {
 
           {/* Action Circles */}
           <div className="action-circles">
-            <button className="action-circle-btn primary" onClick={() => setFormOpen(true)}>
+            <motion.button
+              className="action-circle-btn primary"
+              onClick={() => setFormOpen(true)}
+              whileHover={{ y: -8, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
                   <Plus size={32} strokeWidth={3} />
@@ -150,9 +156,14 @@ export default function ServiceList() {
                 <h3 className="circle-label">Add Service</h3>
                 <p className="circle-sublabel">Create listing</p>
               </div>
-            </button>
+            </motion.button>
 
-            <button className="action-circle-btn">
+            <motion.button
+              className="action-circle-btn"
+              onClick={() => setShowServiceAnalytics(true)}
+              whileHover={{ y: -8, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
                   <Eye size={32} strokeWidth={3} style={{ color: "#f97316" }} />
@@ -161,9 +172,14 @@ export default function ServiceList() {
                 <p className="circle-sublabel">Manage all</p>
                 <span className="circle-badge">{services.length}</span>
               </div>
-            </button>
+            </motion.button>
 
-            <button className="action-circle-btn">
+            <motion.button
+              className="action-circle-btn"
+              onClick={() => setShowBookingAnalytics(true)}
+              whileHover={{ y: -8, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
                   <Calendar size={32} strokeWidth={3} style={{ color: "#f97316" }} />
@@ -172,9 +188,14 @@ export default function ServiceList() {
                 <p className="circle-sublabel">Updates</p>
                 <span className="circle-badge">{bookings.length}</span>
               </div>
-            </button>
+            </motion.button>
 
-            <button className="action-circle-btn">
+            <motion.button
+              className="action-circle-btn"
+              onClick={() => setShowServiceStore(true)}
+              whileHover={{ y: -8, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
                   <Store size={32} strokeWidth={3} style={{ color: "#f97316" }} />
@@ -182,7 +203,7 @@ export default function ServiceList() {
                 <h3 className="circle-label">Open Store</h3>
                 <p className="circle-sublabel">Showcase</p>
               </div>
-            </button>
+            </motion.button>
           </div>
 
           {/* Booking Stats */}
@@ -216,7 +237,7 @@ export default function ServiceList() {
                         <div
                           className="stat-bar"
                           style={{
-                            width: `${totalBookings > 0 ? (value / totalBookings) * 100 : 0}%`,
+                            width: `${totalBookings > 0? (value / totalBookings) * 100 : 0}%`,
                             background: colors[key],
                           }}
                         />
@@ -228,28 +249,51 @@ export default function ServiceList() {
             </div>
           </div>
 
-          {/* Quick Stats */}
+          {/* Quick Stats - CLICKABLE */}
           <div className="quick-stats">
-            <div className="stat-card">
+            <motion.div
+              className="stat-card clickable"
+              onClick={() => setShowBookingAnalytics(true)}
+              whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="stat-icon"><Calendar size={24} /></div>
               <div className="stat-value">{bookings.length}</div>
               <div className="stat-label-text">Total Bookings</div>
-            </div>
-            <div className="stat-card">
+            </motion.div>
+
+            <motion.div
+              className="stat-card clickable"
+              onClick={() => setShowServiceAnalytics(true)}
+              whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="stat-icon"><Wrench size={24} /></div>
               <div className="stat-value">{services.length}</div>
               <div className="stat-label-text">Active Services</div>
-            </div>
-            <div className="stat-card">
+            </motion.div>
+
+            <motion.div
+              className="stat-card clickable"
+              onClick={() => setShowRatingAnalytics(true)}
+              whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="stat-icon"><Star size={24} /></div>
               <div className="stat-value">{avgRating}</div>
               <div className="stat-label-text">Avg. Rating</div>
-            </div>
-            <div className="stat-card">
+            </motion.div>
+
+            <motion.div
+              className="stat-card clickable"
+              onClick={() => setShowCompletionAnalytics(true)}
+              whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="stat-icon"><TrendingUp size={24} /></div>
               <div className="stat-value">{completionRate}%</div>
               <div className="stat-label-text">Completion Rate</div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Charts */}
@@ -262,15 +306,26 @@ export default function ServiceList() {
                 <h2 className="section-title">My Bookings</h2>
                 <p className="section-subtitle">Latest bookings — manage and confirm them here.</p>
               </div>
-              <button className="btn btn-primary" onClick={() => setFormOpen(true)}>
+              <motion.button
+                className="btn btn-primary"
+                onClick={() => setFormOpen(true)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Plus size={16} />
                 Add Service
-              </button>
+              </motion.button>
             </div>
 
             <div className="bookings-list">
-              {bookings.map((booking) => (
-                <div key={booking.id} className="booking-item">
+              {bookings.map((booking, i) => (
+                <motion.div
+                  key={booking.id}
+                  className="booking-item"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
                   <div className="booking-info">
                     <h3 className="booking-service-name">{booking.serviceName}</h3>
                     <p className="booking-meta">{booking.customer} • {booking.date}</p>
@@ -282,7 +337,7 @@ export default function ServiceList() {
                     {booking.status === "cancelled" && <XCircle size={14} />}
                     {booking.status}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -297,8 +352,15 @@ export default function ServiceList() {
             </div>
 
             <div className="services-grid">
-              {services.map((service) => (
-                <div key={service.id} className="service-card">
+              {services.map((service, i) => (
+                <motion.div
+                  key={service.id}
+                  className="service-card"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.05 }}
+                  whileHover={{ y: -8 }}
+                >
                   {service.image && (
                     <img
                       src={service.image}
@@ -322,7 +384,7 @@ export default function ServiceList() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -345,7 +407,7 @@ export default function ServiceList() {
             />
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
     </DashboardShell>
   );
 }
@@ -365,7 +427,7 @@ function DonutChart({ stats }) {
   let offset = 0;
 
   const segments = Object.entries(stats).map(([key, value]) => {
-    const dash = (total > 0 ? value / total : 0) * circumference;
+    const dash = (total > 0? value / total : 0) * circumference;
     const segment = {
       key, value,
       color: colors[key],

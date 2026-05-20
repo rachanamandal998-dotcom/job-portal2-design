@@ -4,7 +4,7 @@ import {
   Plus,
   Eye,
   Truck,
-  Store,
+  Store as StoreIcon, // <-- rename here
   ShoppingBag,
   BarChart2,
   TrendingUp,
@@ -17,7 +17,10 @@ import { ListingFormModal } from "../shared/ListingFormModal";
 import { AnimatePresence } from "framer-motion";
 import TotalOrdersPage from "../pages/Product/TotalOrdersPage";
 import TotalProductsPage from "../pages/Product/TotalProductsPage";
-import TotalStock from "../pages/Product/TotalStock"; // ← ADDED
+import TotalStock from "../pages/Product/TotalStock";
+import Store from "../pages/Product/Store"; // <-- now this is fine
+import AvgPrice from "../pages/Product/AvgPrice";
+import ProductAnalytics from "../pages/Product/ProductAnalytics"; // path to your new file
 
 import "../styles/Global.css";
 import "../styles/Productlisting.css";
@@ -27,7 +30,10 @@ export default function ProductListing() {
   const [showOrdersPage, setShowOrdersPage] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
-  const [showTotalStock, setShowTotalStock] = useState(false); // ← ADDED
+  const [showTotalStock, setShowTotalStock] = useState(false);
+  const [showStore, setShowStore] = useState(false);
+  const [showAvgPrice, setShowAvgPrice] = useState(false);
+  const [showProductAnalytics, setShowProductAnalytics] = useState(false);
 
   const [products, setProducts] = useState([
     {
@@ -287,11 +293,37 @@ export default function ProductListing() {
     );
   }
 
-if (showTotalStock) {  // ← ADD THIS
+  if (showTotalStock) {
+    return (
+      <TotalStock
+        products={products}
+        onBack={() => setShowTotalStock(false)}
+      />
+    );
+  }
+
+  if (showStore) {
+    return (
+      <Store
+        products={products}
+        onBack={() => setShowStore(false)}
+      />
+    );
+  }
+
+  if (showAvgPrice) {
+    return (
+      <AvgPrice
+        products={products}
+        onBack={() => setShowAvgPrice(false)}
+      />
+    );
+  }
+  if (showProductAnalytics) {
   return (
-    <TotalStock 
-      products={products} 
-      onBack={() => setShowTotalStock(false)} 
+    <ProductAnalytics
+      products={products}
+      onBack={() => setShowProductAnalytics(false)}
     />
   );
 }
@@ -307,7 +339,7 @@ if (showTotalStock) {  // ← ADD THIS
 
   // ── HANDLERS ──────────────────────────────────────────────────────────────
   const handleAddProduct = (data) => {
-    setProducts((prev) => [...prev, {...data, id: Date.now() }]);
+    setProducts((prev) => [...prev, { ...data, id: Date.now() }]);
     setFormOpen(false);
     setModalOpen(false);
   };
@@ -328,7 +360,7 @@ if (showTotalStock) {  // ← ADD THIS
   const totalStock = products.reduce((a, p) => a + (p.stock || 0), 0);
   const avgPrice =
     products.length > 0
-     ? (products.reduce((a, p) => a + Number(p.price), 0) / products.length).toFixed(2)
+      ? (products.reduce((a, p) => a + Number(p.price), 0) / products.length).toFixed(2)
       : "0.00";
 
   // ── RENDER ────────────────────────────────────────────────────────────────
@@ -361,7 +393,7 @@ if (showTotalStock) {  // ← ADD THIS
               </div>
             </button>
 
-            <button className="action-circle-btn">
+            <button className="action-circle-btn" onClick={() => setShowProductsPage(true)}>
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
                   <Eye size={32} strokeWidth={3} style={{ color: "#f97316" }} />
@@ -372,7 +404,7 @@ if (showTotalStock) {  // ← ADD THIS
               </div>
             </button>
 
-            <button className="action-circle-btn" onClick={() => setShowProductsPage(true)}>
+            <button className="action-circle-btn" onClick={() => setShowProductAnalytics(true)}>
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
                   <BarChart2 size={32} strokeWidth={3} style={{ color: "#f97316" }} />
@@ -383,10 +415,10 @@ if (showTotalStock) {  // ← ADD THIS
               </div>
             </button>
 
-            <button className="action-circle-btn">
+            <button className="action-circle-btn" onClick={() => setShowStore(true)}>
               <div className="action-circle-content">
                 <div className="circle-icon-wrapper">
-                  <Store size={32} strokeWidth={3} style={{ color: "#f97316" }} />
+                  <StoreIcon size={32} strokeWidth={3} style={{ color: "#f97316" }} />
                 </div>
                 <h3 className="circle-label">Store</h3>
                 <p className="circle-sublabel">Open shop</p>
@@ -416,7 +448,7 @@ if (showTotalStock) {  // ← ADD THIS
                       <div
                         className="stat-bar"
                         style={{
-                          width: `${total > 0? (stat.value / total) * 100 : 0}%`,
+                          width: `${total > 0 ? (stat.value / total) * 100 : 0}%`,
                           background: stat.color,
                         }}
                       />
@@ -447,7 +479,7 @@ if (showTotalStock) {  // ← ADD THIS
               <div className="stat-label-text">Total Stock</div>
             </div>
 
-            <div className="stat-card" onClick={() => setShowTotalStock(true)} style={{ cursor: "pointer" }} title="View pricing details">
+            <div className="stat-card" onClick={() => setShowAvgPrice(true)} style={{ cursor: "pointer" }} title="View pricing details">
               <div className="stat-icon"><TrendingUp size={24} /></div>
               <div className="stat-value">Rs {avgPrice}</div>
               <div className="stat-label-text">Avg. Price</div>
@@ -506,10 +538,10 @@ function DonutChart({ stats, total }) {
   let offset = 0;
 
   const segments = stats.map((stat) => {
-    const percent = total > 0? stat.value / total : 0;
+    const percent = total > 0 ? stat.value / total : 0;
     const dash = percent * circumference;
     const segment = {
-     ...stat,
+      ...stat,
       dasharray: `${dash} ${circumference - dash}`,
       offset: -offset,
     };
