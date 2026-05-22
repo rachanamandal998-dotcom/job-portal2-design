@@ -1,0 +1,315 @@
+/* =========================
+   BASE LAYOUT
+========================= */
+.analytics-page {
+  min-height: 100vh;
+  background: #fff7ed;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* =========================
+   HEADER
+========================= */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.page-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f3f4f6;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  transform: translateY(-3px);
+}
+
+.btn-premium {
+  background: #f97316;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+/* =========================
+   FILTERS
+========================= */
+.filters-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-box input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.filter-grid select {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 8px;
+}
+
+/* =========================
+   KPI GRID
+========================= */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  padding: 1.5rem;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-6px);
+}
+
+.kpi-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.kpi-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
+.kpi-label {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.kpi-trend {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* =========================
+   CHARTS GRID (IMPORTANT FIX)
+========================= */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.chart-card {
+  padding: 1.5rem;
+  border-radius: 16px;
+}
+
+.chart-card.wide {
+  grid-column: 1 / -1;
+}
+
+.chart-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chart-container {
+  height: 300px;
+  position: relative;
+}
+
+/* =========================
+   INSIGHTS
+========================= */
+.insights-panel {
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.insight-card {
+  padding: 1.2rem;
+  border-radius: 12px;
+  border-left: 4px solid;
+}
+
+/* =========================
+   BOTTLENECK
+========================= */
+.bottleneck-card {
+  padding: 1.5rem;
+  border-radius: 16px;
+}
+
+.bottleneck-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bottleneck-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+/* =========================
+   GLASS EFFECT
+========================= */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* =========================
+   RESPONSIVE BREAKPOINTS
+========================= */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .analytics-page {
+    padding: 1.5rem;
+  }
+
+  .charts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .kpi-value {
+    font-size: 1.8rem;
+  }
+
+  .chart-card.wide {
+    grid-column: auto;
+  }
+
+  .chart-container {
+    height: 220px;
+  }
+
+  .filters-panel {
+    padding: 1rem;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .analytics-page {
+    padding: 1rem;
+  }
+
+  .btn-back,
+  .btn-premium {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filter-row {
+    flex-direction: column;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .chart-container {
+    height: 180px;
+  }
+
+  .kpi-value {
+    font-size: 1.6rem;
+  }
+}
