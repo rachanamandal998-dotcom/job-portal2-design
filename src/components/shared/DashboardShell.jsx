@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Store,
@@ -19,17 +19,26 @@ import "./DashboardShell.css";
 export function DashboardShell({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
-  const active = pathname.includes("job")
-    ? "job"
-    : pathname.includes("service")
-    ? "service"
+  // FIX 1: Check for "/jobs" not "job"
+  const active = pathname.startsWith("/jobs")
+   ? "job"
+    : pathname.startsWith("/services")
+   ? "service"
     : "product";
 
   const titleMap = {
     product: "Product Listing",
     job: "Job Portal",
     service: "Service Listing",
+  };
+
+  // FIX 2: Dynamic logo link based on current section
+  const logoLinkMap = {
+    product: "/products",
+    job: "/jobs",
+    service: "/services",
   };
 
   return (
@@ -42,7 +51,8 @@ export function DashboardShell({ children }) {
       {/* HEADER */}
       <header className="ds-header">
         <div className="ds-header-inner">
-          <Link to="/product-listing" className="ds-logo">
+          {/* FIX 3: Link to current section, not always /product-listing */}
+          <Link to={logoLinkMap[active]} className="ds-logo">
             <motion.div
               whileHover={{ rotateY: 180 }}
               transition={{ duration: 0.6 }}
@@ -143,7 +153,7 @@ function NavItem({ to, icon: Icon, label, active, onClick }) {
     <Link
       to={to}
       onClick={onClick}
-      className={`ds-navitem ${active ? "active" : ""}`}
+      className={`ds-navitem ${active? "active" : ""}`}
     >
       <Icon size={16} /> {label}
     </Link>
@@ -183,7 +193,7 @@ export function Greeting({ title, subtitle, verified }) {
 }
 
 /* ─────────────────────────────
-   SECTION PANEL (IMPORTANT FIX HERE)
+   SECTION PANEL
 ───────────────────────────── */
 export function SectionPanel({
   title,
@@ -203,9 +213,7 @@ export function SectionPanel({
         </div>
       </div>
 
-      {/* IMPORTANT FIX:
-          show children OR empty state */}
-      {children ? (
+      {children? (
         <div className="panel-content">{children}</div>
       ) : (
         <div className="panel-empty">

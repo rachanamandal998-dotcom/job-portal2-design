@@ -238,7 +238,7 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        <div className="analytics-header">
+        <div className="analytics-header-content2">
           <motion.button
             className="back-btn"
             onClick={onBack}

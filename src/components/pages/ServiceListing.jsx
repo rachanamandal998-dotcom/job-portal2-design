@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
-  Plus, Eye, Calendar, Store, Wrench, Star, TrendingUp, Clock, CheckCircle, XCircle,
+  Plus, Eye, Calendar, Store, Wrench, Star, TrendingUp, Clock, CheckCircle, XCircle, Filter,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Chart from "chart.js/auto";
@@ -17,9 +17,14 @@ import ServiceStore from "../pages/service/ServiceStore";
 import RatingAnalytics from "../pages/service/RatingAnalytics";
 import CompletionAnalytics from "../pages/service/CompletionAnalytics";
 
+const getBookingStatus = (status) => {
+  return status; // pending | confirmed | completed | cancelled
+};
+
 export default function ServiceListing() {
   const [modalOpen, setModalOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all"); // all | pending | confirmed | completed | cancelled
 
   // ROUTING STATE
   const [showServiceAnalytics, setShowServiceAnalytics] = useState(false);
@@ -61,32 +66,39 @@ export default function ServiceListing() {
     },
   ]);
 
-  const [bookings] = useState([
+  const [bookings, setBookings] = useState([
     { id: 1001, serviceName: "House Cleaning", customer: "John", date: "May 10", status: "pending", revenue: 120 },
     { id: 1002, serviceName: "Plumbing", customer: "Sarah", date: "May 11", status: "confirmed", revenue: 90 },
     { id: 1003, serviceName: "Electrical Repair", customer: "Mike", date: "May 12", status: "completed", revenue: 150 },
+    { id: 1004, serviceName: "House Cleaning", customer: "Priya", date: "May 13", status: "pending", revenue: 120 },
+    { id: 1005, serviceName: "Plumbing", customer: "Raj", date: "May 14", status: "completed", revenue: 90 },
   ]);
 
   const handleAddService = (data) => {
     setServices((prev) => [
-     ...prev,
+    ...prev,
       {...data, id: Date.now(), bookings: 0, rating: 0 },
     ]);
     setFormOpen(false);
     setModalOpen(false);
   };
 
-  const bookingStats = {
-    Pending: bookings.filter((b) => b.status === "pending").length,
-    Confirmed: bookings.filter((b) => b.status === "confirmed").length,
-    Completed: bookings.filter((b) => b.status === "completed").length,
-    Cancelled: bookings.filter((b) => b.status === "cancelled").length,
-  };
+  const bookingStats = useMemo(() => ({
+    pending: bookings.filter((b) => b.status === "pending").length,
+    confirmed: bookings.filter((b) => b.status === "confirmed").length,
+    completed: bookings.filter((b) => b.status === "completed").length,
+    cancelled: bookings.filter((b) => b.status === "cancelled").length,
+  }), [bookings]);
+
+  const filteredBookings = useMemo(() => {
+    if (statusFilter === "all") return bookings;
+    return bookings.filter((b) => b.status === statusFilter);
+  }, [bookings, statusFilter]);
 
   const completed = bookings.filter((b) => b.status === "completed").length;
   const completionRate = bookings.length > 0? Math.round((completed / bookings.length) * 100) : 0;
   const avgRating = services.length > 0
-   ? (services.reduce((a, s) => a + s.rating, 0) / services.length).toFixed(1)
+  ? (services.reduce((a, s) => a + s.rating, 0) / services.length).toFixed(1)
     : "0.0";
   const totalBookings = Object.values(bookingStats).reduce((a, b) => a + b, 0);
 
@@ -219,17 +231,28 @@ export default function ServiceListing() {
               <div className="stats-bars">
                 {Object.entries(bookingStats).map(([key, value]) => {
                   const colors = {
-                    Pending: "#fbbf24",
-                    Confirmed: "#3b82f6",
-                    Completed: "#22c55e",
-                    Cancelled: "#ef4444",
+                    pending: "#fbbf24",
+                    confirmed: "#3b82f6",
+                    completed: "#22c55e",
+                    cancelled: "#ef4444",
+                  };
+                  const labels = {
+                    pending: "Pending",
+                    confirmed: "Confirmed",
+                    completed: "Completed",
+                    cancelled: "Cancelled",
                   };
                   return (
-                    <div key={key} className="stat-row">
+                    <div
+                      key={key}
+                      className={`stat-row ${statusFilter === key? 'active-filter' : ''}`}
+                      onClick={() => setStatusFilter(key)}
+                      title={`Show ${labels[key]} bookings`}
+                    >
                       <div className="stat-header">
                         <div className="stat-label">
                           <span className="stat-dot" style={{ background: colors[key] }} />
-                          {key}
+                          {labels[key]}
                         </div>
                         <span className="stat-value">{value}</span>
                       </div>
@@ -299,47 +322,81 @@ export default function ServiceListing() {
           {/* Charts */}
           <ChartsSection bookings={bookings} services={services} />
 
-          {/* Bookings List */}
+          {/* Bookings List - WITH FILTER */}
           <div className="products-section">
             <div className="section-header">
               <div>
                 <h2 className="section-title">My Bookings</h2>
-                <p className="section-subtitle">Latest bookings — manage and confirm them here.</p>
+                <p className="section-subtitle">
+                  {statusFilter === "all"
+                  ? "Latest bookings — manage and confirm them here."
+                    : `Showing ${filteredBookings.length} ${statusFilter} bookings`
+                  }
+                </p>
               </div>
-              <motion.button
-                className="btn btn-primary"
-                onClick={() => setFormOpen(true)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Plus size={16} />
-                Add Service
-              </motion.button>
+              <div className="section-actions">
+                <div className="filter-wrapper">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="btn filter-select"
+                  >
+                    <option value="all">All Status ({totalBookings})</option>
+                    <option value="pending">Pending ({bookingStats.pending})</option>
+                    <option value="confirmed">Confirmed ({bookingStats.confirmed})</option>
+                    <option value="completed">Completed ({bookingStats.completed})</option>
+                    <option value="cancelled">Cancelled ({bookingStats.cancelled})</option>
+                  </select>
+                  <Filter size={16} className="filter-icon" />
+                </div>
+
+                <motion.button
+                  className="btn btn-primary"
+                  onClick={() => setFormOpen(true)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Plus size={16} />
+                  Add Service
+                </motion.button>
+              </div>
             </div>
 
-            <div className="bookings-list">
-              {bookings.map((booking, i) => (
-                <motion.div
-                  key={booking.id}
-                  className="booking-item"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <div className="booking-info">
-                    <h3 className="booking-service-name">{booking.serviceName}</h3>
-                    <p className="booking-meta">{booking.customer} • {booking.date}</p>
-                  </div>
-                  <div className={`booking-status ${booking.status}`}>
-                    {booking.status === "pending" && <Clock size={14} />}
-                    {booking.status === "confirmed" && <CheckCircle size={14} />}
-                    {booking.status === "completed" && <CheckCircle size={14} />}
-                    {booking.status === "cancelled" && <XCircle size={14} />}
-                    {booking.status}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            {filteredBookings.length === 0? (
+              <div className="empty-state">
+                <Calendar size={48} style={{ margin: "0 auto 1rem", opacity: 0.3 }} />
+                <p>No bookings found with this status.</p>
+                {statusFilter!== "all" && (
+                  <button className="btn" onClick={() => setStatusFilter("all")} style={{ marginTop: "1rem" }}>
+                    Show All Bookings
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="bookings-list">
+                {filteredBookings.map((booking, i) => (
+                  <motion.div
+                    key={booking.id}
+                    className="booking-item"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <div className="booking-info">
+                      <h3 className="booking-service-name">{booking.serviceName}</h3>
+                      <p className="booking-meta">{booking.customer} • {booking.date}</p>
+                    </div>
+                    <div className={`booking-status ${booking.status}`}>
+                      {booking.status === "pending" && <Clock size={14} />}
+                      {booking.status === "confirmed" && <CheckCircle size={14} />}
+                      {booking.status === "completed" && <CheckCircle size={14} />}
+                      {booking.status === "cancelled" && <XCircle size={14} />}
+                      {booking.status}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Services Grid */}
@@ -415,10 +472,10 @@ export default function ServiceListing() {
 // ── Donut Chart ──
 function DonutChart({ stats }) {
   const colors = {
-    Pending: "#fbbf24",
-    Confirmed: "#3b82f6",
-    Completed: "#22c55e",
-    Cancelled: "#ef4444",
+    pending: "#fbbf24",
+    confirmed: "#3b82f6",
+    completed: "#22c55e",
+    cancelled: "#ef4444",
   };
 
   const total = Object.values(stats).reduce((a, b) => a + b, 0);

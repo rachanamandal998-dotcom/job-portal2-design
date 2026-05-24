@@ -1,315 +1,435 @@
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import {
-  ArrowLeft, Search, Filter, Star, ShoppingBag, TrendingUp, Award, 
-  Eye, Heart, Share2, Zap, Package, DollarSign
+  ArrowLeft,
+  Package,
+  TrendingUp,
+  DollarSign,
+  BarChart3,
+  Download,
+  PieChart,
+  Activity,
+  Star,
+  ShoppingBag,
+  AlertCircle,
+  Award,
+  Eye,
 } from "lucide-react";
-import Chart from "chart.js/auto";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  RadialLinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+import { Bar, Doughnut, Line, PolarArea } from "react-chartjs-2";
 import "../../styles/ServiceStore.css";
 
-export default function ServiceStore({ services, bookings, onBack }) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [favorites, setFavorites] = useState([]);
-  const chartsRef = useRef({});
+ChartJS.register(
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  RadialLinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
-  const categories = ['all',...new Set(services.map(s => s.category).filter(Boolean))];
-  const featured = services.filter(s => s.rating >= 4.7).slice(0, 3);
-  const trending = [...services].sort((a, b) => b.bookings - a.bookings).slice(0, 3);
-  const topRated = [...services].sort((a, b) => b.rating - a.rating).slice(0, 4);
+// Mock data - replace with your API
+const mockServices = [
+  { id: 1, name: "Hair Styling", category: "Beauty", price: 1200, bookings: 45, rating: 4.8, dateAdded: "2026-01-15", image: "https://via.placeholder.com/400x300" },
+  { id: 2, name: "Deep Cleaning", category: "Home", price: 2500, bookings: 32, rating: 4.6, dateAdded: "2026-02-10", image: "https://via.placeholder.com/400x300" },
+  { id: 3, name: "Personal Training", category: "Fitness", price: 1800, bookings: 67, rating: 4.9, dateAdded: "2026-03-05", image: "https://via.placeholder.com/400x300" },
+  { id: 4, name: "Makeup Artist", category: "Beauty", price: 3500, bookings: 28, rating: 4.7, dateAdded: "2026-01-20", image: "https://via.placeholder.com/400x300" },
+  { id: 5, name: "Plumbing Repair", category: "Home", price: 1500, bookings: 52, rating: 4.5, dateAdded: "2026-02-28", image: "https://via.placeholder.com/400x300" },
+  { id: 6, name: "Yoga Classes", category: "Fitness", price: 900, bookings: 89, rating: 4.8, dateAdded: "2026-03-18", image: "https://via.placeholder.com/400x300" },
+];
 
-  const filtered = services.filter(s => {
-    const matchSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchCat = selectedCategory === "all" || s.category === selectedCategory;
-    return matchSearch && matchCat;
+export default function ServiceStore({ services = mockServices, onBack }) {
+  const [timeRange, setTimeRange] = useState("all");
+  const [animatedKPIs, setAnimatedKPIs] = useState({
+    revenue: 0,
+    bookings: 0,
+    rating: 0,
   });
 
-  const totalRevenue = services.reduce((a, s) => a + Number(s.price) * s.bookings, 0);
-  const avgRating = (services.reduce((a, s) => a + s.rating, 0) / services.length).toFixed(1);
+  // Core Analytics Calculations
+  const analytics = useMemo(() => {
+    const totalRevenue = services.reduce((sum, s) => sum + Number(s.price) * s.bookings, 0);
+    const totalBookings = services.reduce((sum, s) => sum + s.bookings, 0);
+    const avgRating = services.reduce((sum, s) => sum + s.rating, 0) / services.length;
+    const avgPrice = services.reduce((sum, s) => sum + Number(s.price), 0) / services.length;
 
-  const toggleFavorite = (id) => {
-    setFavorites(prev => prev.includes(id)? prev.filter(f => f !== id) : [...prev, id]);
+    const bestSeller = services.reduce((max, s) => (s.bookings > max.bookings? s : max), services[0]);
+    const topRated = services.reduce((max, s) => (s.rating > max.rating? s : max), services[0]);
+    const lowDemand = services.filter(s => s.bookings < 30);
+    const highDemand = services.filter(s => s.bookings > 60);
+
+    // Category breakdown
+    const categoryData = {};
+    services.forEach(s => {
+      if (!categoryData[s.category]) {
+        categoryData[s.category] = { revenue: 0, bookings: 0, count: 0 };
+      }
+      const rev = Number(s.price) * s.bookings;
+      categoryData[s.category].revenue += rev;
+      categoryData[s.category].bookings += s.bookings;
+      categoryData[s.category].count += 1;
+    });
+
+    return {
+      totalRevenue,
+      totalBookings,
+      avgRating,
+      avgPrice,
+      bestSeller,
+      topRated,
+      lowDemand,
+      highDemand,
+      categoryData,
+    };
+  }, [services]);
+
+  // Animate KPIs on mount
+  useEffect(() => {
+    const duration = 1200;
+    const steps = 60;
+    const incRev = analytics.totalRevenue / steps;
+    const incBook = analytics.totalBookings / steps;
+    const incRate = analytics.avgRating / steps;
+    let current = 0;
+
+    const timer = setInterval(() => {
+      current++;
+      setAnimatedKPIs({
+        revenue: Math.min(incRev * current, analytics.totalRevenue),
+        bookings: Math.min(incBook * current, analytics.totalBookings),
+        rating: Math.min(incRate * current, analytics.avgRating),
+      });
+      if (current >= steps) clearInterval(timer);
+    }, duration / steps);
+
+    return () => clearInterval(timer);
+  }, [analytics]);
+
+  // Chart 1: Revenue by Category
+  const revenueByCategory = useMemo(() => ({
+    labels: Object.keys(analytics.categoryData),
+    datasets: [{
+      label: "Revenue (Rs)",
+      data: Object.values(analytics.categoryData).map(c => c.revenue),
+      backgroundColor: [
+        "rgba(249, 115, 22, 0.8)",
+        "rgba(251, 191, 36, 0.8)",
+        "rgba(234, 88, 12, 0.8)",
+        "rgba(34, 197, 94, 0.8)",
+        "rgba(59, 130, 246, 0.8)",
+      ],
+      borderWidth: 2,
+      borderColor: "#fff",
+    }],
+  }), [analytics.categoryData]);
+
+  // Chart 2: Top Services by Bookings
+  const topServicesData = useMemo(() => {
+    const sorted = [...services].sort((a, b) => b.bookings - a.bookings).slice(0, 6);
+    return {
+      labels: sorted.map(s => s.name),
+      datasets: [{
+        label: "Bookings",
+        data: sorted.map(s => s.bookings),
+        backgroundColor: "rgba(249, 115, 22, 0.8)",
+        borderColor: "rgba(249, 115, 22, 1)",
+        borderWidth: 1,
+        borderRadius: 8,
+      }],
+    };
+  }, [services]);
+
+  // Chart 3: Bookings vs Rating
+  const bookingsVsRatingData = useMemo(() => ({
+    labels: services.map(s => s.name).slice(0, 8),
+    datasets: [
+      {
+        label: "Bookings",
+        data: services.map(s => s.bookings).slice(0, 8),
+        backgroundColor: "rgba(249, 115, 22, 0.7)",
+        yAxisID: 'y',
+      },
+      {
+        label: "Rating",
+        data: services.map(s => s.rating).slice(0, 8),
+        backgroundColor: "rgba(251, 191, 36, 0.7)",
+        yAxisID: 'y1',
+      },
+    ],
+  }), [services]);
+
+  // Chart 4: Price Distribution
+  const priceDistributionData = useMemo(() => ({
+    labels: services.map(s => s.name).slice(0, 8),
+    datasets: [{
+      label: "Price (Rs)",
+      data: services.map(s => Number(s.price)).slice(0, 8),
+      backgroundColor: "rgba(249, 115, 22, 0.3)",
+      borderColor: "rgba(249, 115, 22, 1)",
+      borderWidth: 2,
+      pointBackgroundColor: "rgba(249, 115, 22, 1)",
+    }],
+  }), [services]);
+
+  // Chart 5: Category Performance
+  const categoryPerformanceData = useMemo(() => ({
+    labels: Object.keys(analytics.categoryData),
+    datasets: [{
+      data: Object.values(analytics.categoryData).map(c => c.bookings),
+      backgroundColor: [
+        "rgba(249, 115, 22, 0.8)",
+        "rgba(251, 191, 36, 0.7)",
+        "rgba(234, 88, 12, 0.8)",
+        "rgba(34, 197, 94, 0.7)",
+        "rgba(59, 130, 246, 0.8)",
+      ],
+      borderWidth: 2,
+      borderColor: "#fff",
+    }],
+  }), [analytics.categoryData]);
+
+  // Chart 6: Revenue Trend
+  const revenueTrendData = useMemo(() => ({
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    datasets: [{
+      label: "Revenue (Rs)",
+      data: [45000, 52000, 68000, 72000, 85000, analytics.totalRevenue],
+      fill: true,
+      backgroundColor: "rgba(249, 115, 22, 0.2)",
+      borderColor: "rgba(249, 115, 22, 1)",
+      tension: 0.4,
+      pointBackgroundColor: "rgba(249, 115, 22, 1)",
+      pointBorderColor: "#fff",
+      pointBorderWidth: 2,
+      pointRadius: 5,
+    }],
+  }), [analytics.totalRevenue]);
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: "bottom",
+        labels: { color: "#475569", padding: 15, font: { size: 11, weight: 600 } },
+      },
+      tooltip: {
+        backgroundColor: "rgba(15, 23, 42, 0.95)",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        padding: 12,
+        cornerRadius: 8,
+      },
+    },
   };
 
-  useEffect(() => {
-    Object.values(chartsRef.current).forEach(c => c?.destroy());
+  const barOptions = {
+   ...chartOptions,
+    scales: {
+      x: { grid: { display: false }, ticks: { color: "#64748b", font: { size: 10 } } },
+      y: { grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#64748b" } },
+    },
+  };
 
-    // Service Demand - Doughnut
-    const demandCtx = document.getElementById('demand-chart');
-    if (demandCtx) {
-      chartsRef.current.demand = new Chart(demandCtx, {
-        type: 'doughnut',
-        data: {
-          labels: services.map(s => s.name),
-          datasets: [{
-            data: services.map(s => s.bookings),
-            backgroundColor: ["#f97316", "#3b82f6", "#22c55e", "#fbbf24", "#8b5cf6"],
-            borderWidth: 0,
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '65%' }
-      });
-    }
+  const radarOptions = {
+   ...chartOptions,
+    scales: {
+      r: {
+        angleLines: { color: "rgba(148, 163, 184, 0.2)" },
+        grid: { color: "rgba(148, 163, 184, 0.2)" },
+        pointLabels: { color: "#64748b", font: { size: 10 } },
+        ticks: { color: "#64748b", backdropColor: "transparent" },
+      },
+    },
+  };
 
-    // Rating Trends - Line
-    const ratingCtx = document.getElementById('rating-trend-chart');
-    if (ratingCtx) {
-      chartsRef.current.rating = new Chart(ratingCtx, {
-        type: 'line',
-        data: {
-          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-          datasets: [{
-            label: 'Avg Rating',
-            data: [4.2, 4.4, 4.5, 4.6, 4.7, avgRating],
-            borderColor: "#fbbf24",
-            backgroundColor: "rgba(251,191,36,0.1)",
-            fill: true,
-            tension: 0.4,
-            borderWidth: 3,
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 5 } } }
-      });
-    }
+  const handleExport = () => {
+    const csv = [
+      ["Service", "Category", "Price", "Bookings", "Rating", "Revenue"],
+     ...services.map(s => [
+        s.name,
+        s.category,
+        s.price,
+        s.bookings,
+        s.rating,
+        Number(s.price) * s.bookings
+      ]),
+    ].map(row => row.join(",")).join("\n");
 
-    // Popular Categories - Polar Area
-    const catCtx = document.getElementById('category-chart');
-    if (catCtx) {
-      const catData = categories.slice(1).map(cat => 
-        services.filter(s => s.category === cat).reduce((a, s) => a + s.bookings, 0)
-      );
-      chartsRef.current.category = new Chart(catCtx, {
-        type: 'polarArea',
-        data: {
-          labels: categories.slice(1),
-          datasets: [{
-            data: catData,
-            backgroundColor: ["#f97316", "#3b82f6", "#22c55e", "#fbbf24"].map(c => c + '80'),
-            borderColor: ["#f97316", "#3b82f6", "#22c55e", "#fbbf24"],
-            borderWidth: 2,
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
-    }
-
-    // Revenue Overview - Bar
-    const revCtx = document.getElementById('revenue-overview');
-    if (revCtx) {
-      chartsRef.current.revenue = new Chart(revCtx, {
-        type: 'bar',
-        data: {
-          labels: services.map(s => s.name),
-          datasets: [{
-            label: 'Revenue',
-            data: services.map(s => Number(s.price) * s.bookings),
-            backgroundColor: "#f97316",
-            borderRadius: 8,
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-      });
-    }
-
-    return () => Object.values(chartsRef.current).forEach(c => c?.destroy());
-  }, [services, avgRating]);
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "service-analytics.csv";
+    a.click();
+  };
 
   return (
-    <motion.div className="store-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      {/* Hero Section */}
-      <div className="store-hero">
-        <motion.button className="back-btn" onClick={onBack} whileHover={{ x: -5 }} whileTap={{ scale: 0.95 }}>
-          <ArrowLeft size={20} /> Back to Dashboard
-        </motion.button>
-        
-        <motion.div className="hero-content" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-          <h1>Your Service Storefront</h1>
-          <p>Showcase your premium services to the world</p>
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <span className="stat-num">{services.length}</span>
-              <span className="stat-text">Services</span>
+    <div className="service-store-page">
+      {/* Header */}
+      <motion.div className="service-store-header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <button className="back-btn" onClick={onBack}>
+          <ArrowLeft size={20} />
+          Back
+        </button>
+        <div className="header-content">
+          <div className="header-left">
+            <div className="header-icon">
+              <BarChart3 size={32} />
             </div>
-            <div className="hero-stat">
-              <span className="stat-num">{bookings.length}</span>
-              <span className="stat-text">Bookings</span>
-            </div>
-            <div className="hero-stat">
-              <span className="stat-num">{avgRating}★</span>
-              <span className="stat-text">Rating</span>
-            </div>
-            <div className="hero-stat">
-              <span className="stat-num">₹{totalRevenue.toLocaleString()}</span>
-              <span className="stat-text">Revenue</span>
+            <div>
+              <h1 className="store-title">Service Analytics</h1>
+              <p className="store-subtitle">Deep insights into service performance</p>
             </div>
           </div>
-        </motion.div>
+          <button className="export-btn" onClick={handleExport}>
+            <Download size={18} />
+            Export CSV
+          </button>
+        </div>
+      </motion.div>
 
-        {/* Banner Carousel */}
-        <div className="banner-carousel">
-          <motion.div className="banner-slide" animate={{ x: [0, -100, 0] }} transition={{ repeat: Infinity, duration: 20 }}>
-            <Package size={32} /> Premium Quality Services
+      {/* KPI Cards */}
+      <div className="kpi-grid">
+        {[
+          { icon: DollarSign, label: "Total Revenue", value: `Rs ${Math.round(animatedKPIs.revenue).toLocaleString()}`, color: "green" },
+          { icon: ShoppingBag, label: "Total Bookings", value: Math.round(animatedKPIs.bookings).toLocaleString(), color: "orange" },
+          { icon: Star, label: "Avg Rating", value: animatedKPIs.rating.toFixed(1), color: "yellow" },
+          { icon: Package, label: "Total Services", value: services.length, color: "purple" },
+          { icon: Award, label: "Best Seller", value: analytics.bestSeller.name, color: "pink" },
+          { icon: TrendingUp, label: "Avg Price", value: `Rs ${Math.round(analytics.avgPrice).toLocaleString()}`, color: "blue" },
+        ].map((kpi, idx) => (
+          <motion.div
+            key={kpi.label}
+            className="kpi-card"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: idx * 0.1 }}
+          >
+            <div className={`kpi-icon ${kpi.color}`}>
+              <kpi.icon size={24} />
+            </div>
+            <div className="kpi-content">
+              <div className="kpi-label">{kpi.label}</div>
+              <div className="kpi-value">{kpi.value}</div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Insights */}
+      <motion.div className="insights-section" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+        <h2 className="section-title">Smart Insights</h2>
+        <div className="insights-grid">
+          <div className="insight-card success">
+            <div className="insight-icon"><TrendingUp size={20} /></div>
+            <p className="insight-text">Best Seller: {analytics.bestSeller.name} with {analytics.bestSeller.bookings} bookings</p>
+          </div>
+          <div className="insight-card info">
+            <div className="insight-icon"><Star size={20} /></div>
+            <p className="insight-text">Top Rated: {analytics.topRated.name} at {analytics.topRated.rating}★</p>
+          </div>
+          <div className="insight-card warning">
+            <div className="insight-icon"><AlertCircle size={20} /></div>
+            <p className="insight-text">{analytics.lowDemand.length} services need promotion</p>
+          </div>
+          <div className="insight-card info">
+            <div className="insight-icon"><Eye size={20} /></div>
+            <p className="insight-text">{analytics.highDemand.length} services in high demand</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Charts Grid */}
+      <div className="charts-section">
+        <h2 className="section-title">Visual Analytics</h2>
+        <div className="charts-grid">
+          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
+            <div className="chart-header">
+              <PieChart size={20} className="chart-icon" />
+              <div>
+                <h3 className="chart-title">Revenue by Category</h3>
+                <p className="chart-subtitle">Category performance</p>
+              </div>
+            </div>
+            <div className="chart-body"><Doughnut data={revenueByCategory} options={chartOptions} /></div>
+          </motion.div>
+
+          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
+            <div className="chart-header">
+              <BarChart3 size={20} className="chart-icon" />
+              <div>
+                <h3 className="chart-title">Top Services</h3>
+                <p className="chart-subtitle">By bookings volume</p>
+              </div>
+              </div>
+            <div className="chart-body"><Bar data={topServicesData} options={barOptions} /></div>
+          </motion.div>
+
+          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
+            <div className="chart-header">
+              <Activity size={20} className="chart-icon" />
+              <div>
+                <h3 className="chart-title">Bookings vs Rating</h3>
+                <p className="chart-subtitle">Performance correlation</p>
+              </div>
+            </div>
+            <div className="chart-body"><Bar data={bookingsVsRatingData} options={barOptions} /></div>
+          </motion.div>
+
+          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0 }}>
+            <div className="chart-header">
+              <DollarSign size={20} className="chart-icon" />
+              <div>
+                <h3 className="chart-title">Price Distribution</h3>
+                <p className="chart-subtitle">By service</p>
+              </div>
+              </div>
+            <div className="chart-body"><Line data={priceDistributionData} options={radarOptions} /></div>
+          </motion.div>
+
+          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}>
+            <div className="chart-header">
+              <TrendingUp size={20} className="chart-icon" />
+              <div>
+                <h3 className="chart-title">Category Performance</h3>
+                <p className="chart-subtitle">Bookings per category</p>
+              </div>
+            </div>
+            <div className="chart-body"><PolarArea data={categoryPerformanceData} options={chartOptions} /></div>
+          </motion.div>
+
+          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}>
+            <div className="chart-header">
+              <DollarSign size={20} className="chart-icon" />
+              <div>
+                <h3 className="chart-title">Revenue Trend</h3>
+                <p className="chart-subtitle">Last 6 months</p>
+              </div>
+            </div>
+            <div className="chart-body"><Line data={revenueTrendData} options={barOptions} /></div>
           </motion.div>
         </div>
       </div>
-
-      {/* Search & Filter */}
-      <div className="store-filters">
-        <div className="search-box">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Search services..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="category-pills">
-          {categories.map(cat => (
-            <motion.button
-              key={cat}
-              className={`pill ${selectedCategory === cat? 'active' : ''}`}
-              onClick={() => setSelectedCategory(cat)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {cat === 'all'? 'All' : cat}
-            </motion.button>
-          ))}
-        </div>
-      </div>
-
-      {/* Featured Services */}
-      {featured.length > 0 && (
-        <div className="featured-section">
-          <h2><Award size={24} /> Featured Services</h2>
-          <div className="featured-grid">
-            {featured.map((s, i) => (
-              <motion.div
-                key={s.id}
-                className="featured-card"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -10, boxShadow: "0 20px 40px rgba(249,115,22,0.3)" }}
-              >
-                <div className="featured-badge">Featured</div>
-                <img src={s.image} alt={s.name} />
-                <div className="featured-info">
-                  <h3>{s.name}</h3>
-                  <p>{s.description}</p>
-                  <div className="featured-meta">
-                    <span className="price">Rs {s.price}</span>
-                    <div className="rating">
-                      <Star size={16} fill="#fbbf24" color="#fbbf24" />
-                      {s.rating}
-                    </div>
-                  </div>
-                  <motion.button className="book-btn" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <ShoppingBag size={16} /> Book Now
-                  </motion.button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Trending Services */}
-      <div className="trending-section">
-        <h2><TrendingUp size={24} /> Trending Now</h2>
-        <div className="trending-grid">
-          {trending.map((s, i) => (
-            <motion.div
-              key={s.id}
-              className="trending-card"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ scale: 1.03 }}
-            >
-              <div className="trending-rank">#{i + 1}</div>
-              <img src={s.image} alt={s.name} />
-              <div className="trending-info">
-                <h4>{s.name}</h4>
-                <p>{s.bookings} bookings this month</p>
-                <div className="trending-rating">
-                  <Star size={14} fill="#fbbf24" color="#fbbf24" />
-                  {s.rating}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* All Services Grid */}
-      <div className="all-services">
-        <h2>All Services</h2>
-        <div className="services-grid">
-          {filtered.map((s, i) => (
-            <motion.div
-              key={s.id}
-              className="service-card-store"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.05 }}
-              whileHover={{ y: -8 }}
-            >
-              <div className="card-actions">
-                <motion.button
-                  className={`fav-btn ${favorites.includes(s.id)? 'active' : ''}`}
-                  onClick={() => toggleFavorite(s.id)}
-                  whileTap={{ scale: 0.8 }}
-                >
-                  <Heart size={18} fill={favorites.includes(s.id)? "#ef4444" : "none"} />
-                </motion.button>
-                <motion.button className="share-btn" whileTap={{ scale: 0.8 }}>
-                  <Share2 size={18} />
-                </motion.button>
-              </div>
-              <img src={s.image} alt={s.name} />
-              <div className="card-body">
-                <h3>{s.name}</h3>
-                <p>{s.description}</p>
-                <div className="card-footer">
-                  <span className="price-tag">Rs {s.price}</span>
-                  <div className="rating-tag">
-                    <Star size={14} fill="#fbbf24" color="#fbbf24" />
-                    {s.rating}
-                  </div>
-                </div>
-                <motion.button className="book-btn" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <ShoppingBag size={16} /> Book Service
-                </motion.button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* Analytics Charts */}
-      <div className="store-analytics">
-        <h2><BarChart3 size={24} /> Store Analytics</h2>
-        <div className="charts-grid">
-          <div className="chart-card">
-            <h3>Service Demand</h3>
-            <div className="chart-wrap"><canvas id="demand-chart" /></div>
-          </div>
-          <div className="chart-card">
-            <h3>Rating Trends</h3>
-            <div className="chart-wrap"><canvas id="rating-trend-chart" /></div>
-          </div>
-          <div className="chart-card">
-            <h3>Popular Categories</h3>
-            <div className="chart-wrap"><canvas id="category-chart" /></div>
-          </div>
-          <div className="chart-card">
-            <h3>Revenue Overview</h3>
-            <div className="chart-wrap"><canvas id="revenue-overview" /></div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
+    </div>
   );
 }

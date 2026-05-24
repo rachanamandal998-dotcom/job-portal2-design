@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Briefcase, Plus, Eye, Search, ChevronDown, Upload, Clock,
-  CheckCircle, TrendingUp, X, FileText, Mail, Phone, MapPin
+  CheckCircle, TrendingUp, X, FileText, Mail, Phone, MapPin, Filter
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Chart from "chart.js/auto";
@@ -13,7 +13,7 @@ import { DashboardShell } from "../shared/DashboardShell";
 // Import sub-pages
 import SuccessRate from "../pages/job/SuccessRate";
 import Applications from "../pages/job/Applications";
-import InterviewCalls from "../pages/job/InterviewCalls";
+import OffersReceived from "../pages/job/OffersReceived";
 import Rejections from "../pages/job/Rejections";
 import CVViewer from "../pages/job/CVViewer";
 
@@ -23,8 +23,9 @@ export default function JobPortal() {
   const dropdownRef = useRef(null);
 
   // ROUTING STATE - 6 possible views
-  const [currentView, setCurrentView] = useState("dashboard"); // dashboard | applications | successRate | interviews | rejections | cvViewer
+  const [currentView, setCurrentView] = useState("dashboard"); // dashboard | applications | successRate | offers | rejections | cvViewer
   const [applicationsTab, setApplicationsTab] = useState("all"); // all | pending | shortlisted
+  const [statusFilter, setStatusFilter] = useState("all"); // NEW: all | applied | pending | shortlisted | rejected
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All categories");
@@ -62,7 +63,7 @@ export default function JobPortal() {
       title: "Product Manager",
       company: "Startup Inc",
       date: "May 13",
-      status: "interview",
+      status: "shortlisted",
       location: "Remote",
       salary: "$120k-150k",
     },
@@ -75,6 +76,63 @@ export default function JobPortal() {
       location: "Boston",
       salary: "$75k-95k",
     },
+  ]);
+
+  const [offers, setOffers] = useState([
+    {
+      id: 'OFF-2026-1001',
+      company: 'Google',
+      logo: '🔍',
+      role: 'Frontend Developer',
+      department: 'Engineering',
+      salary: 18,
+      salaryDisplay: '₹18 LPA',
+      bonus: 3,
+      stocks: 5,
+      location: 'Remote',
+      workMode: 'Remote',
+      offerDate: '2026-05-15',
+      joiningDate: '2026-06-01',
+      expiryDate: '2026-05-30',
+      expiryDays: 6,
+      recruiter: 'Sarah Johnson',
+      recruiterEmail: 'sarah@google.com',
+      recruiterPhone: '+91 98765 43210',
+      status: 'Pending',
+      source: 'LinkedIn',
+      probation: '3 Months',
+      benefits: ['Health Insurance', 'Bonus', 'Stock Options', 'Paid Leaves', 'Flexible Hours'],
+      leavePolicy: '24 days annual + 12 sick leaves',
+      notes: '',
+      bookmarked: false
+    },
+    {
+      id: 'OFF-2026-1002',
+      company: 'Amazon',
+      logo: '📦',
+      role: 'Backend Developer',
+      department: 'AWS',
+      salary: 16,
+      salaryDisplay: '₹16 LPA',
+      bonus: 2,
+      stocks: 3,
+      location: 'Bangalore',
+      workMode: 'Hybrid',
+      offerDate: '2026-05-10',
+      joiningDate: '2026-06-15',
+      expiryDate: '2026-05-25',
+      expiryDays: 1,
+      recruiter: 'Michael Chen',
+      recruiterEmail: 'michael@amazon.com',
+      recruiterPhone: '+91 98765 43211',
+      status: 'Accepted',
+      source: 'Referral',
+      probation: '3 Months',
+      benefits: ['Health Insurance', 'Bonus', 'Relocation', 'Paid Leaves'],
+      leavePolicy: '20 days annual',
+      notes: '',
+      bookmarked: true
+    }
   ]);
 
   const [cvData] = useState({
@@ -91,26 +149,37 @@ export default function JobPortal() {
     ]
   });
 
-  const applicationStats = {
-    Applied: applications.filter(a => a.status === "applied").length,
-    Pending: applications.filter(a => a.status === "pending").length,
-    Shortlisted: applications.filter(a => a.status === "shortlisted").length,
-    Rejected: applications.filter(a => a.status === "rejected").length,
-    Interview: applications.filter(a => a.status === "interview").length,
-  };
+  const applicationStats = useMemo(() => ({
+    applied: applications.filter(a => a.status === "applied").length,
+    pending: applications.filter(a => a.status === "pending").length,
+    shortlisted: applications.filter(a => a.status === "shortlisted").length,
+    rejected: applications.filter(a => a.status === "rejected").length,
+  }), [applications]);
 
   const jobCategories = ["Tech", "Design", "Marketing", "Sales", "Finance", "Remote"];
 
   const total = Object.values(applicationStats).reduce((a, b) => a + b, 0);
-  const successRate = applicationStats.Applied > 0
-   ? Math.round((applicationStats.Shortlisted / applicationStats.Applied) * 100)
+  const successRate = applicationStats.applied > 0
+? Math.round((applicationStats.shortlisted / applicationStats.applied) * 100)
     : 0;
 
-  const interviewCount = applicationStats.Interview;
+  const filteredApplications = useMemo(() => {
+    let filtered = applications;
+    if (statusFilter!== "all") {
+      filtered = filtered.filter(app => app.status === statusFilter);
+    }
+    if (searchQuery) {
+      filtered = filtered.filter(app =>
+        app.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        app.company.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    return filtered;
+  }, [applications, statusFilter, searchQuery]);
 
   const handleAddJob = (data) => {
     setApplications(prev => [
-     ...prev,
+  ...prev,
       {
         id: Date.now(),
         title: data.title,
@@ -129,7 +198,6 @@ export default function JobPortal() {
     setShowDropdown(false);
   };
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current &&!dropdownRef.current.contains(e.target)) {
@@ -153,9 +221,11 @@ export default function JobPortal() {
     />;
   }
 
-  if (currentView === "interviews") {
-    return <InterviewCalls
+  if (currentView === "offers") {
+    return <OffersReceived
       applications={applications}
+      offers={offers}
+      setOffers={setOffers}
       onBack={() => setCurrentView("dashboard")}
     />;
   }
@@ -187,7 +257,6 @@ export default function JobPortal() {
 
           {/* Action Circles */}
           <div className="action-circles">
-            {/* 1. Add Jobs - Modal */}
             <motion.button
               className="action-circle-btn primary"
               onClick={() => setModalOpen(true)}
@@ -200,11 +269,10 @@ export default function JobPortal() {
                 </div>
                 <h3 className="circle-label">Add Jobs</h3>
                 <p className="circle-sublabel">Applications</p>
-                <span className="circle-badge">{applicationStats.Applied}</span>
+                <span className="circle-badge">{applicationStats.applied}</span>
               </div>
             </motion.button>
 
-            {/* 2. Pending - Applications page with pending filter */}
             <motion.button
               className="action-circle-btn"
               onClick={() => {
@@ -220,11 +288,10 @@ export default function JobPortal() {
                 </div>
                 <h3 className="circle-label">Pending</h3>
                 <p className="circle-sublabel">Under Review</p>
-                <span className="circle-badge">{applicationStats.Pending}</span>
+                <span className="circle-badge">{applicationStats.pending}</span>
               </div>
             </motion.button>
 
-            {/* 3. Shortlisted - Applications page with shortlisted filter */}
             <motion.button
               className="action-circle-btn"
               onClick={() => {
@@ -240,11 +307,10 @@ export default function JobPortal() {
                 </div>
                 <h3 className="circle-label">Shortlisted</h3>
                 <p className="circle-sublabel">Approved</p>
-                <span className="circle-badge">{applicationStats.Shortlisted}</span>
+                <span className="circle-badge">{applicationStats.shortlisted}</span>
               </div>
             </motion.button>
 
-            {/* 4. View CV - CVViewer page */}
             <motion.button
               className="action-circle-btn"
               onClick={() => setCurrentView("cvViewer")}
@@ -262,7 +328,7 @@ export default function JobPortal() {
             </motion.button>
           </div>
 
-          {/* Application Stats Section */}
+          {/* Application Stats Section - NOW CLICKABLE */}
           <div className="application-stats-section">
             <div className="overview-header">
               <h2 className="overview-title">Application Overview</h2>
@@ -273,18 +339,28 @@ export default function JobPortal() {
               <div className="stats-bars">
                 {Object.entries(applicationStats).map(([key, value]) => {
                   const colors = {
-                    Applied: "#f97316",
-                    Pending: "#fbbf24",
-                    Shortlisted: "#22c55e",
-                    Rejected: "#ef4444",
-                    Interview: "#3b82f6",
+                    applied: "#f97316",
+                    pending: "#fbbf24",
+                    shortlisted: "#22c55e",
+                    rejected: "#ef4444",
+                  };
+                  const labels = {
+                    applied: "Applied",
+                    pending: "Pending",
+                    shortlisted: "Shortlisted",
+                    rejected: "Rejected",
                   };
                   return (
-                    <div key={key} className="stat-row">
+                    <div
+                      key={key}
+                      className={`stat-row ${statusFilter === key? 'active-filter' : ''}`}
+                      onClick={() => setStatusFilter(key)}
+                      title={`Show ${labels[key]} applications`}
+                    >
                       <div className="stat-header">
                         <div className="stat-label">
                           <span className="stat-dot" style={{ background: colors[key] }} />
-                          {key}
+                          {labels[key]}
                         </div>
                         <span className="stat-value">{value}</span>
                       </div>
@@ -304,9 +380,8 @@ export default function JobPortal() {
             </div>
           </div>
 
-          {/* Quick Stats Grid - Updated with new routes */}
+          {/* Quick Stats Grid - Updated with Offers */}
           <div className="quick-stats">
-            {/* Card 1: Applications */}
             <motion.div
               className="stat-card"
               whileHover={{ y: -5 }}
@@ -317,23 +392,21 @@ export default function JobPortal() {
               style={{ cursor: 'pointer' }}
             >
               <div className="stat-icon"><Briefcase size={24} /></div>
-              <div className="stat-value">{applicationStats.Applied}</div>
+              <div className="stat-value">{applicationStats.applied}</div>
               <div className="stat-label-text">Applications</div>
             </motion.div>
 
-            {/* Card 2: Interviews Call - Opens InterviewCalls page */}
             <motion.div
               className="stat-card"
               whileHover={{ y: -5 }}
-              onClick={() => setCurrentView("interviews")}
+              onClick={() => setCurrentView("offers")}
               style={{ cursor: 'pointer' }}
             >
-              <div className="stat-icon" style={{ color: "#3b82f6" }}><Mail size={24} /></div>
-              <div className="stat-value">{interviewCount}</div>
-              <div className="stat-label-text">Interviews Call</div>
+              <div className="stat-icon" style={{ color: "#f97316" }}><FileText size={24} /></div>
+              <div className="stat-value">{offers.length}</div>
+              <div className="stat-label-text">Offers Received</div>
             </motion.div>
 
-            {/* Card 3: Rejections - Opens Rejections page */}
             <motion.div
               className="stat-card"
               whileHover={{ y: -5 }}
@@ -341,11 +414,10 @@ export default function JobPortal() {
               style={{ cursor: 'pointer' }}
             >
               <div className="stat-icon" style={{ color: "#ef4444" }}><X size={24} /></div>
-              <div className="stat-value">{applicationStats.Rejected}</div>
+              <div className="stat-value">{applicationStats.rejected}</div>
               <div className="stat-label-text">Rejections</div>
             </motion.div>
 
-            {/* Card 4: Success Rate */}
             <motion.div
               className="stat-card"
               whileHover={{ y: -5 }}
@@ -384,43 +456,75 @@ export default function JobPortal() {
             </select>
           </div>
 
-          {/* Applications List */}
+          {/* Applications List - WITH FILTER */}
           <div className="products-section">
             <div className="section-header">
               <div>
                 <h2 className="section-title">My Applications</h2>
-                <p className="section-subtitle">Latest applications</p>
+                <p className="section-subtitle">
+                  {statusFilter === "all"
+                 ? "Latest applications"
+                    : `Showing ${filteredApplications.length} ${statusFilter} applications`
+                  }
+                </p>
+              </div>
+              <div className="section-actions">
+                <div className="filter-wrapper">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="btn filter-select"
+                  >
+                    <option value="all">All Status ({total})</option>
+                    <option value="applied">Applied ({applicationStats.applied})</option>
+                    <option value="pending">Pending ({applicationStats.pending})</option>
+                    <option value="shortlisted">Shortlisted ({applicationStats.shortlisted})</option>
+                    <option value="rejected">Rejected ({applicationStats.rejected})</option>
+                  </select>
+                  <Filter size={16} className="filter-icon" />
+                </div>
               </div>
             </div>
-            <div className="applications-list">
-              {applications.filter(app =>
-                app.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                app.company.toLowerCase().includes(searchQuery.toLowerCase())
-              ).map((app) => (
-                <motion.div
-                  key={app.id}
-                  className="application-item"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <div className="application-info">
-                    <h3 className="application-title">{app.title}</h3>
-                    <div className="application-meta">
-                      <span>{app.company}</span>
-                      <span>•</span>
-                      <span>{app.date}</span>
-                      <span>•</span>
-                      <span>{app.location}</span>
+
+            {filteredApplications.length === 0? (
+              <div className="empty-state">
+                <Briefcase size={48} style={{ margin: "0 auto 1rem", opacity: 0.3 }} />
+                <p>No applications found with this status.</p>
+                {statusFilter!== "all" && (
+                  <button className="btn" onClick={() => setStatusFilter("all")} style={{ marginTop: "1rem" }}>
+                    Show All Applications
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="applications-list">
+                {filteredApplications.map((app) => (
+                  <motion.div
+                    key={app.id}
+                    className="application-item"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <div className="application-info">
+                      <h3 className="application-title">{app.title}</h3>
+                      <div className="application-meta">
+                        <span>{app.company}</span>
+                        <span>•</span>
+                        <span>{app.date}</span>
+                        <span>•</span>
+                        <span>{app.location}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className={`application-status ${app.status}`}>
-                    {(app.status === "applied" || app.status === "pending") && <Clock size={14} />}
-                    {app.status === "shortlisted" && <CheckCircle size={14} />}
-                    {app.status}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                    <div className={`application-status ${app.status}`}>
+                      {(app.status === "applied" || app.status === "pending") && <Clock size={14} />}
+                      {app.status === "shortlisted" && <CheckCircle size={14} />}
+                      {app.status === "rejected" && <X size={14} />}
+                      {app.status}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Dropdown */}
@@ -478,11 +582,10 @@ export default function JobPortal() {
 // Donut Chart Component
 function DonutChart({ stats }) {
   const colors = {
-    Applied: "#f97316",
-    Pending: "#fbbf24",
-    Shortlisted: "#22c55e",
-    Rejected: "#ef4444",
-    Interview: "#3b82f6",
+    applied: "#f97316",
+    pending: "#fbbf24",
+    shortlisted: "#22c55e",
+    rejected: "#ef4444",
   };
   const total = Object.values(stats).reduce((a, b) => a + b, 0);
   const radius = 45;
@@ -504,7 +607,7 @@ function DonutChart({ stats }) {
 
   return (
     <div className="donut-container">
-      <svg width="140" height="140" viewBox="0 0 120 120">
+      <svg width="140" height="140" viewBox="0 0 120">
         <circle cx="60" cy="60" r={radius} fill="none" stroke="#f1f5f9" strokeWidth="12" />
         {segments.map((s) => (
           <circle
@@ -579,11 +682,11 @@ function ChartsSection({ stats }) {
       chartsRef.current.pie = new Chart(pieRef.current, {
         type: "doughnut",
         data: {
-          labels: ["Applied", "Pending", "Shortlisted", "Rejected", "Interview"],
+          labels: ["Applied", "Pending", "Shortlisted", "Rejected"],
           datasets: [
             {
-              data: [stats.Applied, stats.Pending, stats.Shortlisted, stats.Rejected, stats.Interview],
-              backgroundColor: ["#f97316", "#fbbf24", "#22c55e", "#ef4444", "#3b82f6"],
+              data: [stats.applied, stats.pending, stats.shortlisted, stats.rejected],
+              backgroundColor: ["#f97316", "#fbbf24", "#22c55e", "#ef4444"],
               borderWidth: 2,
               borderColor: "#fff",
             },

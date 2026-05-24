@@ -11,16 +11,32 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.analytics-header {
+.analytics-header-content {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
   display: flex;
+  width: 90%;
+  margin-left: 50px;
+  justify-content: space-between;
   align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.15);
   flex-wrap: wrap;
+  gap: 1rem;
+  box-sizing: border-box;
 }
 
 .back-btn {
@@ -45,6 +61,23 @@
 .back-btn:hover {
   background: #ffedd5;
   transform: translateX(-3px);
+}
+
+.analytics-header {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  width: 95%;
+  margin-left: 25px;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.15);
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-sizing: border-box;
 }
 
 .analytics-header h1 {
@@ -80,14 +113,14 @@
   border-radius: 12px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(249,115,22,0.3);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
   transition: all 0.2s;
 }
 
 .export-btn:hover {
   background: #ea580c;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(249,115,22,0.4);
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
 }
 
 /* KPI Grid */
@@ -95,14 +128,14 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-top: 2rem;
 }
 
 .kpi-card {
   background: white;
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(249,115,22,0.08);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.08);
   border: 1.5px solid #fed7aa;
   position: relative;
   overflow: hidden;
@@ -137,7 +170,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .kpi-trend {
@@ -222,7 +255,7 @@
 
 .search-box:focus-within {
   border-color: #f97316;
-  box-shadow: 0 0 0 3px rgba(249,115,22,0.1);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
 .search-box input {
@@ -266,7 +299,7 @@
   background: white;
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(249,115,22,0.08);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.08);
   border: 1.5px solid #fed7aa;
   transition: all 0.3s;
 }
@@ -278,7 +311,7 @@
 
 .chart-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(249,115,22,0.15);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.15);
 }
 
 .chart-card.wide {
@@ -313,7 +346,7 @@
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 16px rgba(249,115,22,0.08);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.08);
   border: 1.5px solid #fed7aa;
   margin-bottom: 2rem;
 }
@@ -419,7 +452,7 @@
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 16px rgba(249,115,22,0.08);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.08);
   border: 1.5px solid #fed7aa;
 }
 
@@ -532,7 +565,8 @@ td {
   color: #fdba74;
 }
 
-.revenue-cell,.profit-cell {
+.revenue-cell,
+.profit-cell {
   font-weight: 700;
   color: #9a3412;
 }
@@ -569,25 +603,29 @@ td {
 
 /* Responsive */
 @media (max-width: 1024px) {
- .charts-grid {
+  .charts-grid {
     grid-template-columns: 1fr;
   }
- .chart-card.wide {
+
+  .chart-card.wide {
     grid-column: 1;
   }
 }
 
 @media (max-width: 768px) {
- .analytics-page {
+  .analytics-page {
     padding: 1rem;
   }
- .kpi-grid {
+
+  .kpi-grid {
     grid-template-columns: repeat(2, 1fr);
   }
- .insight-cards {
+
+  .insight-cards {
     grid-template-columns: 1fr;
   }
- .analytics-header {
+
+  .analytics-header {
     flex-direction: column;
     align-items: flex-start;
   }
