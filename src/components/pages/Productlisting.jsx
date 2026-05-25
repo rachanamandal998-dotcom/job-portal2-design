@@ -1,13 +1,14 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Package,
   Plus,
   Eye,
   Truck,
-  Store as StoreIcon, // <-- rename here
+  Store as StoreIcon,
   ShoppingBag,
   BarChart2,
   TrendingUp,
+  Filter, // <-- added
 } from "lucide-react";
 
 import Chart from "chart.js/auto";
@@ -18,9 +19,9 @@ import { AnimatePresence } from "framer-motion";
 import TotalOrdersPage from "../pages/Product/TotalOrdersPage";
 import TotalProductsPage from "../pages/Product/TotalProductsPage";
 import TotalStock from "../pages/Product/TotalStock";
-import Store from "../pages/Product/Store"; // <-- now this is fine
+import Store from "../pages/Product/Store";
 import AvgPrice from "../pages/Product/AvgPrice";
-import ProductAnalytics from "../pages/Product/ProductAnalytics"; // path to your new file
+import ProductAnalytics from "../pages/Product/ProductAnalytics";
 
 import "../styles/Global.css";
 import "../styles/Productlisting.css";
@@ -34,6 +35,10 @@ export default function ProductListing() {
   const [showStore, setShowStore] = useState(false);
   const [showAvgPrice, setShowAvgPrice] = useState(false);
   const [showProductAnalytics, setShowProductAnalytics] = useState(false);
+
+  // NEW: Product filter state
+  const [productFilter, setProductFilter] = useState("all"); // all, inStock, lowStock, outOfStock, category
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   const [products, setProducts] = useState([
     {
@@ -283,6 +288,33 @@ export default function ProductListing() {
     },
   ]);
 
+  // ── FILTERED PRODUCTS ────────────────────────────────────
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    // Stock status filter
+    if (productFilter === "inStock") {
+      result = result.filter(p => (p.stock || 0) > 5);
+    } else if (productFilter === "lowStock") {
+      result = result.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= 5);
+    } else if (productFilter === "outOfStock") {
+      result = result.filter(p => (p.stock || 0) === 0);
+    }
+
+    // Category filter
+    if (categoryFilter!== "all") {
+      result = result.filter(p => p.category === categoryFilter);
+    }
+
+    return result;
+  }, [products, productFilter, categoryFilter]);
+
+  // Get unique categories for dropdown
+  const categories = useMemo(() => {
+    const cats = [...new Set(products.map(p => p.category))];
+    return cats.sort();
+  }, [products]);
+
   // ── CONDITIONAL RETURNS ────────────────────────────────────
   if (showProductsPage) {
     return (
@@ -339,7 +371,7 @@ export default function ProductListing() {
 
   // ── HANDLERS ──────────────────────────────────────────────────────────────
   const handleAddProduct = (data) => {
-    setProducts((prev) => [...prev, { ...data, id: Date.now() }]);
+    setProducts((prev) => [...prev, {...data, id: Date.now() }]);
     setFormOpen(false);
     setModalOpen(false);
   };
@@ -360,7 +392,7 @@ export default function ProductListing() {
   const totalStock = products.reduce((a, p) => a + (p.stock || 0), 0);
   const avgPrice =
     products.length > 0
-      ? (products.reduce((a, p) => a + Number(p.price), 0) / products.length).toFixed(2)
+     ? (products.reduce((a, p) => a + Number(p.price), 0) / products.length).toFixed(2)
       : "0.00";
 
   // ── RENDER ────────────────────────────────────────────────────────────────
@@ -448,7 +480,7 @@ export default function ProductListing() {
                       <div
                         className="stat-bar"
                         style={{
-                          width: `${total > 0 ? (stat.value / total) * 100 : 0}%`,
+                          width: `${total > 0? (stat.value / total) * 100 : 0}%`,
                           background: stat.color,
                         }}
                       />
@@ -489,34 +521,74 @@ export default function ProductListing() {
           {/* Charts */}
           <ChartsSection orders={orders} products={products} />
 
-          {/* Products Grid */}
+          {/* Products Grid - WITH FILTER */}
           <div className="products-section">
             <div className="section-header">
               <div>
                 <h2 className="section-title">Products</h2>
-                <p className="section-subtitle">Manage your listings with a polished product view.</p>
+                <p className="section-subtitle">
+                  {productFilter === "all" && categoryFilter === "all"
+                   ? "Manage your listings with a polished product view."
+                    : `Showing ${filteredProducts.length} filtered products`
+                  }
+                </p>
               </div>
-              <button className="btn btn-primary" onClick={() => setFormOpen(true)}>
-                <Plus size={16} /> Add Product
-              </button>
+              <div className="section-actions">
+                <div className="filter-wrapper">
+                  <select
+                    value={productFilter}
+                    onChange={(e) => setProductFilter(e.target.value)}
+                    className="btn filter-select"
+                  >
+                    <option value="all">All Stock ({total})</option>
+                    <option value="inStock">In Stock ({inStock})</option>
+                    <option value="lowStock">Low Stock ({lowStock})</option>
+                    <option value="outOfStock">Out of Stock ({outStock})</option>
+                  </select>
+                  <Filter size={16} className="filter-icon" />
+                </div>
+                <div className="filter-wrapper">
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="btn filter-select"
+                  >
+                    <option value="all">All Categories</option>
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  <Filter size={16} className="filter-icon" />
+                </div>
+                <button className="btn btn-primary" onClick={() => setFormOpen(true)}>
+                  <Plus size={16} /> Add Product
+                </button>
+              </div>
             </div>
 
             <div className="products-grid">
-              {products.map((product) => (
-                <div key={product.id} className="product-card">
-                  <img src={product.image} alt={product.name} className="product-image" />
-                  <div className="product-info">
-                    <h3 className="product-name">{product.name}</h3>
-                    <div className="product-price">Rs {product.price}</div>
-                    <div className="product-stock">
-                      {product.stock > 5 && <span className="stock-badge in-stock">In Stock</span>}
-                      {product.stock > 0 && product.stock <= 5 && <span className="stock-badge low-stock">Low Stock</span>}
-                      {product.stock === 0 && <span className="stock-badge out-of-stock">Out of Stock</span>}
-                      {product.stock} units
+              {filteredProducts.length === 0? (
+                <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
+                  <Package size={48} style={{ color: '#cbd5e1' }} />
+                  <p>No products match your filters</p>
+                </div>
+              ) : (
+                filteredProducts.map((product) => (
+                  <div key={product.id} className="product-card">
+                    <img src={product.image} alt={product.name} className="product-image" />
+                    <div className="product-info">
+                      <h3 className="product-name">{product.name}</h3>
+                      <div className="product-price">Rs {product.price}</div>
+                      <div className="product-stock">
+                        {product.stock > 5 && <span className="stock-badge in-stock">In Stock</span>}
+                        {product.stock > 0 && product.stock <= 5 && <span className="stock-badge low-stock">Low Stock</span>}
+                        {product.stock === 0 && <span className="stock-badge out-of-stock">Out of Stock</span>}
+                        {product.stock} units
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -538,10 +610,10 @@ function DonutChart({ stats, total }) {
   let offset = 0;
 
   const segments = stats.map((stat) => {
-    const percent = total > 0 ? stat.value / total : 0;
+    const percent = total > 0? stat.value / total : 0;
     const dash = percent * circumference;
     const segment = {
-      ...stat,
+     ...stat,
       dasharray: `${dash} ${circumference - dash}`,
       offset: -offset,
     };

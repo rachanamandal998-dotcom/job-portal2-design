@@ -527,7 +527,29 @@
   position: relative;
   width: 100%;
 }
+.section-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
 
+.filter-wrapper {
+  position: relative;
+}
+
+.filter-select {
+  padding: 10px 40px 10px 14px;
+  appearance: none;
+}
+
+.filter-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--muted);
+}
 /* ================================
    PRODUCTS SECTION
 ================================ */

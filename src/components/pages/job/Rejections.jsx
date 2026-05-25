@@ -16,9 +16,9 @@ import {
 } from 'chart.js';
 import { Line, Bar, Pie, Radar } from 'react-chartjs-2';
 import {
-  Search, Filter, Download, UserCheck, Mail, Eye, FileText, Archive,
-  RefreshCw, TrendingUp, Percent, Calendar, AlertTriangle, Briefcase,
-  ChevronDown, ChevronUp, CheckCircle, XCircle, Users, BarChart3
+  Search, Filter, Download, UserCheck, Mail, Archive,
+  RefreshCw, TrendingUp, Percent, Calendar, AlertTriangle,
+  ChevronDown, ChevronUp, CheckCircle, XCircle, Users, BarChart3, ArrowLeft
 } from 'lucide-react';
 import '../../styles/Rejections.css';
 
@@ -87,7 +87,7 @@ const generateMockData = () => {
 
 const INITIAL_REJECTIONS = generateMockData();
 
-export default function RejectionsPage() {
+export default function RejectionsPage({ onBack }) {
   const [rejections, setRejections] = useState(INITIAL_REJECTIONS);
   const [search, setSearch] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -113,6 +113,7 @@ export default function RejectionsPage() {
     });
     setSearch('');
     setCurrentPage(1);
+    setIsFilterOpen(false);
   };
 
   const filteredData = useMemo(() => {
@@ -135,16 +136,18 @@ export default function RejectionsPage() {
       if (filters.dateRange!== 'All') {
         const itemDate = new Date(item.rejectionDate);
         const today = new Date();
-        const diffTime = Math.abs(today - itemDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        today.setHours(0, 0, 0, 0);
+        itemDate.setHours(0, 0, 0, 0);
+        const diffTime = today - itemDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-        switch(filters.dateRange) {
-          case 'Today': if (diffDays > 1) return false; break;
-          case 'Yesterday': if (diffDays!== 2) return false; break;
-          case 'Last 7 Days': if (diffDays > 7) return false; break;
-          case 'Last 30 Days': if (diffDays > 30) return false; break;
-          case 'Last 90 Days': if (diffDays > 90) return false; break;
-          case 'Last Year': if (diffDays > 365) return false; break;
+        switch (filters.dateRange) {
+          case 'Today': if (diffDays!== 0) return false; break;
+          case 'Yesterday': if (diffDays!== 1) return false; break;
+          case 'Last 7 Days': if (diffDays >= 7) return false; break;
+          case 'Last 30 Days': if (diffDays >= 30) return false; break;
+          case 'Last 90 Days': if (diffDays >= 90) return false; break;
+          case 'Last Year': if (diffDays >= 365) return false; break;
           default: break;
         }
       }
@@ -163,18 +166,25 @@ export default function RejectionsPage() {
     const total = filteredData.length;
     const recovered = filteredData.filter(i => i.status === 'Reconsidered' || i.status === 'Re-applied').length;
     const successRate = total > 0? ((recovered / total) * 100).toFixed(1) : 0;
-    const thisMonth = filteredData.filter(i => i.month === 'May').length;
-    const thisWeek = Math.ceil(thisMonth * 0.25);
+    const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+    const thisMonth = filteredData.filter(i => i.month === currentMonth).length;
+    const thisWeek = filteredData.filter(i => {
+      const itemDate = new Date(i.rejectionDate);
+      const now = new Date();
+      const diffTime = now - itemDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays < 7;
+    }).length;
 
     return {
       total,
-      rate: total > 0? ((total / (total + 140)) * 100).toFixed(1) : 0,
+      rate: total > 0? ((total / rejections.length) * 100).toFixed(1) : 0,
       thisMonth,
       thisWeek,
       recovered,
       successRate
     };
-  }, [filteredData]);
+  }, [filteredData, rejections.length]);
 
   const insights = useMemo(() => {
     if (filteredData.length === 0) return { reason: 'N/A', company: 'N/A', role: 'N/A', avgScore: 0 };
@@ -187,7 +197,7 @@ export default function RejectionsPage() {
       counts.totalScore += item.skillsMatch;
     });
 
-    const getTop = (obj) => Object.entries(obj).sort((a,b) => b[1] - a[1])[0]?.[0] || 'N/A';
+    const getTop = (obj) => Object.entries(obj).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
 
     return {
       reason: getTop(counts.reasons),
@@ -202,7 +212,13 @@ export default function RejectionsPage() {
   };
 
   const handleExport = (type) => {
-    alert(`Exporting ${filteredData.length} records as ${type.toUpperCase()}`);
+    const dataStr = JSON.stringify(filteredData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rejections.${type}`;
+    a.click();
   };
 
   const toggleSelect = (id) => {
@@ -227,37 +243,45 @@ export default function RejectionsPage() {
     }
   };
 
-  const lineChartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-    datasets: [{
-      label: 'Rejection Volume Trend',
-      data: [35, 42, 28, 50, metrics.thisMonth, 30, 40, 45, 38, 52, 60, 48],
-      borderColor: '#f97316',
-      backgroundColor: 'rgba(249, 115, 22, 0.1)',
-      tension: 0.4,
-      fill: true
-    }]
-  };
+  const lineChartData = useMemo(() => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const data = months.map(month =>
+      filteredData.filter(i => i.month.startsWith(month)).length
+    );
+    return {
+      labels: months,
+      datasets: [{
+        label: 'Rejection Volume Trend',
+        data,
+        borderColor: '#f97316',
+        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+        tension: 0.4,
+        fill: true
+      }]
+    };
+  }, [filteredData]);
 
-  const barChartData = {
+  const barChartData = useMemo(() => ({
     labels: COMPANIES.slice(0, 6),
     datasets: [{
       label: 'Rejections By Corporate Entity',
-      data: [24, 18, 32, 15, 29, 21],
+      data: COMPANIES.slice(0, 6).map(c =>
+        filteredData.filter(i => i.company === c).length
+      ),
       backgroundColor: '#fdba74',
       hoverBackgroundColor: '#f97316',
       borderRadius: 6
     }]
-  };
+  }), [filteredData]);
 
-  const pieChartData = {
+  const pieChartData = useMemo(() => ({
     labels: REASONS,
     datasets: [{
       data: REASONS.map(r => filteredData.filter(i => i.reason === r).length),
-      backgroundColor: ['#ffedd5', '#fed7aa', '#fdb674', '#fda4af', '#f97316', '#ea580c', '#c2410c'],
+      backgroundColor: ['#ffedd5', '#fed7aa', '#fdba74', '#fda4af', '#f97316', '#ea580c', '#c2410c'],
       borderWidth: 1
     }]
-  };
+  }), [filteredData]);
 
   const radarChartData = {
     labels: ['React/Frontend', 'Node/Backend', 'System Design', 'UI/UX Alignment', 'Communication', 'Problem Solving'],
@@ -284,7 +308,21 @@ export default function RejectionsPage() {
       transition={{ duration: 0.5 }}
       className="rejections-page"
     >
-      {/* HEADER */}
+      {/* HEADER WITH BACK BUTTON */}
+      <div className="ba-header">
+        {onBack && (
+          <motion.button
+            className="ba-back-btn"
+            onClick={onBack}
+            whileHover={{ x: -5 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <ArrowLeft size={16} /> Back
+          </motion.button>
+        )}
+      </div>
+
+      {/* PAGE HEADER */}
       <header className="page-header">
         <div className="header-left">
           <h1>
@@ -368,8 +406,8 @@ export default function RejectionsPage() {
             >
               {[
                 { label: 'Timeframe', key: 'dateRange', options: ['All', 'Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days', 'Last 90 Days', 'Last Year'] },
-                { label: 'Month', key: 'month', options: ['All', 'January','February','March','April','May','June','July','August','September','October','November','December'] },
-                { label: 'Day Matrix', key: 'day', options: ['All', 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] },
+                { label: 'Month', key: 'month', options: ['All', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] },
+                { label: 'Day Matrix', key: 'day', options: ['All', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] },
                 { label: 'Primary Fault', key: 'reason', options: ['All',...REASONS] },
                 { label: 'Company Class', key: 'companyType', options: ['All', 'Tech Companies', 'Startups', 'Enterprises', 'Remote Companies'] },
                 { label: 'Engineering Track', key: 'jobCategory', options: ['All', 'Frontend', 'Backend', 'Full Stack', 'UI/UX', 'Marketing', 'HR', 'Sales'] },
@@ -379,7 +417,7 @@ export default function RejectionsPage() {
                   <label>{filter.label}</label>
                   <select
                     value={filters[filter.key]}
-                    onChange={e => setFilters({...filters, [filter.key]: e.target.value})}
+                    onChange={e => setFilters({...filters, [filter.key]: e.target.value })}
                   >
                     {filter.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                   </select>
@@ -402,7 +440,7 @@ export default function RejectionsPage() {
         </div>
         <div className="chart-card">
           <h3><BarChart3 size={16} /> Breakdown of Attrition Factors</h3>
-          <div className="chart-wrapper"><Pie data={pieChartData} options={{...chartOptions, maintainAspectRatio: false}} /></div>
+          <div className="chart-wrapper"><Pie data={pieChartData} options={{...chartOptions, maintainAspectRatio: false }} /></div>
         </div>
         <div className="chart-card chart-card-wide">
           <h3><BarChart3 size={16} /> Candidate Competency vs. Hiring Target</h3>
@@ -464,7 +502,15 @@ export default function RejectionsPage() {
               </tr>
             </thead>
             <tbody>
-              {paginatedData.map((record) => (
+              {paginatedData.length === 0? (
+                <tr>
+                  <td colSpan={9} className="empty-state">
+                    <Users size={40} />
+                    <p>No rejections match your filters</p>
+                    <button onClick={resetFilters} className="reset-btn">Clear filters</button>
+                  </td>
+                </tr>
+              ) : paginatedData.map((record) => (
                 <tr key={record.id}>
                   <td>
                     <input
@@ -478,7 +524,7 @@ export default function RejectionsPage() {
                       <div className="avatar">{record.name.charAt(0)}</div>
                       <div>
                         <div className="name">{record.name}</div>
-                        <div className="email"><Mail size={12}/>{record.email}</div>
+                        <div className="email"><Mail size={12} />{record.email}</div>
                       </div>
                     </div>
                   </td>
@@ -498,30 +544,31 @@ export default function RejectionsPage() {
                   </td>
                   <td data-label="Reason">
                     <span className="reason-badge">
-                      <AlertTriangle size={12}/> {record.reason}
+                      <AlertTriangle size={12} /> {record.reason}
                     </span>
                   </td>
                   <td data-label="Score">
                     <div className="score-display">
                       <div className="score-text">{record.experience} exp</div>
                       <div className="score-bar">
-                        <div style={{width: `${record.skillsMatch}%`}} className="score-fill" />
+                        <div style={{ width: `${record.skillsMatch}%` }} className="score-fill" />
                       </div>
                       <span className="score-percent">{record.skillsMatch}% Match</span>
                     </div>
                   </td>
                   <td data-label="Status">
-                    <span className={`status-badge status-${record.status.toLowerCase()}`}>
+                    <span className={`status-badge status-${record.status.toLowerCase().replace('-', '')}`}>
                       {record.status}
                     </span>
                   </td>
                   <td data-label="Actions">
                     <div className="actions">
-                      <button title="View Dossier" className="action-btn"><Eye size={15}/></button>
-                      <button title="Examine CV" className="action-btn"><FileText size={15}/></button>
-                      <button title="Initiate Contact" onClick={() => handleUpdateStatus(record.id, 'Contacted')} className="action-btn action-purple"><Mail size={15}/></button>
-                      <button title="Activate Reconsideration" onClick={() => handleUpdateStatus(record.id, 'Reconsidered')} className="action-btn action-emerald"><UserCheck size={15}/></button>
-                      <button title="Commit Archive" onClick={() => handleUpdateStatus(record.id, 'Archived')} className="action-btn action-rose"><Archive size={15}/></button>
+                      <button title="Contact" onClick={() => handleUpdateStatus(record.id, 'Contacted')}
+                              className="action-btn action-purple"><Mail size={15}/></button>
+                      <button title="Reconsider" onClick={() => handleUpdateStatus(record.id, 'Reconsidered')}
+                              className="action-btn action-emerald"><UserCheck size={15}/></button>
+                      <button title="Archive" onClick={() => handleUpdateStatus(record.id, 'Archived')}
+                              className="action-btn action-rose"><Archive size={15}/></button>
                     </div>
                   </td>
                 </tr>
