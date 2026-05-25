@@ -15,7 +15,7 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
 
   // SAFE CALCULATIONS WITH DEFAULTS
   const safeServices = services.map(s => ({
-   ...s,
+    ...s,
     price: Number(s.price) || 0,
     bookings: Number(s.bookings) || 0,
     rating: Number(s.rating) || 0,
@@ -25,27 +25,27 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
 
   const totalRevenue = safeServices.reduce((a, s) => a + s.price * s.bookings, 0);
   const avgRating = safeServices.length > 0
-   ? (safeServices.reduce((a, s) => a + s.rating, 0) / safeServices.length).toFixed(1)
+    ? (safeServices.reduce((a, s) => a + s.rating, 0) / safeServices.length).toFixed(1)
     : "0.0";
   const totalBookings = safeServices.reduce((a, s) => a + s.bookings, 0);
-  const topService = safeServices.length > 0? [...safeServices].sort((a, b) => b.bookings - a.bookings)[0] : null;
-  const worstService = safeServices.length > 0? [...safeServices].sort((a, b) => a.bookings - b.bookings)[0] : null;
-  const highestRated = safeServices.length > 0? [...safeServices].sort((a, b) => b.rating - a.rating)[0] : null;
-  const categories = ['all',...new Set(safeServices.map(s => s.category))];
+  const topService = safeServices.length > 0 ? [...safeServices].sort((a, b) => b.bookings - a.bookings)[0] : null;
+  const worstService = safeServices.length > 0 ? [...safeServices].sort((a, b) => a.bookings - b.bookings)[0] : null;
+  const highestRated = safeServices.length > 0 ? [...safeServices].sort((a, b) => b.rating - a.rating)[0] : null;
+  const categories = ['all', ...new Set(safeServices.map(s => s.category))];
 
   // Filter + Sort
   const filteredServices = safeServices
-   .filter(s => {
+    .filter(s => {
       const matchSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchCat = filterCategory === "all" || s.category === filterCategory;
       return matchSearch && matchCat;
     })
-   .map(s => ({
-     ...s,
+    .map(s => ({
+      ...s,
       revenue: s.price * s.bookings,
       profit: (s.price - s.cost) * s.bookings
     }))
-   .sort((a, b) => {
+    .sort((a, b) => {
       if (sortBy === "revenue") return b.revenue - a.revenue;
       if (sortBy === "bookings") return b.bookings - a.bookings;
       if (sortBy === "rating") return b.rating - a.rating;
@@ -221,7 +221,7 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
       s.revenue || 0,
       s.rating || 0
     ]);
-    const csv = [headers,...rows].map(r => r.join(',')).join('\n');
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -239,6 +239,7 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
         animate={{ opacity: 1 }}
       >
         <div className="analytics-header-content2">
+
           <motion.button
             className="back-btn"
             onClick={onBack}
@@ -248,6 +249,7 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
             <ArrowLeft size={20} /> Back
           </motion.button>
           <div>
+
             <h1>Service Analytics</h1>
             <p>No services found</p>
           </div>
@@ -257,7 +259,7 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
           <h2>No Services Yet</h2>
           <p>Add services to see detailed analytics and insights</p>
         </div>
-      </motion.div>
+      </motion.div >
     );
   }
 
@@ -313,7 +315,7 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
           />
         </div>
         <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)}>
-          {categories.map(c => <option key={c} value={c}>{c === 'all'? 'All Categories' : c}</option>)}
+          {categories.map(c => <option key={c} value={c}>{c === 'all' ? 'All Categories' : c}</option>)}
         </select>
         <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
           <option value="revenue">Sort by Revenue</option>
@@ -460,9 +462,9 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
                       <motion.div
                         className="perf-fill"
                         initial={{ width: 0 }}
-                        animate={{ width: `${topService? ((s.bookings || 0) / (topService.bookings || 1)) * 100 : 0}%` }}
+                        animate={{ width: `${topService ? ((s.bookings || 0) / (topService.bookings || 1)) * 100 : 0}%` }}
                         transition={{ duration: 1, delay: i * 0.1 }}
-                        style={{ background: (s.bookings || 0) > 10? '#22c55e' : (s.bookings || 0) > 5? '#fbbf24' : '#ef4444' }}
+                        style={{ background: (s.bookings || 0) > 10 ? '#22c55e' : (s.bookings || 0) > 5 ? '#fbbf24' : '#ef4444' }}
                       />
                     </div>
                   </td>
@@ -488,9 +490,9 @@ function KpiCard({ icon: Icon, label, value, sub, trend, color }) {
         <div className="kpi-icon" style={{ background: color }}>
           <Icon size={24} color="white" />
         </div>
-        {trend!== undefined && (
-          <div className={`kpi-trend ${isUp? 'up' : 'down'}`}>
-            {isUp? '↑' : '↓'} {Math.abs(trend)}%
+        {trend !== undefined && (
+          <div className={`kpi-trend ${isUp ? 'up' : 'down'}`}>
+            {isUp ? '↑' : '↓'} {Math.abs(trend)}%
           </div>
         )}
       </div>

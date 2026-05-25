@@ -301,10 +301,12 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
     <div className="analytics-page">
       {/* Header */}
       <motion.div className="analytics-header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="btn-cover">
         <button className="back-btn" onClick={onBack}>
           <ArrowLeft size={20} />
           Back
         </button>
+        </div>
         <div className="header-content">
           <div className="header-left">
             <div className="header-icon">

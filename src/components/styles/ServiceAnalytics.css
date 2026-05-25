@@ -22,13 +22,14 @@
   }
 }
 
-.analytics-header-content {
+.analytics-header-content2{
   background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 2rem;
   display: flex;
   width: 90%;
+  margin-top: 20px;
   margin-left: 50px;
   justify-content: space-between;
   align-items: center;

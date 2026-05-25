@@ -9,6 +9,7 @@ import {
   Package,
   Wrench,
   BadgeCheck,
+  ArrowLeft,
 } from "lucide-react";
 
 import "./DashboardShell.css";
@@ -16,17 +17,17 @@ import "./DashboardShell.css";
 /* ─────────────────────────────
    DASHBOARD SHELL
 ───────────────────────────── */
-export function DashboardShell({ children }) {
+export function DashboardShell({ children, onBack }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
   // FIX 1: Check for "/jobs" not "job"
   const active = pathname.startsWith("/jobs")
-   ? "job"
+    ? "job"
     : pathname.startsWith("/services")
-   ? "service"
-    : "product";
+      ? "service"
+      : "product";
 
   const titleMap = {
     product: "Product Listing",
@@ -153,7 +154,7 @@ function NavItem({ to, icon: Icon, label, active, onClick }) {
     <Link
       to={to}
       onClick={onClick}
-      className={`ds-navitem ${active? "active" : ""}`}
+      className={`ds-navitem ${active ? "active" : ""}`}
     >
       <Icon size={16} /> {label}
     </Link>
@@ -213,7 +214,7 @@ export function SectionPanel({
         </div>
       </div>
 
-      {children? (
+      {children ? (
         <div className="panel-content">{children}</div>
       ) : (
         <div className="panel-empty">
