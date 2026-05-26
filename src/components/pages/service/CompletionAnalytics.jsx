@@ -11,7 +11,7 @@ export default function CompletionAnalytics({ bookings, services, onBack }) {
   const cancelled = bookings.filter(b => b.status === "cancelled").length;
   const pending = bookings.filter(b => b.status === "pending").length;
   const confirmed = bookings.filter(b => b.status === "confirmed").length;
-  const completionRate = bookings.length > 0? ((completed / bookings.length) * 100).toFixed(0) : 0;
+  const completionRate = bookings.length > 0 ? ((completed / bookings.length) * 100).toFixed(0) : 0;
   const efficiencyScore = Math.round((completed / (completed + cancelled || 1)) * 100);
   const avgResponseTime = "2.5h"; // Mock data
 
@@ -66,7 +66,7 @@ export default function CompletionAnalytics({ bookings, services, onBack }) {
       const serviceEfficiency = services.map(s => {
         const serviceBookings = bookings.filter(b => b.serviceName === s.name);
         const completedCount = serviceBookings.filter(b => b.status === "completed").length;
-        return serviceBookings.length > 0? (completedCount / serviceBookings.length) * 100 : 0;
+        return serviceBookings.length > 0 ? (completedCount / serviceBookings.length) * 100 : 0;
       });
 
       chartsRef.current.efficiency = new Chart(efficiencyCtx, {
@@ -118,9 +118,11 @@ export default function CompletionAnalytics({ bookings, services, onBack }) {
   return (
     <motion.div className="analytics-page" initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }}>
       <div className="analytics-header">
-        <motion.button className="back-btn" onClick={onBack} whileHover={{ x: -5 }}>
-          <ArrowLeft size={20} /> Back
-        </motion.button>
+        <div className="context">
+          <motion.button className="back-btn" onClick={onBack} whileHover={{ x: -5 }}>
+            <ArrowLeft size={20} /> Back
+          </motion.button>
+        </div>
         <div>
           <h1>Completion Analytics</h1>
           <p>Booking success & service efficiency insights</p>
@@ -216,8 +218,8 @@ export default function CompletionAnalytics({ bookings, services, onBack }) {
                 const serviceBookings = bookings.filter(b => b.serviceName === s.name);
                 const completedCount = serviceBookings.filter(b => b.status === "completed").length;
                 const cancelledCount = serviceBookings.filter(b => b.status === "cancelled").length;
-                const efficiency = serviceBookings.length > 0? ((completedCount / serviceBookings.length) * 100).toFixed(0) : 0;
-                
+                const efficiency = serviceBookings.length > 0 ? ((completedCount / serviceBookings.length) * 100).toFixed(0) : 0;
+
                 return (
                   <motion.tr key={s.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                     <td className="service-name-cell">
@@ -234,7 +236,7 @@ export default function CompletionAnalytics({ bookings, services, onBack }) {
                           initial={{ width: 0 }}
                           animate={{ width: `${efficiency}%` }}
                           transition={{ duration: 1, delay: i * 0.1 }}
-                          style={{ background: efficiency >= 80? '#22c55e' : efficiency >= 60? '#fbbf24' : '#ef4444' }}
+                          style={{ background: efficiency >= 80 ? '#22c55e' : efficiency >= 60 ? '#fbbf24' : '#ef4444' }}
                         />
                         <span>{efficiency}%</span>
                       </div>
