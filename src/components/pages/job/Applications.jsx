@@ -21,6 +21,8 @@ const NAMES = [
   "Gaurav Acharya", "Sima Chaudhary", "Rajan Bhusal", "Pooja Devkota", "Sachin Mishra",
   "Laxmi Chhetri", "Nishant Dhakal", "Meena Sapkota", "Prabin Koirala", "Sarita Bajracharya"
 ];
+
+
 const POSITIONS = [
   "Frontend Developer", "Backend Engineer", "UI/UX Designer", "Product Manager",
   "Data Analyst", "DevOps Engineer", "QA Engineer", "Marketing Manager",

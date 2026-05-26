@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Download, Mail, Phone, MapPin, Briefcase, GraduationCap,
   Award, Star, Printer, Share2, Linkedin, Github, Globe, Calendar,
-  FileText, CheckCircle, TrendingUp
+  FileText, CheckCircle, TrendingUp, Ban
 } from "lucide-react";
 import Chart from "chart.js/auto";
 import { useEffect, useRef } from "react";
@@ -304,7 +304,7 @@ export default function ViewCvPage() {
         <div className="action-footer glass">
           <button className="btn-premium success"><CheckCircle size={18} /> Shortlist</button>
           <button className="btn-premium"><Calendar size={18} /> Schedule Interview</button>
-          <button className="btn-premium danger"><XCircle size={18} /> Reject</button>
+          <button className="btn-premium danger"><Ban size={18} /> Reject</button>
         </div>
       </div>
     </div>
