@@ -6,7 +6,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Chart from "chart.js/auto";
 import { Modal } from "../Modal";
-import "../styles/Global.css";
+
 import "../styles/JobPortal.css";
 import { DashboardShell } from "../shared/DashboardShell";
 
@@ -338,13 +338,7 @@ export default function JobPortal() {
               <div className="stat-value">{applicationStats.rejected}</div>
               <div className="stat-label-text">Rejections</div>
             </motion.div>
-            <motion.div className="stat-card" whileHover={{ y: -5 }} onClick={() => setCurrentView("rejections")} style={{ cursor: 'pointer' }}>
-              <div className="stat-icon" style={{ color: "#f0e9e9" }}><X size={24} /></div>
-              <div className="stat-value">{applicationStats.rejected}</div>
-              <div className="stat-label-text">Rejections</div>
-            </motion.div>
-            
-
+                  
             <motion.div className="stat-card" whileHover={{ y: -5 }} onClick={() => setCurrentView("successRate")} style={{ cursor: 'pointer' }}>
               <div className="stat-icon"><TrendingUp size={24} /></div>
               <div className="stat-value">{successRate}%</div>

@@ -13,9 +13,8 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
   const [sortBy, setSortBy] = useState("revenue");
   const chartsRef = useRef({});
 
-  // SAFE CALCULATIONS WITH DEFAULTS
   const safeServices = services.map(s => ({
-    ...s,
+  ...s,
     price: Number(s.price) || 0,
     bookings: Number(s.bookings) || 0,
     rating: Number(s.rating) || 0,
@@ -25,43 +24,37 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
 
   const totalRevenue = safeServices.reduce((a, s) => a + s.price * s.bookings, 0);
   const avgRating = safeServices.length > 0
-    ? (safeServices.reduce((a, s) => a + s.rating, 0) / safeServices.length).toFixed(1)
+  ? (safeServices.reduce((a, s) => a + s.rating, 0) / safeServices.length).toFixed(1)
     : "0.0";
   const totalBookings = safeServices.reduce((a, s) => a + s.bookings, 0);
-  const topService = safeServices.length > 0 ? [...safeServices].sort((a, b) => b.bookings - a.bookings)[0] : null;
-  const worstService = safeServices.length > 0 ? [...safeServices].sort((a, b) => a.bookings - b.bookings)[0] : null;
-  const highestRated = safeServices.length > 0 ? [...safeServices].sort((a, b) => b.rating - a.rating)[0] : null;
-  const categories = ['all', ...new Set(safeServices.map(s => s.category))];
+  const topService = safeServices.length > 0? [...safeServices].sort((a, b) => b.bookings - a.bookings)[0] : null;
+  const worstService = safeServices.length > 0? [...safeServices].sort((a, b) => a.bookings - b.bookings)[0] : null;
+  const highestRated = safeServices.length > 0? [...safeServices].sort((a, b) => b.rating - a.rating)[0] : null;
+  const categories = ['all',...new Set(safeServices.map(s => s.category))];
 
-  // Filter + Sort
   const filteredServices = safeServices
-    .filter(s => {
+  .filter(s => {
       const matchSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchCat = filterCategory === "all" || s.category === filterCategory;
       return matchSearch && matchCat;
     })
-    .map(s => ({
-      ...s,
+  .map(s => ({
+    ...s,
       revenue: s.price * s.bookings,
       profit: (s.price - s.cost) * s.bookings
     }))
-    .sort((a, b) => {
+  .sort((a, b) => {
       if (sortBy === "revenue") return b.revenue - a.revenue;
       if (sortBy === "bookings") return b.bookings - a.bookings;
       if (sortBy === "rating") return b.rating - a.rating;
       return 0;
     });
 
-  // Charts
   useEffect(() => {
-    const orange = "rgb(249,115,22)";
     const colors = ["#f97316", "#3b82f6", "#22c55e", "#fbbf24", "#8b5cf6", "#ec4899"];
-
     Object.values(chartsRef.current).forEach(c => c?.destroy());
-
     if (filteredServices.length === 0) return;
 
-    // 1. Revenue by Service - Bar Chart
     const revCtx = document.getElementById('revenue-service-chart');
     if (revCtx) {
       chartsRef.current.revenue = new Chart(revCtx, {
@@ -79,14 +72,7 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => `₹${(ctx.parsed.y || 0).toLocaleString()}`
-              }
-            }
-          },
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `₹${(ctx.parsed.y || 0).toLocaleString()}` } } },
           scales: {
             y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: v => `₹${(v || 0).toLocaleString()}` } },
             x: { grid: { display: false } }
@@ -95,7 +81,6 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
       });
     }
 
-    // 2. Rating Comparison - Radar Chart
     const radarCtx = document.getElementById('rating-radar-chart');
     if (radarCtx) {
       chartsRef.current.radar = new Chart(radarCtx, {
@@ -105,22 +90,17 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
           datasets: [{
             label: 'Ratings',
             data: filteredServices.map(s => s.rating || 0),
-            borderColor: orange,
+            borderColor: "#f97316",
             backgroundColor: 'rgba(249,115,22,0.2)',
             borderWidth: 2,
-            pointBackgroundColor: orange,
+            pointBackgroundColor: "#f97316",
             pointRadius: 5,
           }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: { r: { min: 0, max: 5, ticks: { stepSize: 1 } } }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 5, ticks: { stepSize: 1 } } } }
       });
     }
 
-    // 3. Service Popularity - Polar Area
     const polarCtx = document.getElementById('popularity-polar');
     if (polarCtx) {
       chartsRef.current.polar = new Chart(polarCtx, {
@@ -139,7 +119,6 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
       });
     }
 
-    // 4. Revenue Trend - Line Chart
     const trendCtx = document.getElementById('revenue-trend-chart');
     if (trendCtx) {
       chartsRef.current.trend = new Chart(trendCtx, {
@@ -165,7 +144,6 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
       });
     }
 
-    // 5. Bookings per Service - Doughnut
     const doughnutCtx = document.getElementById('bookings-doughnut');
     if (doughnutCtx) {
       chartsRef.current.doughnut = new Chart(doughnutCtx, {
@@ -178,16 +156,10 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
             borderWidth: 0,
           }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '65%',
-          plugins: { legend: { position: 'bottom' } }
-        }
+        options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom' } } }
       });
     }
 
-    // 6. Service Growth - Area Chart
     const growthCtx = document.getElementById('growth-area');
     if (growthCtx) {
       chartsRef.current.growth = new Chart(growthCtx, {
@@ -213,15 +185,8 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
 
   const exportCSV = () => {
     const headers = ['Service', 'Category', 'Price', 'Bookings', 'Revenue', 'Rating'];
-    const rows = filteredServices.map(s => [
-      s.name,
-      s.category,
-      s.price || 0,
-      s.bookings || 0,
-      s.revenue || 0,
-      s.rating || 0
-    ]);
-    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const rows = filteredServices.map(s => [s.name, s.category, s.price || 0, s.bookings || 0, s.revenue || 0, s.rating || 0]);
+    const csv = [headers,...rows].map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -230,26 +195,14 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
     a.click();
   };
 
-  // FIXED EMPTY STATE - ALL TAGS PROPERLY CLOSED
   if (safeServices.length === 0) {
     return (
-      <motion.div
-        className="analytics-page"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      >
+      <motion.div className="analytics-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <div className="analytics-header-content2">
-
-          <motion.button
-            className="back-btn"
-            onClick={onBack}
-            whileHover={{ x: -5 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <motion.button className="back-btn" onClick={onBack} whileHover={{ x: -5 }} whileTap={{ scale: 0.95 }}>
             <ArrowLeft size={20} /> Back
           </motion.button>
-          <div>
-
+          <div className="empty-header-text">
             <h1>Service Analytics</h1>
             <p>No services found</p>
           </div>
@@ -259,43 +212,25 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
           <h2>No Services Yet</h2>
           <p>Add services to see detailed analytics and insights</p>
         </div>
-      </motion.div >
+      </motion.div>
     );
   }
 
   return (
-    <motion.div
-      className="analytics-page"
-      initial={{ opacity: 0, x: 100 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -100 }}
-      transition={{ duration: 0.3 }}
-    >
-      {/* Header */}
+    <motion.div className="analytics-page" initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -100 }} transition={{ duration: 0.3 }}>
       <div className="analytics-header">
-        <motion.button
-          className="back-btn"
-          onClick={onBack}
-          whileHover={{ x: -5 }}
-          whileTap={{ scale: 0.95 }}
-        >
+        <motion.button className="back-btn" onClick={onBack} whileHover={{ x: -5 }} whileTap={{ scale: 0.95 }}>
           <ArrowLeft size={20} /> Back
         </motion.button>
         <div>
           <h1>Service Analytics</h1>
           <p>Deep insights into your service performance</p>
         </div>
-        <motion.button
-          className="export-btn"
-          onClick={exportCSV}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
+        <motion.button className="export-btn" onClick={exportCSV} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Download size={18} /> Export CSV
         </motion.button>
       </div>
 
-      {/* KPI Cards */}
       <div className="kpi-grid">
         <KpiCard icon={DollarSign} label="Total Revenue" value={`₹${totalRevenue.toLocaleString()}`} trend={15.3} color="#22c55e" />
         <KpiCard icon={Star} label="Avg Rating" value={avgRating} trend={5.2} color="#fbbf24" />
@@ -303,19 +238,13 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
         <KpiCard icon={Users} label="Total Bookings" value={totalBookings} trend={18.9} color="#3b82f6" />
       </div>
 
-      {/* Filters */}
       <div className="filters-bar">
         <div className="search-box">
           <Search size={18} />
-          <input
-            type="text"
-            placeholder="Search services..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
+          <input type="text" placeholder="Search services..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
         </div>
         <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)}>
-          {categories.map(c => <option key={c} value={c}>{c === 'all' ? 'All Categories' : c}</option>)}
+          {categories.map(c => <option key={c} value={c}>{c === 'all'? 'All Categories' : c}</option>)}
         </select>
         <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
           <option value="revenue">Sort by Revenue</option>
@@ -324,7 +253,6 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
         </select>
       </div>
 
-      {/* Charts Grid */}
       <div className="charts-grid">
         <div className="chart-card wide">
           <div className="chart-header">
@@ -375,7 +303,6 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
         </div>
       </div>
 
-      {/* Insights Section */}
       <div className="insights-section">
         <h2><Zap size={24} /> AI-Powered Insights</h2>
         <div className="insight-cards">
@@ -417,7 +344,6 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
         </div>
       </div>
 
-      {/* Service Performance Table */}
       <div className="performance-table">
         <h3>Service Performance Breakdown</h3>
         <div className="table-wrap">
@@ -436,12 +362,7 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
             </thead>
             <tbody>
               {filteredServices.map((s, i) => (
-                <motion.tr
-                  key={s.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
+                <motion.tr key={s.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                   <td className="service-name-cell">
                     {s.image && <img src={s.image} alt="" />}
                     <span>{s.name}</span>
@@ -462,9 +383,9 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
                       <motion.div
                         className="perf-fill"
                         initial={{ width: 0 }}
-                        animate={{ width: `${topService ? ((s.bookings || 0) / (topService.bookings || 1)) * 100 : 0}%` }}
+                        animate={{ width: `${topService? ((s.bookings || 0) / (topService.bookings || 1)) * 100 : 0}%` }}
                         transition={{ duration: 1, delay: i * 0.1 }}
-                        style={{ background: (s.bookings || 0) > 10 ? '#22c55e' : (s.bookings || 0) > 5 ? '#fbbf24' : '#ef4444' }}
+                        style={{ background: (s.bookings || 0) > 10? '#22c55e' : (s.bookings || 0) > 5? '#fbbf24' : '#ef4444' }}
                       />
                     </div>
                   </td>
@@ -481,18 +402,14 @@ export default function ServiceAnalytics({ services = [], bookings = [], onBack 
 function KpiCard({ icon: Icon, label, value, sub, trend, color }) {
   const isUp = (trend || 0) >= 0;
   return (
-    <motion.div
-      className="kpi-card"
-      whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }}
-      transition={{ type: "spring", stiffness: 300 }}
-    >
+    <motion.div className="kpi-card" whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }} transition={{ type: "spring", stiffness: 300 }}>
       <div className="kpi-top">
         <div className="kpi-icon" style={{ background: color }}>
           <Icon size={24} color="white" />
         </div>
-        {trend !== undefined && (
-          <div className={`kpi-trend ${isUp ? 'up' : 'down'}`}>
-            {isUp ? '↑' : '↓'} {Math.abs(trend)}%
+        {trend!== undefined && (
+          <div className={`kpi-trend ${isUp? 'up' : 'down'}`}>
+            {isUp? '↑' : '↓'} {Math.abs(trend)}%
           </div>
         )}
       </div>

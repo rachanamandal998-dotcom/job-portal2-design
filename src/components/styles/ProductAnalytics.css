@@ -57,6 +57,7 @@
   padding: 2rem;
   width: 100%;
   font-family: var(--ss-font-body);
+
 }
 
 /* ================================
@@ -566,9 +567,9 @@
     border-radius: 12px;
   }
 
-  .back-btn {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
+  .analytics-page .back-btn {
+    width: 70px;
+    justify-content: center;
 
   }
 

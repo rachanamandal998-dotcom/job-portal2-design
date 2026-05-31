@@ -27,9 +27,7 @@ ChartJS.register(
   ArcElement, RadialLinearScale, Title, Tooltip, Legend, Filler
 );
 
-// ==========================================
-// MOCK DATA GENERATOR
-// ==========================================
+//... MOCK DATA GENERATOR stays same...
 const COMPANIES = [
   'TechVantage', 'InnoSys', 'CloudScale', 'Apex Digital', 'Quantum Labs',
   'AlphaStream', 'ByteWorks', 'DevCore', 'Zeta Global', 'Stellar UI',
@@ -308,7 +306,6 @@ export default function RejectionsPage({ onBack }) {
       transition={{ duration: 0.5 }}
       className="rejections-page"
     >
-      {/* HEADER WITH BACK BUTTON */}
       <div className="ba-header">
         {onBack && (
           <motion.button
@@ -322,7 +319,6 @@ export default function RejectionsPage({ onBack }) {
         )}
       </div>
 
-      {/* PAGE HEADER */}
       <header className="page-header">
         <div className="header-left">
           <h1>
@@ -345,7 +341,6 @@ export default function RejectionsPage({ onBack }) {
         </div>
       </header>
 
-      {/* KPI GRID */}
       <section className="kpi-grid">
         {[
           { label: 'Total Rejections', val: metrics.total, icon: <XCircle className="icon-rose" /> },
@@ -369,7 +364,6 @@ export default function RejectionsPage({ onBack }) {
         ))}
       </section>
 
-      {/* SEARCH & FILTERS */}
       <section className="filters-section">
         <div className="filter-row-top">
           <div className="search-box">
@@ -428,7 +422,6 @@ export default function RejectionsPage({ onBack }) {
         </AnimatePresence>
       </section>
 
-      {/* CHARTS */}
       <section className="charts-grid">
         <div className="chart-card">
           <h3><BarChart3 size={16} /> Longitudinal Rejection Trend</h3>
@@ -448,7 +441,6 @@ export default function RejectionsPage({ onBack }) {
         </div>
       </section>
 
-      {/* INSIGHTS PANEL */}
       <section className="insights-panel">
         <h3>⚡ Algorithmic Sourcing Insights</h3>
         <div className="insights-grid">
@@ -471,7 +463,6 @@ export default function RejectionsPage({ onBack }) {
         </div>
       </section>
 
-      {/* DATA TABLE */}
       <section className="table-section">
         <div className="table-header">
           <div>
@@ -577,7 +568,6 @@ export default function RejectionsPage({ onBack }) {
           </table>
         </div>
 
-        {/* PAGINATION */}
         <div className="pagination">
           <span>Viewing {paginatedData.length} records out of {filteredData.length} filtered items</span>
           <div className="pagination-btns">
@@ -587,8 +577,8 @@ export default function RejectionsPage({ onBack }) {
             >
               Previous
             </button>
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, idx) => {
-              const page = idx + 1;
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              const page = i + 1;
               return (
                 <button
                   key={page}

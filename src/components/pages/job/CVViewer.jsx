@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Download, Mail, Phone, MapPin, Briefcase, GraduationCap,
   Award, Star, Printer, Share2, Linkedin, Github, Globe, Calendar,
-  FileText, CheckCircle, TrendingUp, Ban
+  FileText, CheckCircle, TrendingUp, Ban, User, Zap
 } from "lucide-react";
 import Chart from "chart.js/auto";
 import { useEffect, useRef } from "react";
@@ -86,7 +86,14 @@ export default function ViewCvPage() {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          scales: { r: { beginAtZero: true, max: 100, grid: { color: '#fff7ed' } } },
+          scales: {
+            r: {
+              beginAtZero: true,
+              max: 100,
+              grid: { color: '#fff7ed' },
+              ticks: { display: false }
+            }
+          },
           plugins: { legend: { display: false } }
         }
       });
@@ -101,14 +108,20 @@ export default function ViewCvPage() {
           labels: ['Technical', 'Communication', 'Problem Solving', 'Teamwork'],
           datasets: [{
             data: [90, 85, 88, 92],
-            backgroundColor: ['#f97316', '#fb923c', '#22c55e', '#3b82f6']
+            backgroundColor: ['#f97316', '#fb923c', '#22c55e', '#3b82f6'],
+            borderWidth: 0
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           cutout: '70%',
-          plugins: { legend: { position: 'bottom', labels: { padding: 10, usePointStyle: true } } }
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { padding: 15, usePointStyle: true, font: { size: 12 } }
+            }
+          }
         }
       });
     }
@@ -125,29 +138,39 @@ export default function ViewCvPage() {
 
   const recommendation = getRecommendation();
 
+  const handleDownload = () => {
+    window.print();
+  };
+
   return (
-    <div className="cv-page">
-      <div className="cv-header no-print glass">
-        <button className="btn-back" onClick={() => navigate(-1)}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="cv-page"
+    >
+      {/* HEADER */}
+      <div className="cv-header no-print">
+        <button className="cv-back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={20} /> Back
         </button>
-        <h1>Candidate Profile</h1>
+        <div className="header-content">
+          <h1>Candidate Profile</h1>
+          <p>Detailed CV and performance analysis</p>
+        </div>
         <div className="header-actions">
-          <button className="btn-premium" onClick={() => window.print()}>
+          <button className="cv-action-btn secondary" onClick={handleDownload}>
             <Printer size={18} /> Print
           </button>
-          <button className="btn-premium">
+          <button className="cv-action-btn primary" onClick={handleDownload}>
             <Download size={18} /> Download PDF
-          </button>
-          <button className="btn-premium">
-            <Share2 size={18} /> Share
           </button>
         </div>
       </div>
 
+      {/* CV CONTAINER */}
       <div className="cv-container">
         <motion.div
-          className="cv-hero glass"
+          className="cv-hero"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -161,9 +184,15 @@ export default function ViewCvPage() {
               <span><MapPin size={14} /> {candidate.location}</span>
             </div>
             <div className="cv-socials">
-              <a href={`https://${candidate.linkedin}`}><Linkedin size={18} /></a>
-              <a href={`https://${candidate.github}`}><Github size={18} /></a>
-              <a href={`https://${candidate.portfolio}`}><Globe size={18} /></a>
+              <a href={`https://${candidate.linkedin}`} target="_blank" rel="noreferrer">
+                <Linkedin size={18} />
+              </a>
+              <a href={`https://${candidate.github}`} target="_blank" rel="noreferrer">
+                <Github size={18} />
+              </a>
+              <a href={`https://${candidate.portfolio}`} target="_blank" rel="noreferrer">
+                <Globe size={18} />
+              </a>
             </div>
             <div className="cv-badges">
               <div className="match-badge" style={{ background: recommendation.color }}>
@@ -177,7 +206,13 @@ export default function ViewCvPage() {
         </motion.div>
 
         <div className="cv-grid">
-          <motion.div className="cv-section glass" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
+          {/* Summary */}
+          <motion.div
+            className="cv-section"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+          >
             <h3><Award size={20} /> Professional Summary</h3>
             <p>{candidate.summary}</p>
             <div className="summary-stats">
@@ -187,16 +222,28 @@ export default function ViewCvPage() {
             </div>
           </motion.div>
 
-          <motion.div className="cv-section glass" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+          {/* Skill Analysis */}
+          <motion.div
+            className="cv-section"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             <h3><TrendingUp size={20} /> Skill Analysis</h3>
             <div className="chart-container" style={{ height: '250px' }}>
               <canvas id="skillRadar" />
             </div>
           </motion.div>
 
-          <motion.div className="cv-section glass" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
-            <h3><Briefcase size={20} /> Skills</h3>
-            <div className="skills-grid">
+          {/* Skills */}
+          <motion.div
+            className="cv-section"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <h3><Zap size={20} /> Technical Skills</h3>
+            <div className="skill-bars">
               {candidate.skills.map((skill, i) => (
                 <div key={i} className="skill-item">
                   <div className="skill-header">
@@ -216,8 +263,14 @@ export default function ViewCvPage() {
             </div>
           </motion.div>
 
-          <motion.div className="cv-section glass" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
-            <h3><CheckCircle size={20} /> Performance</h3>
+          {/* Performance */}
+          <motion.div
+            className="cv-section"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h3><CheckCircle size={20} /> Performance Metrics</h3>
             <div className="chart-container" style={{ height: '250px' }}>
               <canvas id="perfChart" />
             </div>
@@ -227,7 +280,13 @@ export default function ViewCvPage() {
             </div>
           </motion.div>
 
-          <motion.div className="cv-section glass full-width" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+          {/* Work Experience */}
+          <motion.div
+            className="cv-section full-width"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
             <h3><Briefcase size={20} /> Work Experience</h3>
             <div className="timeline">
               {candidate.workExp.map((exp, i) => (
@@ -244,7 +303,13 @@ export default function ViewCvPage() {
             </div>
           </motion.div>
 
-          <motion.div className="cv-section glass" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}>
+          {/* Education */}
+          <motion.div
+            className="cv-section"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6 }}
+          >
             <h3><GraduationCap size={20} /> Education</h3>
             {candidate.education.map((edu, i) => (
               <div key={i} className="edu-item">
@@ -255,7 +320,13 @@ export default function ViewCvPage() {
             ))}
           </motion.div>
 
-          <motion.div className="cv-section glass" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7 }}>
+          {/* Certifications */}
+          <motion.div
+            className="cv-section"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.7 }}
+          >
             <h3><Award size={20} /> Certifications</h3>
             {candidate.certifications.map((cert, i) => (
               <div key={i} className="cert-item">
@@ -268,8 +339,14 @@ export default function ViewCvPage() {
             ))}
           </motion.div>
 
-          <motion.div className="cv-section glass full-width" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
-            <h3><FileText size={20} /> Projects</h3>
+          {/* Projects */}
+          <motion.div
+            className="cv-section full-width"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+          >
+            <h3><FileText size={20} /> Key Projects</h3>
             <div className="projects-grid">
               {candidate.projects.map((proj, i) => (
                 <div key={i} className="project-card">
@@ -281,7 +358,13 @@ export default function ViewCvPage() {
             </div>
           </motion.div>
 
-          <motion.div className="cv-section glass" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 }}>
+          {/* Languages */}
+          <motion.div
+            className="cv-section"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.9 }}
+          >
             <h3>Languages</h3>
             <div className="lang-list">
               {candidate.languages.map((lang, i) => (
@@ -290,7 +373,13 @@ export default function ViewCvPage() {
             </div>
           </motion.div>
 
-          <motion.div className="cv-section glass" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1 }}>
+          {/* Achievements */}
+          <motion.div
+            className="cv-section"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1 }}
+          >
             <h3>Achievements</h3>
             {candidate.achievements.map((ach, i) => (
               <div key={i} className="achievement-item">
@@ -301,12 +390,19 @@ export default function ViewCvPage() {
           </motion.div>
         </div>
 
-        <div className="action-footer glass">
-          <button className="btn-premium success"><CheckCircle size={18} /> Shortlist</button>
-          <button className="btn-premium"><Calendar size={18} /> Schedule Interview</button>
-          <button className="btn-premium danger"><Ban size={18} /> Reject</button>
+        {/* Action Footer */}
+        <div className="action-footer no-print">
+          <button className="btn-premium success">
+            <CheckCircle size={18} /> Shortlist Candidate
+          </button>
+          <button className="btn-premium primary">
+            <Calendar size={18} /> Schedule Interview
+          </button>
+          <button className="btn-premium danger">
+            <Ban size={18} /> Reject
+          </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
