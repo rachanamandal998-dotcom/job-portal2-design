@@ -12,7 +12,7 @@ import {
   Activity,
   Target,
   AlertTriangle,
-  AlertCircle, // <-- add this
+  AlertCircle,
   Star,
   ShoppingBag,
   Box,
@@ -48,7 +48,6 @@ ChartJS.register(
   Filler
 );
 
-// Mock data - replace with your API later
 const mockProducts = [
   { id: 1, name: "Wireless Headphones", category: "Electronics", price: 4500, cost: 2800, stock: 45, soldCount: 120, rating: 4.7, dateAdded: "2026-01-15" },
   { id: 2, name: "Smart Watch", category: "Electronics", price: 8900, cost: 5200, stock: 12, soldCount: 89, rating: 4.5, dateAdded: "2026-02-10" },
@@ -68,7 +67,6 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
     sold: 0,
   });
 
-  // Core Analytics Calculations
   const analytics = useMemo(() => {
     const totalRevenue = products.reduce((sum, p) => sum + Number(p.price) * (p.soldCount || 0), 0);
     const totalCost = products.reduce((sum, p) => sum + Number(p.cost) * (p.soldCount || 0), 0);
@@ -78,15 +76,14 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
     const avgRating = products.reduce((sum, p) => sum + p.rating, 0) / products.length;
     const avgMargin = products.reduce((sum, p) => {
       const profit = Number(p.price) - Number(p.cost);
-      return sum + (Number(p.price) > 0? (profit / Number(p.price)) * 100 : 0);
+      return sum + (Number(p.price) > 0 ? (profit / Number(p.price)) * 100 : 0);
     }, 0) / products.length;
 
-    const bestSeller = products.reduce((max, p) => ((p.soldCount || 0) > (max.soldCount || 0)? p : max), products[0]);
+    const bestSeller = products.reduce((max, p) => ((p.soldCount || 0) > (max.soldCount || 0) ? p : max), products[0]);
     const lowStock = products.filter(p => p.stock > 0 && p.stock <= 10);
     const outOfStock = products.filter(p => p.stock === 0);
-    const topRated = products.reduce((max, p) => (p.rating > max.rating? p : max), products[0]);
+    const topRated = products.reduce((max, p) => (p.rating > max.rating ? p : max), products[0]);
 
-    // Category breakdown
     const categoryData = {};
     products.forEach(p => {
       if (!categoryData[p.category]) {
@@ -115,7 +112,6 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
     };
   }, [products]);
 
-  // Animate KPIs on mount
   useEffect(() => {
     const duration = 1200;
     const steps = 60;
@@ -137,7 +133,6 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
     return () => clearInterval(timer);
   }, [analytics]);
 
-  // Chart 1: Revenue by Category
   const revenueByCategory = useMemo(() => ({
     labels: Object.keys(analytics.categoryData),
     datasets: [{
@@ -155,7 +150,6 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
     }],
   }), [analytics.categoryData]);
 
-  // Chart 2: Top Products by Sales
   const topProductsData = useMemo(() => {
     const sorted = [...products].sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0)).slice(0, 6);
     return {
@@ -171,7 +165,6 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
     };
   }, [products]);
 
-  // Chart 3: Stock vs Sold
   const stockVsSoldData = useMemo(() => ({
     labels: products.map(p => p.name).slice(0, 8),
     datasets: [
@@ -188,14 +181,13 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
     ],
   }), [products]);
 
-  // Chart 4: Profit Margin by Product
   const profitMarginData = useMemo(() => ({
     labels: products.map(p => p.name).slice(0, 8),
     datasets: [{
       label: "Margin %",
       data: products.map(p => {
         const profit = Number(p.price) - Number(p.cost);
-        return Number(p.price) > 0? (profit / Number(p.price)) * 100 : 0;
+        return Number(p.price) > 0 ? (profit / Number(p.price)) * 100 : 0;
       }).slice(0, 8),
       backgroundColor: "rgba(249, 115, 22, 0.3)",
       borderColor: "rgba(249, 115, 22, 1)",
@@ -204,7 +196,6 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
     }],
   }), [products]);
 
-  // Chart 5: Category Performance
   const categoryPerformanceData = useMemo(() => ({
     labels: Object.keys(analytics.categoryData),
     datasets: [{
@@ -221,7 +212,6 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
     }],
   }), [analytics.categoryData]);
 
-  // Chart 6: Revenue Trend - simulated monthly
   const revenueTrendData = useMemo(() => ({
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
     datasets: [{
@@ -258,7 +248,7 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
   };
 
   const barOptions = {
-   ...chartOptions,
+    ...chartOptions,
     scales: {
       x: { grid: { display: false }, ticks: { color: "#64748b", font: { size: 10 } } },
       y: { grid: { color: "rgba(148, 163, 184, 0.1)" }, ticks: { color: "#64748b" } },
@@ -266,7 +256,7 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
   };
 
   const radarOptions = {
-   ...chartOptions,
+    ...chartOptions,
     scales: {
       r: {
         angleLines: { color: "rgba(148, 163, 184, 0.2)" },
@@ -280,11 +270,11 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
   const handleExport = () => {
     const csv = [
       ["Product", "Category", "Price", "Cost", "Stock", "Sold", "Revenue", "Profit", "Margin%"],
-     ...products.map(p => {
+      ...products.map(p => {
         const rev = Number(p.price) * (p.soldCount || 0);
         const cost = Number(p.cost) * (p.soldCount || 0);
         const profit = rev - cost;
-        const margin = Number(p.price) > 0? ((Number(p.price) - Number(p.cost)) / Number(p.price)) * 100 : 0;
+        const margin = Number(p.price) > 0 ? ((Number(p.price) - Number(p.cost)) / Number(p.price)) * 100 : 0;
         return [p.name, p.category, p.price, p.cost, p.stock, p.soldCount || 0, rev, profit, margin.toFixed(1)];
       }),
     ].map(row => row.join(",")).join("\n");
@@ -298,26 +288,26 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
   };
 
   return (
-    <div className="analytics-page">
+    <div className="product-analytics-page">
       {/* Header */}
-      <motion.div className="analytics-header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="btn-cover">
-        <button className="back-btn" onClick={onBack}>
-          <ArrowLeft size={20} />
-          Back
-        </button>
+      <motion.div className="product-analytics-header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="product-btn-cover">
+          <button className="product-back-btn" onClick={onBack}>
+            <ArrowLeft size={20} />
+            Back
+          </button>
         </div>
-        <div className="header-content">
-          <div className="header-left">
-            <div className="header-icon">
+        <div className="product-header-content">
+          <div className="product-header-left">
+            <div className="product-header-icon">
               <BarChart3 size={32} />
             </div>
             <div>
-              <h1 className="analytics-title">Product Analytics</h1>
-              <p className="analytics-subtitle">Deep insights into product performance</p>
+              <h1 className="product-analytics-title">Product Analytics</h1>
+              <p className="product-analytics-subtitle">Deep insights into product performance</p>
             </div>
           </div>
-          <button className="export-btn" onClick={handleExport}>
+          <button className="product-export-btn" onClick={handleExport}>
             <Download size={18} />
             Export CSV
           </button>
@@ -325,7 +315,7 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
       </motion.div>
 
       {/* KPI Cards */}
-      <div className="kpi-grid">
+      <div className="product-kpi-grid">
         {[
           { icon: DollarSign, label: "Total Revenue", value: `Rs ${Math.round(animatedKPIs.revenue).toLocaleString()}`, color: "green" },
           { icon: TrendingUp, label: "Total Profit", value: `Rs ${Math.round(animatedKPIs.profit).toLocaleString()}`, color: "orange" },
@@ -336,113 +326,113 @@ export default function ProductAnalytics({ products = mockProducts, onBack }) {
         ].map((kpi, idx) => (
           <motion.div
             key={kpi.label}
-            className="kpi-card"
+            className="product-kpi-card"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: idx * 0.1 }}
           >
-            <div className={`kpi-icon ${kpi.color}`}>
+            <div className={`product-kpi-icon ${kpi.color}`}>
               <kpi.icon size={24} />
             </div>
-            <div className="kpi-content">
-              <div className="kpi-label">{kpi.label}</div>
-              <div className="kpi-value">{kpi.value}</div>
+            <div className="product-kpi-content">
+              <div className="product-kpi-label">{kpi.label}</div>
+              <div className="product-kpi-value">{kpi.value}</div>
             </div>
           </motion.div>
         ))}
       </div>
 
       {/* Insights */}
-      <motion.div className="insights-section" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
-        <h2 className="section-title">Smart Insights</h2>
-        <div className="insights-grid">
-          <div className="insight-card success">
-            <div className="insight-icon"><TrendingUp size={20} /></div>
-            <p className="insight-text">Best Seller: {analytics.bestSeller.name} with {analytics.bestSeller.soldCount} units sold</p>
+      <motion.div className="product-insights-section" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+        <h2 className="product-section-title">Smart Insights</h2>
+        <div className="product-insights-grid">
+          <div className="product-insight-card success">
+            <div className="product-insight-icon"><TrendingUp size={20} /></div>
+            <p className="product-insight-text">Best Seller: {analytics.bestSeller.name} with {analytics.bestSeller.soldCount} units sold</p>
           </div>
-          <div className="insight-card info">
-            <div className="insight-icon"><Star size={20} /></div>
-            <p className="insight-text">Top Rated: {analytics.topRated.name} at {analytics.topRated.rating}★</p>
+          <div className="product-insight-card info">
+            <div className="product-insight-icon"><Star size={20} /></div>
+            <p className="product-insight-text">Top Rated: {analytics.topRated.name} at {analytics.topRated.rating}★</p>
           </div>
-          <div className="insight-card warning">
-            <div className="insight-icon"><AlertTriangle size={20} /></div>
-            <p className="insight-text">{analytics.lowStock.length} products need restock soon</p>
+          <div className="product-insight-card warning">
+            <div className="product-insight-icon"><AlertTriangle size={20} /></div>
+            <p className="product-insight-text">{analytics.lowStock.length} products need restock soon</p>
           </div>
-          <div className="insight-card info">
-            <div className="insight-icon"><AlertCircle size={20} /></div>
-            <p className="insight-text">{analytics.outOfStock.length} products out of stock</p>
+          <div className="product-insight-card info">
+            <div className="product-insight-icon"><AlertCircle size={20} /></div>
+            <p className="product-insight-text">{analytics.outOfStock.length} products out of stock</p>
           </div>
         </div>
       </motion.div>
 
       {/* Charts Grid */}
-      <div className="charts-section">
-        <h2 className="section-title">Visual Analytics</h2>
-        <div className="charts-grid">
-          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
-            <div className="chart-header">
-              <PieChart size={20} className="chart-icon" />
+      <div className="product-charts-section">
+        <h2 className="product-section-title">Visual Analytics</h2>
+        <div className="product-charts-grid">
+          <motion.div className="product-chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
+            <div className="product-chart-header">
+              <PieChart size={20} className="product-chart-icon" />
               <div>
-                <h3 className="chart-title">Revenue by Category</h3>
-                <p className="chart-subtitle">Category performance</p>
+                <h3 className="product-chart-title">Revenue by Category</h3>
+                <p className="product-chart-subtitle">Category performance</p>
               </div>
             </div>
-            <div className="chart-body"><Pie data={revenueByCategory} options={chartOptions} /></div>
+            <div className="product-chart-body"><Pie data={revenueByCategory} options={chartOptions} /></div>
           </motion.div>
 
-          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
-            <div className="chart-header">
-              <BarChart3 size={20} className="chart-icon" />
+          <motion.div className="product-chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
+            <div className="product-chart-header">
+              <BarChart3 size={20} className="product-chart-icon" />
               <div>
-                <h3 className="chart-title">Top Products</h3>
-                <p className="chart-subtitle">By sales volume</p>
+                <h3 className="product-chart-title">Top Products</h3>
+                <p className="product-chart-subtitle">By sales volume</p>
               </div>
             </div>
-            <div className="chart-body"><Bar data={topProductsData} options={barOptions} /></div>
+            <div className="product-chart-body"><Bar data={topProductsData} options={barOptions} /></div>
           </motion.div>
 
-          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
-            <div className="chart-header">
-              <Box size={20} className="chart-icon" />
+          <motion.div className="product-chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
+            <div className="product-chart-header">
+              <Box size={20} className="product-chart-icon" />
               <div>
-                <h3 className="chart-title">Stock vs Sold</h3>
-                <p className="chart-subtitle">Inventory status</p>
+                <h3 className="product-chart-title">Stock vs Sold</h3>
+                <p className="product-chart-subtitle">Inventory status</p>
               </div>
             </div>
-            <div className="chart-body"><Bar data={stockVsSoldData} options={barOptions} /></div>
+            <div className="product-chart-body"><Bar data={stockVsSoldData} options={barOptions} /></div>
           </motion.div>
 
-          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0 }}>
-            <div className="chart-header">
-              <Activity size={20} className="chart-icon" />
+          <motion.div className="product-chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0 }}>
+            <div className="product-chart-header">
+              <Activity size={20} className="product-chart-icon" />
               <div>
-                <h3 className="chart-title">Profit Margin</h3>
-                <p className="chart-subtitle">By product</p>
+                <h3 className="product-chart-title">Profit Margin</h3>
+                <p className="product-chart-subtitle">By product</p>
               </div>
             </div>
-            <div className="chart-body"><Radar data={profitMarginData} options={radarOptions} /></div>
+            <div className="product-chart-body"><Radar data={profitMarginData} options={radarOptions} /></div>
           </motion.div>
 
-          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}>
-            <div className="chart-header">
-              <TrendingUp size={20} className="chart-icon" />
+          <motion.div className="product-chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}>
+            <div className="product-chart-header">
+              <TrendingUp size={20} className="product-chart-icon" />
               <div>
-                <h3 className="chart-title">Category Performance</h3>
-                <p className="chart-subtitle">Units sold per category</p>
+                <h3 className="product-chart-title">Category Performance</h3>
+                <p className="product-chart-subtitle">Units sold per category</p>
               </div>
             </div>
-            <div className="chart-body"><PolarArea data={categoryPerformanceData} options={chartOptions} /></div>
+            <div className="product-chart-body"><PolarArea data={categoryPerformanceData} options={chartOptions} /></div>
           </motion.div>
 
-          <motion.div className="chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}>
-            <div className="chart-header">
-              <DollarSign size={20} className="chart-icon" />
+          <motion.div className="product-chart-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}>
+            <div className="product-chart-header">
+              <DollarSign size={20} className="product-chart-icon" />
               <div>
-                <h3 className="chart-title">Revenue Trend</h3>
-                <p className="chart-subtitle">Last 6 months</p>
+                <h3 className="product-chart-title">Revenue Trend</h3>
+                <p className="product-chart-subtitle">Last 6 months</p>
               </div>
             </div>
-            <div className="chart-body"><Line data={revenueTrendData} options={barOptions} /></div>
+            <div className="product-chart-body"><Line data={revenueTrendData} options={barOptions} /></div>
           </motion.div>
         </div>
       </div>

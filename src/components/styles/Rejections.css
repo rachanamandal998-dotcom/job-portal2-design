@@ -1,630 +1,924 @@
-/* Rejections.css - 100% scoped to.rejections-page */
+Here is the complete,
+fully responsive `Rejections.css` file. I have perfectly matched the **orange glassmorphic header**,
+the **centered typography**,
+and the **clean,
+modern body** with full dark mode support to ensure it seamlessly aligns with your `ProductAnalytics`,
+`Applications`,
+and `OffersReceived` pages. ### `Rejections.css` ```css
+/* ══════════════════════════════════════════
+   Rejections.css
+   Orange Glassmorphism Header + Clean Body
+   ══════════════════════════════════════════ */
+
 .rejections-page {
   min-height: 100vh;
   background: #f8fafc;
-  padding: 2rem;
-  font-family: 'Inter', sans-serif;
+  padding: clamp(1rem, 3vw, 2rem);
+  animation: fadeIn 0.3s ease;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1e293b;
+}
+
+.rejections-page.dark {
+  background: #121212;
+  color: #f8fafc;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rejections-page *,
+.rejections-page *::before,
+.rejections-page *::after {
   box-sizing: border-box;
 }
 
-[data-theme="dark"].rejections-page {
-  background: #0f172a;
+/* ─────────────────────────────────────────────────────────
+   BACK BUTTON
+────────────────────────────────────────────────────────── */
+.rejections-page .ba-header {
+  margin-bottom: 1rem;
 }
 
-.rejections-page.ba-header {
-  margin-bottom: 2rem;
-}
-
-.rejections-page.ba-back-btn {
-  display: flex;
+.rejections-page .ba-back-btn {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
   background: white;
-  border: 2px solid #e2e8f0;
+  border: 2px solid #fed7aa;
   border-radius: 12px;
-  color: #1e293b;
+  color: #f97316;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.9375rem;
+  font-size: clamp(0.875rem, 2vw, 0.9375rem);
 }
 
-[data-theme="dark"].rejections-page.ba-back-btn {
-  background: #1e293b;
-  border-color: #334155;
-  color: #f1f5f9;
+.rejections-page.dark .ba-back-btn {
+  background: #262626;
+  border-color: #404040;
+  color: #fb923c;
 }
 
-.rejections-page.ba-back-btn:hover {
-  background: #f1f5f9;
+.rejections-page .ba-back-btn:hover {
+  background: #ffedd5;
   transform: translateX(-3px);
 }
 
-[data-theme="dark"].rejections-page.ba-back-btn:hover {
-  background: #334155;
-}
-
-.rejections-page.page-header {
+/* ─────────────────────────────────────────────────────────
+   HEADER (Exact Match to Offers/ProductAnalytics)
+────────────────────────────────────────────────────────── */
+.rejections-page .page-header {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: clamp(12px, 2vw, 20px);
+  padding: clamp(1rem, 3vw, 2rem);
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
   gap: 1.5rem;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.15);
+  margin-bottom: clamp(1rem, 3vw, 2rem);
+  width: 100%;
 }
 
-.rejections-page.header-left h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0 0 0.5rem 0;
+.rejections-page .header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.rejections-page .page-header h1 {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
-}
-
-[data-theme="dark"].rejections-page.header-left h1 {
-  color: #f1f5f9;
-}
-
-.rejections-page.header-icon {
-  color: #f97316;
-}
-
-.rejections-page.header-left p {
-  color: #64748b;
+  font-size: clamp(1.25rem, 4vw, 2rem);
+  font-weight: 800;
+  color: #9a3412;
   margin: 0;
-  font-size: 1rem;
 }
 
-[data-theme="dark"].rejections-page.header-left p {
-  color: #94a3b8;
+.rejections-page.dark .page-header h1 {
+  color: #f3f4f6;
 }
 
-.rejections-page.header-actions {
+.rejections-page .header-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  border-radius: 12px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.rejections-page .page-header p {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  color: #ea580c;
+  margin: 0;
+  font-weight: 500;
+}
+
+.rejections-page.dark .page-header p {
+  color: #fb923c;
+}
+
+.rejections-page .header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 0.75rem;
   flex-wrap: wrap;
 }
 
-.rejections-page.export-btn {
+.rejections-page .export-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0.6rem 1.2rem;
   background: #f97316;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.875rem;
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.rejections-page.export-btn:hover {
+.rejections-page .export-btn:hover {
   background: #ea580c;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
 }
 
-.rejections-page.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-}
-
-.rejections-page.kpi-card {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-  border: 1.5px solid #f1f5f9;
-  transition: all 0.3s;
-}
-
-[data-theme="dark"].rejections-page.kpi-card {
-  background: #1e293b;
-  border-color: #334155;
-}
-
-.rejections-page.kpi-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.rejections-page.kpi-label {
-  font-size: 0.875rem;
-  color: #64748b;
-  font-weight: 600;
-}
-
-[data-theme="dark"].rejections-page.kpi-label {
-  color: #94a3b8;
-}
-
-.rejections-page.icon-rose { color: #f43f5e; }
-.rejections-page.icon-orange { color: #f97316; }
-.rejections-page.icon-amber { color: #f59e0b; }
-.rejections-page.icon-blue { color: #3b82f6; }
-.rejections-page.icon-emerald { color: #10b981; }
-.rejections-page.icon-teal { color: #14b8a6; }
-
-.rejections-page.kpi-value {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #0f172a;
-}
-
-[data-theme="dark"].rejections-page.kpi-value {
-  color: #f1f5f9;
-}
-
-.rejections-page.filters-section {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-  border: 1.5px solid #f1f5f9;
-  margin-bottom: 2rem;
-}
-
-[data-theme="dark"].rejections-page.filters-section {
-  background: #1e293b;
-  border-color: #334155;
-}
-
-.rejections-page.filter-row-top {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.rejections-page.search-box {
-  flex: 1;
-  min-width: 300px;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.25rem;
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  transition: all 0.2s;
-}
-
-[data-theme="dark"].rejections-page.search-box {
-  background: #0f172a;
-  border-color: #334155;
-}
-
-.rejections-page.search-box:focus-within {
-  border-color: #f97316;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-}
-
-.rejections-page.search-box input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: #0f172a;
-  font-size: 0.9375rem;
-}
-
-[data-theme="dark"].rejections-page.search-box input {
-  color: #f1f5f9;
-}
-
-.rejections-page.filter-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.rejections-page.filter-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.25rem;
-  background: white;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  color: #475569;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-[data-theme="dark"].rejections-page.filter-btn {
-  background: #0f172a;
-  border-color: #334155;
-  color: #cbd5e1;
-}
-
-.rejections-page.filter-btn.active {
-  background: #ffedd5;
-  border-color: #fdba74;
-  color: #c2410c;
-}
-
-[data-theme="dark"].rejections-page.filter-btn.active {
-  background: #431407;
-  border-color: #9a3412;
-  color: #fdba74;
-}
-
-.rejections-page.reset-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: white;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-[data-theme="dark"].rejections-page.reset-btn {
-  background: #0f172a;
-  border-color: #334155;
-  color: #94a3b8;
-}
-
-.rejections-page.reset-btn:hover {
-  background: #f1f5f9;
-  transform: rotate(180deg);
-}
-
-[data-theme="dark"].rejections-page.reset-btn:hover {
-  background: #1e293b;
-}
-
-/* Rejections.css - Scoped to .rejections-page */
-.rejections-page .filter-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.rejections-page .filter-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.rejections-page .filter-label {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #9a3412;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-[data-theme="dark"] .rejections-page .filter-label {
-  color: #d1d5db;
-}
-
-.rejections-page .filter-select-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.rejections-page .filter-select {
-  width: 100%;
-  padding: 0.875rem 2.5rem 0.875rem 1.25rem;
-  background: white;
-  border: 1.5px solid #fed7aa;
-  border-radius: 12px;
-  color: #9a3412;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.9375rem;
-  appearance: none;
-  transition: all 0.2s;
-}
-
-[data-theme="dark"] .rejections-page .filter-select {
-  background: #262626;
-  border-color: #404040;
-  color: #f3f4f6;
-}
-
-.rejections-page .filter-select:focus {
-  border-color: #f97316;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-  outline: none;
-}
-
-.rejections-page .filter-select-wrap .chevron {
-  position: absolute;
-  right: 1rem;
-  color: #c2410c;
-  pointer-events: none;
-}
-
-[data-theme="dark"] .rejections-page .filter-select-wrap .chevron {
-  color: #9ca3af;
-}
-
-.rejections-page .search-box {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.25rem;
-  background: white;
-  border: 1.5px solid #fed7aa;
-  border-radius: 12px;
-  transition: all 0.2s;
-}
-
-[data-theme="dark"] .rejections-page .search-box {
-  background: #262626;
-  border-color: #404040;
-}
-
-.rejections-page .search-box:focus-within {
-  border-color: #f97316;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-}
-
-.rejections-page .search-box input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: #9a3412;
-  font-size: 0.9375rem;
-}
-
-[data-theme="dark"] .rejections-page .search-box input {
-  color: #f3f4f6;
-}
-
-.rejections-page .search-box input::placeholder {
-  color: #ea580c;
-  opacity: 0.6;
-}
-
-[data-theme="dark"] .rejections-page .search-box input::placeholder {
-  color: #9ca3af;
-}
-
+/* ─────────────────────────────────────────────────────────
+   KPI GRID
+────────────────────────────────────────────────────────── */
 .rejections-page .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
   margin-bottom: 2rem;
 }
 
 .rejections-page .kpi-card {
   background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(239, 68, 0.08);
-  border: 1.5px solid #fecaca;
-  position: relative;
-  overflow: hidden;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 4px solid #f97316;
 }
 
-[data-theme="dark"] .rejections-page .kpi-card {
-  background: #262626;
-  border-color: #404040;
+.rejections-page.dark .kpi-card {
+  background: #1e1e1e;
+  border-color: #333;
 }
 
-.rejections-page .kpi-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #ef4444, #f87171);
-}
-
-.rejections-page .kpi-top {
+.rejections-page .kpi-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.rejections-page .kpi-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.rejections-page .kpi-value {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #991b1b;
-  margin-bottom: 0.25rem;
-}
-
-[data-theme="dark"] .rejections-page .kpi-value {
-  color: #fca5a5;
 }
 
 .rejections-page .kpi-label {
-  font-size: 0.875rem;
-  color: #dc2626;
+  font-size: 0.85rem;
+  color: #64748b;
   font-weight: 600;
 }
 
-[data-theme="dark"] .rejections-page .kpi-label {
-  color: #f87171;
+.rejections-page.dark .kpi-label {
+  color: #94a3b8;
 }
 
-.rejections-page .rejections-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.rejections-page .kpi-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
 }
 
-.rejections-page .rejection-card {
+.rejections-page.dark .kpi-value {
+  color: #f8fafc;
+}
+
+/* KPI Icon Colors */
+.rejections-page .icon-rose {
+  color: #ef4444;
+}
+
+.rejections-page .icon-orange {
+  color: #f97316;
+}
+
+.rejections-page .icon-amber {
+  color: #f59e0b;
+}
+
+.rejections-page .icon-blue {
+  color: #3b82f6;
+}
+
+.rejections-page .icon-emerald {
+  color: #10b981;
+}
+
+.rejections-page .icon-teal {
+  color: #14b8a6;
+}
+
+/* ─────────────────────────────────────────────────────────
+   FILTERS SECTION
+────────────────────────────────────────────────────────── */
+.rejections-page .filters-section {
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.08);
-  border: 1.5px solid #fecaca;
-  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
 }
 
-[data-theme="dark"] .rejections-page .rejection-card {
-  background: #262626;
+.rejections-page.dark .filters-section {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+.rejections-page .filter-row-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.rejections-page .search-box {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+}
+
+.rejections-page.dark .search-box {
+  background: #2a2a2a;
   border-color: #404040;
 }
 
-.rejections-page .rejection-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.15);
+.rejections-page .search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  flex: 1;
+  color: #475569;
+  font-size: 0.9rem;
 }
 
-.rejections-page .rejection-header {
+.rejections-page.dark .search-box input {
+  color: #d1d5db;
+}
+
+.rejections-page .filter-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rejections-page .filter-btn,
+.rejections-page .reset-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.rejections-page.dark .filter-btn,
+.rejections-page.dark .reset-btn {
+  background: #333;
+  color: #e2e8f0;
+  border-color: #444;
+}
+
+.rejections-page .filter-btn:hover,
+.rejections-page .reset-btn:hover {
+  background: #e2e8f0;
+}
+
+.rejections-page.dark .filter-btn:hover,
+.rejections-page.dark .reset-btn:hover {
+  background: #444;
+}
+
+.rejections-page .filter-btn.active {
+  background: #f97316;
+  color: white;
+  border-color: #f97316;
+}
+
+.rejections-page .filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.rejections-page.dark .filter-grid {
+  border-top-color: #444;
+}
+
+.rejections-page .filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rejections-page .filter-item label {
+  font-size: 0.8rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.rejections-page.dark .filter-item label {
+  color: #d1d5db;
+}
+
+.rejections-page .filter-item select {
+  padding: 0.6rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #475569;
+  outline: none;
+  font-size: 0.85rem;
+}
+
+.rejections-page.dark .filter-item select {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #d1d5db;
+}
+
+/* ─────────────────────────────────────────────────────────
+   CHARTS & INSIGHTS
+────────────────────────────────────────────────────────── */
+.rejections-page .charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.rejections-page .chart-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+}
+
+.rejections-page.dark .chart-card {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+.rejections-page .chart-card-wide {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 1024px) {
+  .rejections-page .chart-card-wide {
+    grid-column: span 2;
+  }
+}
+
+.rejections-page .chart-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+}
+
+.rejections-page.dark .chart-card h3 {
+  color: #f8fafc;
+}
+
+.rejections-page .chart-wrapper {
+  position: relative;
+  height: 250px;
+  width: 100%;
+}
+
+.rejections-page .insights-panel {
+  background: linear-gradient(135deg, #fff7ed, #ffffff);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #fed7aa;
+  margin-bottom: 2rem;
+}
+
+.rejections-page.dark .insights-panel {
+  background: linear-gradient(135deg, #2c1a0c, #1e1e1e);
+  border-color: #4a2a10;
+}
+
+.rejections-page .insights-panel h3 {
+  margin: 0 0 1.5rem 0;
+  color: #ea580c;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rejections-page .insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.rejections-page .insight-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rejections-page .insight-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.rejections-page.dark .insight-label {
+  color: #94a3b8;
+}
+
+.rejections-page .insight-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.rejections-page.dark .insight-value {
+  color: #f8fafc;
+}
+
+/* ─────────────────────────────────────────────────────────
+   TABLE SECTION
+────────────────────────────────────────────────────────── */
+.rejections-page .table-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
+}
+
+.rejections-page.dark .table-section {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+.rejections-page .table-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-  gap: 1rem;
-  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
 }
 
-.rejections-page .rejection-title {
-  font-size: 1.125rem;
+.rejections-page .table-header h2 {
+  margin: 0 0 0.25rem 0;
+  color: #1e293b;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #991b1b;
+}
+
+.rejections-page.dark .table-header h2 {
+  color: #f8fafc;
+}
+
+.rejections-page .table-header p {
   margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
 }
 
-[data-theme="dark"] .rejections-page .rejection-title {
-  color: #fca5a5;
+.rejections-page.dark .table-header p {
+  color: #94a3b8;
 }
 
-.rejections-page .rejection-meta {
+.rejections-page .table-wrapper {
+  overflow-x: auto;
+}
+
+.rejections-page table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.rejections-page th,
+.rejections-page td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.rejections-page.dark th,
+.rejections-page.dark td {
+  border-color: #333;
+}
+
+.rejections-page th {
+  background: #f8fafc;
+  font-weight: 700;
+  color: #475569;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.rejections-page.dark th {
+  background: #2a2a2a;
+  color: #d1d5db;
+}
+
+.rejections-page tbody tr:hover {
+  background: #f8fafc;
+}
+
+.rejections-page.dark tbody tr:hover {
+  background: #2a2a2a;
+}
+
+/* Table Elements */
+.rejections-page input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #f97316;
+  cursor: pointer;
+}
+
+.rejections-page .candidate-cell {
   display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  font-size: 0.875rem;
-  color: #dc2626;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-[data-theme="dark"] .rejections-page .rejection-meta {
+.rejections-page .avatar {
+  width: 36px;
+  height: 36px;
+  background: #ffedd5;
+  color: #ea580c;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.rejections-page.dark .avatar {
+  background: #4a2a10;
+  color: #fdba74;
+}
+
+.rejections-page .name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.rejections-page.dark .name {
+  color: #f8fafc;
+}
+
+.rejections-page .email {
+  font-size: 0.8rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rejections-page.dark .email {
+  color: #94a3b8;
+}
+
+.rejections-page .position {
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 0.25rem;
+}
+
+.rejections-page .category-tag,
+.rejections-page .company-type {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.rejections-page.dark .category-tag,
+.rejections-page.dark .company-type {
+  background: #333;
+  color: #cbd5e1;
+}
+
+.rejections-page .company {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.rejections-page.dark .company {
+  color: #f8fafc;
+}
+
+.rejections-page .timeline div {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.2rem;
+}
+
+.rejections-page.dark .timeline div {
+  color: #94a3b8;
+}
+
+.rejections-page .timeline span {
+  font-weight: 600;
+  color: #475569;
+}
+
+.rejections-page.dark .timeline span {
+  color: #cbd5e1;
+}
+
+.rejections-page .reason-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.rejections-page.dark .reason-badge {
+  background: #450a0a;
   color: #f87171;
 }
 
-.rejections-page .rejection-reason {
-  background: #fef2f2;
-  border-left: 4px solid #ef4444;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-top: 1rem;
-  font-size: 0.9375rem;
-  color: #991b1b;
-  line-height: 1.6;
+.rejections-page .score-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
-[data-theme="dark"] .rejections-page .rejection-reason {
-  background: #450a0a;
-  color: #fca5a5;
-  border-left-color: #dc2626;
+.rejections-page .score-text {
+  font-size: 0.8rem;
+  color: #475569;
+  font-weight: 500;
 }
 
-.rejections-page .reason-tag {
-  display: inline-block;
-  padding: 0.375rem 0.875rem;
-  background: #fee2e2;
-  color: #991b1b;
-  border-radius: 999px;
-  font-size: 0.8125rem;
+.rejections-page.dark .score-text {
+  color: #cbd5e1;
+}
+
+.rejections-page .score-bar {
+  width: 100px;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.rejections-page.dark .score-bar {
+  background: #333;
+}
+
+.rejections-page .score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f97316, #fbbf24);
+  border-radius: 3px;
+}
+
+.rejections-page .score-percent {
+  font-size: 0.75rem;
+  color: #f97316;
   font-weight: 700;
-  margin-top: 0.5rem;
 }
 
-[data-theme="dark"] .rejections-page .reason-tag {
-  background: #7f1d1d;
-  color: #fecaca;
+.rejections-page .status-badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.rejections-page .status-reconsidered {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.rejections-page .status-reapplied {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.rejections-page .status-contacted {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.rejections-page .status-archived {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.rejections-page.dark .status-reconsidered {
+  background: #052e16;
+  color: #4ade80;
+}
+
+.rejections-page.dark .status-reapplied {
+  background: #451a03;
+  color: #fbbf24;
+}
+
+.rejections-page.dark .status-contacted {
+  background: #0c4a6e;
+  color: #bae6fd;
+}
+
+.rejections-page.dark .status-archived {
+  background: #1f2937;
+  color: #9ca3af;
+}
+
+.rejections-page .actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.rejections-page .action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  color: white;
+}
+
+.rejections-page .action-purple {
+  background: #8b5cf6;
+}
+
+.rejections-page .action-emerald {
+  background: #10b981;
+}
+
+.rejections-page .action-rose {
+  background: #ef4444;
+}
+
+.rejections-page .action-btn:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
 }
 
 .rejections-page .empty-state {
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 3rem;
+  color: #64748b;
+}
+
+.rejections-page.dark .empty-state {
+  color: #94a3b8;
+}
+
+.rejections-page .empty-state svg {
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+/* ─────────────────────────────────────────────────────────
+   PAGINATION
+────────────────────────────────────────────────────────── */
+.rejections-page .pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.rejections-page.dark .pagination {
+  border-top-color: #333;
+}
+
+.rejections-page .pagination span {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.rejections-page.dark .pagination span {
+  color: #94a3b8;
+}
+
+.rejections-page .pagination-btns {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.rejections-page .pagination-btns button {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #cbd5e1;
   background: white;
-  border-radius: 16px;
-  border: 1.5px solid #fecaca;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #475569;
+  transition: 0.2s;
 }
 
-[data-theme="dark"] .rejections-page .empty-state {
-  background: #262626;
-  border-color: #404040;
+.rejections-page.dark .pagination-btns button {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #d1d5db;
 }
 
-.rejections-page .empty-state h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #991b1b;
-  margin: 1rem 0 0.5rem;
+.rejections-page .pagination-btns button.active {
+  background: #f97316;
+  color: white;
+  border-color: #f97316;
 }
 
-[data-theme="dark"] .rejections-page .empty-state h3 {
-  color: #fca5a5;
+.rejections-page .pagination-btns button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.rejections-page .empty-state p {
-  color: #dc2626;
-  margin: 0;
+.rejections-page .pagination-btns button:hover:not(:disabled):not(.active) {
+  background: #f8fafc;
 }
 
-[data-theme="dark"] .rejections-page .empty-state p {
-  color: #f87171;
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-  .rejections-page .filter-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .rejections-page {
-    padding: 1rem;
-  }
-  .rejections-page .kpi-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-  .rejections-page .filter-grid {
-    grid-template-columns: 1fr;
-  }
-  .rejections-page .rejection-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-@media (max-width: 480px) {
-  .rejections-page .kpi-grid {
-    grid-template-columns: 1fr;
-  }
-  .rejections-page .kpi-value {
-    font-size: 1.5rem;
-  }
-  .rejections-page .rejection-meta {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+.rejections-page.dark .pagination-btns button:hover:not(:disabled):not(.active) {
+  background: #333;
 }

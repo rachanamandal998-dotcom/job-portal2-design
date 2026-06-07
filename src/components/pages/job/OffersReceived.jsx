@@ -512,7 +512,7 @@ export default function OffersReceived() {
       {/* OFFERS GRID */}
       <section className="offers-section">
         <div className="section-header">
-          <div>
+          <div className=".header-info1">
             <h2>All Offers ({filteredOffers.length})</h2>
             <p>Showing {paginatedOffers.length} of {filteredOffers.length} offers</p>
           </div>
