@@ -656,9 +656,7 @@ export default function TotalProductsPage({ products=[], onBack }) {
             </button>
           )}
           <div className="total-products-header-left">
-            <div className="total-products-header-icon">
-              <BarChart3 size={32}/>
-            </div>
+            
             <div>
               <h1 className="total-products-title">Total Products Analytics</h1>
               <p className="total-products-subtitle">AI-powered inventory intelligence</p>

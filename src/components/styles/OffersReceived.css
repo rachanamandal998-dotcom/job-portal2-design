@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════
    OffersReceived.css
-   Orange Glassmorphism Header + Clean Body
+   Orange Glassmorphism Theme with Data Table
    ══════════════════════════════════════════ */
 
 .offers-page {
@@ -19,7 +19,8 @@
   background: #121212;
   color: #f8fafc;
 }
-.offers-page .back-btn{
+
+.offers-page .back-btn {
   width: 100%;
 }
 
@@ -28,6 +29,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -41,7 +43,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────
-   HEADER (Exact Match to ProductAnalytics/Applications)
+   HEADER
 ────────────────────────────────────────────────────────── */
 .offers-page .page-header {
   background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%);
@@ -63,7 +65,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    position: relative; /* Required to perfectly center the text */
+    position: relative;
   }
 }
 
@@ -78,11 +80,10 @@
   .offers-page .header-left {
     flex-direction: row;
     align-items: center;
-    flex: unset; /* Remove flex stretch to allow absolute centering of text */
+    flex: unset;
   }
-  
-  /* Perfectly center the text container on desktop */
-  .offers-page .header-left > div {
+
+  .offers-page .header-left>div {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -94,9 +95,8 @@
   }
 }
 
-/* Mobile text centering */
 @media (max-width: 767px) {
-  .offers-page .header-left > div {
+  .offers-page .header-left>div {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -105,13 +105,11 @@
   }
 }
 
-/* Header Back Button */
 .offers-page .back-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
- 
   padding: 0.625rem 1.25rem;
   background: white;
   border: 2px solid #fed7aa;
@@ -143,7 +141,6 @@
   transform: translateX(-3px);
 }
 
-/* Header Typography & Icon */
 .offers-page .page-header h1 {
   display: flex;
   align-items: center;
@@ -184,7 +181,6 @@
   color: #d1d5db;
 }
 
-/* Header Right Actions */
 .offers-page .header-right {
   display: flex;
   align-items: center;
@@ -230,13 +226,6 @@
 .offers-page .theme-toggle:hover {
   background: #ffedd5;
   transform: translateY(-2px);
-}
-
-@media (max-width: 480px) {
-  .offers-page .header-icon {
-    width: 40px;
-    height: 40px;
-  }
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -646,13 +635,12 @@
 }
 
 /* ─────────────────────────────────────────────────────────
-   OFFERS GRID (Upgraded Orange Theme & Centered Header)
+   DATA TABLE SECTION (Replaces Old Grid)
 ────────────────────────────────────────────────────────── */
 .offers-page .offers-section {
   margin-bottom: 2rem;
 }
 
-/* Centered Section Header for "All Offers" */
 .offers-page .section-header {
   display: flex;
   flex-direction: column;
@@ -687,21 +675,6 @@
   color: #fb923c;
 }
 
-/* Center elements properly from the React code's nested divs */
-.offers-page .header-info1 {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  width: 100%;
-}
-
-.offers-page .header-actions {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
 .offers-page .compare-btn {
   display: flex;
   align-items: center;
@@ -722,170 +695,135 @@
   transform: translateY(-2px);
 }
 
-.offers-page .offers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
-}
-
-/* Upgraded Offer Cards */
-.offers-page .offer-card {
+.offers-page .table-wrapper {
+  overflow-x: auto;
   background: white;
   border-radius: 16px;
-  padding: 1.5rem;
   border: 1.5px solid #fed7aa;
   box-shadow: 0 4px 16px rgba(249, 115, 22, 0.06);
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
 }
 
-.offers-page.dark .offer-card {
+.offers-page.dark .table-wrapper {
   background: #1e1e1e;
   border-color: #404040;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-.offers-page .offer-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #f97316, #fbbf24);
+.offers-page .data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+  text-align: left;
 }
 
-.offers-page .offer-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(249, 115, 22, 0.12);
-  border-color: #f97316;
+.offers-page .data-table th {
+  padding: 1.25rem 1rem;
+  background: #fff7ed;
+  color: #9a3412;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-bottom: 2px solid #fed7aa;
+  white-space: nowrap;
 }
 
-.offers-page.dark .offer-card:hover {
-  border-color: #f97316;
-  box-shadow: 0 12px 24px rgba(249, 115, 22, 0.2);
+.offers-page.dark .data-table th {
+  background: #2c1a0c;
+  color: #fdba74;
+  border-bottom-color: #7c2d12;
 }
 
-.offers-page .offer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+.offers-page .data-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+  font-size: 0.9rem;
+  color: #475569;
 }
 
-.offers-page .company-info {
+.offers-page.dark .data-table td {
+  border-bottom-color: #333;
+  color: #cbd5e1;
+}
+
+.offers-page .data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.offers-page .data-table tr {
+  transition: background 0.2s;
+}
+
+.offers-page .data-table tr:hover {
+  background: #fffcf8;
+}
+
+.offers-page.dark .data-table tr:hover {
+  background: #262626;
+}
+
+.offers-page .data-table .selected-row {
+  background: #fff7ed !important;
+}
+
+.offers-page.dark .data-table .selected-row {
+  background: #2c1a0c !important;
+}
+
+/* Table Inner Elements */
+.offers-page .td-candidate {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.offers-page .company-logo {
-  width: 52px;
-  height: 52px;
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
-  color: #f97316;
-  border-radius: 14px;
+.offers-page .td-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #f97316;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.8rem;
-}
-
-.offers-page.dark .company-logo {
-  background: #2c1a0c;
-  border-color: #7c2d12;
-}
-
-.offers-page .company-info h3 {
-  margin: 0 0 0.2rem 0;
-  font-size: 1.15rem;
-  color: #1e293b;
   font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
-.offers-page.dark .company-info h3 {
+.offers-page .td-name {
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.2rem;
+}
+
+.offers-page.dark .td-name {
   color: #f8fafc;
 }
 
-.offers-page .role {
-  margin: 0;
+.offers-page .td-email {
+  font-size: 0.8rem;
   color: #64748b;
-  font-size: 0.9rem;
+}
+
+.offers-page .td-primary {
   font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.2rem;
 }
 
-.offers-page.dark .role {
-  color: #94a3b8;
-}
-
-.offers-page .offer-actions-top {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.offers-page .bookmark-btn {
-  background: none;
-  border: none;
+.offers-page.dark .td-primary {
   color: #cbd5e1;
-  cursor: pointer;
-  padding: 0;
-  transition: 0.2s;
 }
 
-.offers-page .bookmark-btn:hover {
-  color: #f59e0b;
-  transform: scale(1.1);
-}
-
-.offers-page.dark .bookmark-btn {
-  color: #475569;
-}
-
-.offers-page .bookmark-btn.active {
-  color: #f59e0b;
-}
-
-.offers-page.dark .bookmark-btn.active {
-  color: #fcd34d;
-}
-
-.offers-page .offer-actions-top input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: #f97316;
-}
-
-.offers-page .offer-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.85rem;
-  font-size: 0.85rem;
-  color: #475569;
-}
-
-.offers-page.dark .offer-details {
-  color: #d1d5db;
-}
-
-.offers-page .detail-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.offers-page .detail-row svg {
-  color: #f97316;
+.offers-page .td-secondary {
+  font-size: 0.8rem;
+  color: #64748b;
 }
 
 .offers-page .salary {
   font-weight: 800;
   color: #059669;
+  font-size: 1rem;
 }
 
 .offers-page .badge {
@@ -907,6 +845,16 @@
   font-weight: 700;
 }
 
+.offers-page input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #f97316;
+}
+
+/* ─────────────────────────────────────────────────────────
+   STATUS BADGES
+────────────────────────────────────────────────────────── */
 .offers-page .status-badge {
   display: inline-block;
   padding: 0.35rem 0.8rem;
@@ -914,7 +862,7 @@
   font-size: 0.8rem;
   font-weight: 700;
   text-align: center;
-  width: max-content;
+  white-space: nowrap;
 }
 
 .offers-page .status-accepted {
@@ -922,29 +870,14 @@
   color: #16a34a;
 }
 
-.offers-page .status-rejected {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.offers-page .status-pending {
-  background: #fef3c7;
-  color: #d97706;
-}
-
-.offers-page .status-negotiation {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
-.offers-page .status-expired {
-  background: #f1f5f9;
-  color: #475569;
-}
-
 .offers-page.dark .status-accepted {
   background: #052e16;
   color: #4ade80;
+}
+
+.offers-page .status-rejected {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 .offers-page.dark .status-rejected {
@@ -952,9 +885,19 @@
   color: #f87171;
 }
 
+.offers-page .status-pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
 .offers-page.dark .status-pending {
   background: #451a03;
   color: #fbbf24;
+}
+
+.offers-page .status-negotiation {
+  background: #dbeafe;
+  color: #2563eb;
 }
 
 .offers-page.dark .status-negotiation {
@@ -962,60 +905,55 @@
   color: #60a5fa;
 }
 
+.offers-page .status-expired {
+  background: #f1f5f9;
+  color: #475569;
+}
+
 .offers-page.dark .status-expired {
   background: #1f2937;
   color: #94a3b8;
 }
 
-.offers-page .offer-actions {
+/* ─────────────────────────────────────────────────────────
+   ACTION BUTTONS (Table Specific)
+────────────────────────────────────────────────────────── */
+.offers-page .td-actions {
   display: flex;
-  flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid #fed7aa;
 }
 
-.offers-page.dark .offer-actions {
-  border-top-color: #404040;
-}
-
-.offers-page .offer-actions button {
-  flex: 1;
+.offers-page .action-icon {
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  padding: 0.6rem;
   border: none;
   border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+  color: white;
 }
 
-.offers-page .offer-actions button:hover {
+.offers-page .action-icon:hover {
   opacity: 0.9;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .offers-page .btn-accept {
   background: #22c55e;
-  color: white;
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3);
 }
 
 .offers-page .btn-negotiate {
   background: #f97316;
-  color: white;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.3);
 }
 
 .offers-page .btn-reject {
   background: #ef4444;
-  color: white;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
 }
 
 .offers-page .btn-view {

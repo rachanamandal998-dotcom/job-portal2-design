@@ -1,16 +1,9 @@
-Here is the complete,
-fully responsive `Rejections.css` file. I have perfectly matched the **orange glassmorphic header**,
-the **centered typography**,
-and the **clean,
-modern body** with full dark mode support to ensure it seamlessly aligns with your `ProductAnalytics`,
-`Applications`,
-and `OffersReceived` pages. ### `Rejections.css` ```css
 /* ══════════════════════════════════════════
    Rejections.css
-   Orange Glassmorphism Header + Clean Body
+   Orange Glassmorphism Theme with Data Table
    ══════════════════════════════════════════ */
 
-.rejections-page {
+.offers-page {
   min-height: 100vh;
   background: #f8fafc;
   padding: clamp(1rem, 3vw, 2rem);
@@ -22,38 +15,91 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   color: #1e293b;
 }
 
-.rejections-page.dark {
+.offers-page.dark {
   background: #121212;
   color: #f8fafc;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.offers-page .back-btn {
+  width: 100%;
 }
 
-.rejections-page *,
-.rejections-page *::before,
-.rejections-page *::after {
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.offers-page *,
+.offers-page *::before,
+.offers-page *::after {
   box-sizing: border-box;
 }
 
 /* ─────────────────────────────────────────────────────────
-   BACK BUTTON
+   HEADER
 ────────────────────────────────────────────────────────── */
-.rejections-page .ba-header {
-  margin-bottom: 1rem;
+.offers-page .page-header {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: clamp(12px, 2vw, 20px);
+  padding: clamp(1rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.15);
+  margin-bottom: clamp(1rem, 3vw, 2rem);
+  width: 100%;
 }
 
-.rejections-page .ba-back-btn {
-  display: inline-flex;
+@media (min-width: 768px) {
+  .offers-page .page-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+  }
+}
+
+.offers-page .header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .offers-page .header-left {
+    flex-direction: row;
+    align-items: center;
+    flex: unset;
+  }
+  
+  .offers-page .header-left > div {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: max-content;
+  }
+}
+
+@media (max-width: 767px) {
+  .offers-page .header-left > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+.offers-page .back-btn {
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
@@ -66,62 +112,40 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   cursor: pointer;
   transition: all 0.2s;
   font-size: clamp(0.875rem, 2vw, 0.9375rem);
+  width: 100%;
+  flex-shrink: 0;
 }
 
-.rejections-page.dark .ba-back-btn {
+@media (min-width: 768px) {
+  .offers-page .back-btn { width: auto; justify-content: flex-start; }
+}
+
+.offers-page.dark .back-btn {
   background: #262626;
   border-color: #404040;
   color: #fb923c;
 }
 
-.rejections-page .ba-back-btn:hover {
+.offers-page .back-btn:hover {
   background: #ffedd5;
   transform: translateX(-3px);
 }
 
-/* ─────────────────────────────────────────────────────────
-   HEADER (Exact Match to Offers/ProductAnalytics)
-────────────────────────────────────────────────────────── */
-.rejections-page .page-header {
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%);
-  backdrop-filter: blur(10px);
-  border-radius: clamp(12px, 2vw, 20px);
-  padding: clamp(1rem, 3vw, 2rem);
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 1.5rem;
-  border: 1px solid rgba(249, 115, 22, 0.25);
-  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.15);
-  margin-bottom: clamp(1rem, 3vw, 2rem);
-  width: 100%;
-}
-
-.rejections-page .header-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  width: 100%;
-  gap: 0.5rem;
-}
-
-.rejections-page .page-header h1 {
+.offers-page .page-header h1 {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.75rem;
+  justify-content: center;
+  text-align: center;
   font-size: clamp(1.25rem, 4vw, 2rem);
-  font-weight: 800;
+  font-weight: 600;
   color: #9a3412;
   margin: 0;
 }
 
-.rejections-page.dark .page-header h1 {
-  color: #f3f4f6;
-}
+.offers-page.dark .page-header h1 { color: #f3f4f6; }
 
-.rejections-page .header-icon {
+.offers-page .header-icon {
   width: 48px;
   height: 48px;
   background: linear-gradient(135deg, #f97316, #ea580c);
@@ -133,133 +157,123 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   flex-shrink: 0;
 }
 
-.rejections-page .page-header p {
+.offers-page .page-header p {
   font-size: clamp(0.875rem, 2vw, 1rem);
-  color: #ea580c;
-  margin: 0;
-  font-weight: 500;
+  color: #c2410c;
+  margin: 0.25rem 0 0;
+  font-weight: normal;
+  text-align: center;
 }
 
-.rejections-page.dark .page-header p {
-  color: #fb923c;
-}
+.offers-page.dark .page-header p { color: #d1d5db; }
 
-.rejections-page .header-actions {
+.offers-page .header-right {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  flex-wrap: wrap;
 }
 
-.rejections-page .export-btn {
+.offers-page .offers-badge {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
+  padding: 0.75rem 1.5rem;
   background: #f97316;
   color: white;
-  border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 700;
-  cursor: pointer;
+  font-size: clamp(0.875rem, 2vw, 0.9375rem);
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-  transition: all 0.2s;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
-.rejections-page .export-btn:hover {
-  background: #ea580c;
+.offers-page .theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: white;
+  color: #f97316;
+  border: 1px solid #fed7aa;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.offers-page.dark .theme-toggle {
+  background: #262626;
+  border-color: #404040;
+  color: #fb923c;
+}
+
+.offers-page .theme-toggle:hover {
+  background: #ffedd5;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
 }
 
 /* ─────────────────────────────────────────────────────────
-   KPI GRID
+   STATS GRID
 ────────────────────────────────────────────────────────── */
-.rejections-page .kpi-grid {
+.offers-page .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
 }
 
-.rejections-page .kpi-card {
+.offers-page .stat-card {
   background: white;
   border-radius: 12px;
   padding: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   border: 1px solid #e2e8f0;
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 1rem;
   transition: transform 0.2s, box-shadow 0.2s;
-  border-left: 4px solid #f97316;
 }
 
-.rejections-page.dark .kpi-card {
+.offers-page.dark .stat-card {
   background: #1e1e1e;
   border-color: #333;
 }
 
-.rejections-page .kpi-header {
+.offers-page .stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.rejections-page .kpi-label {
-  font-size: 0.85rem;
+.offers-page .stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.offers-page .stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.offers-page.dark .stat-value { color: #f8fafc; }
+
+.offers-page .stat-label {
+  font-size: 0.8rem;
   color: #64748b;
   font-weight: 600;
 }
-
-.rejections-page.dark .kpi-label {
-  color: #94a3b8;
-}
-
-.rejections-page .kpi-value {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #1e293b;
-}
-
-.rejections-page.dark .kpi-value {
-  color: #f8fafc;
-}
-
-/* KPI Icon Colors */
-.rejections-page .icon-rose {
-  color: #ef4444;
-}
-
-.rejections-page .icon-orange {
-  color: #f97316;
-}
-
-.rejections-page .icon-amber {
-  color: #f59e0b;
-}
-
-.rejections-page .icon-blue {
-  color: #3b82f6;
-}
-
-.rejections-page .icon-emerald {
-  color: #10b981;
-}
-
-.rejections-page .icon-teal {
-  color: #14b8a6;
-}
+.offers-page.dark .stat-label { color: #94a3b8; }
 
 /* ─────────────────────────────────────────────────────────
    FILTERS SECTION
 ────────────────────────────────────────────────────────── */
-.rejections-page .filters-section {
+.offers-page .filters-section {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
@@ -267,20 +281,19 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   border: 1px solid #e2e8f0;
   margin-bottom: 2rem;
 }
-
-.rejections-page.dark .filters-section {
+.offers-page.dark .filters-section {
   background: #1e1e1e;
   border-color: #333;
 }
 
-.rejections-page .filter-row-top {
+.offers-page .filter-row-top {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   align-items: center;
 }
 
-.rejections-page .search-box {
+.offers-page .search-box {
   flex: 1;
   min-width: 250px;
   display: flex;
@@ -291,13 +304,9 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   border-radius: 8px;
   padding: 0.6rem 1rem;
 }
+.offers-page.dark .search-box { background: #2a2a2a; border-color: #404040; }
 
-.rejections-page.dark .search-box {
-  background: #2a2a2a;
-  border-color: #404040;
-}
-
-.rejections-page .search-box input {
+.offers-page .search-box input {
   border: none;
   background: transparent;
   outline: none;
@@ -305,18 +314,12 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   color: #475569;
   font-size: 0.9rem;
 }
+.offers-page.dark .search-box input { color: #d1d5db; }
 
-.rejections-page.dark .search-box input {
-  color: #d1d5db;
-}
+.offers-page .filter-actions { display: flex; gap: 0.5rem; }
 
-.rejections-page .filter-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.rejections-page .filter-btn,
-.rejections-page .reset-btn {
+.offers-page .filter-btn,
+.offers-page .reset-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -330,31 +333,21 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   color: #475569;
   border: 1px solid #cbd5e1;
 }
+.offers-page.dark .filter-btn,
+.offers-page.dark .reset-btn { background: #333; color: #e2e8f0; border-color: #444; }
 
-.rejections-page.dark .filter-btn,
-.rejections-page.dark .reset-btn {
-  background: #333;
-  color: #e2e8f0;
-  border-color: #444;
-}
+.offers-page .filter-btn:hover,
+.offers-page .reset-btn:hover { background: #e2e8f0; }
+.offers-page.dark .filter-btn:hover,
+.offers-page.dark .reset-btn:hover { background: #444; }
 
-.rejections-page .filter-btn:hover,
-.rejections-page .reset-btn:hover {
-  background: #e2e8f0;
-}
-
-.rejections-page.dark .filter-btn:hover,
-.rejections-page.dark .reset-btn:hover {
-  background: #444;
-}
-
-.rejections-page .filter-btn.active {
+.offers-page .filter-btn.active {
   background: #f97316;
   color: white;
   border-color: #f97316;
 }
 
-.rejections-page .filter-grid {
+.offers-page .filter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
@@ -362,28 +355,14 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   margin-top: 1rem;
   border-top: 1px dashed #e2e8f0;
 }
+.offers-page.dark .filter-grid { border-top-color: #444; }
 
-.rejections-page.dark .filter-grid {
-  border-top-color: #444;
-}
+.offers-page .filter-item { display: flex; flex-direction: column; gap: 0.4rem; }
 
-.rejections-page .filter-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
+.offers-page .filter-item label { font-size: 0.8rem; color: #475569; font-weight: 600; }
+.offers-page.dark .filter-item label { color: #d1d5db; }
 
-.rejections-page .filter-item label {
-  font-size: 0.8rem;
-  color: #475569;
-  font-weight: 600;
-}
-
-.rejections-page.dark .filter-item label {
-  color: #d1d5db;
-}
-
-.rejections-page .filter-item select {
+.offers-page .filter-item select {
   padding: 0.6rem;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
@@ -392,47 +371,34 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   outline: none;
   font-size: 0.85rem;
 }
-
-.rejections-page.dark .filter-item select {
-  background: #2a2a2a;
-  border-color: #444;
-  color: #d1d5db;
-}
+.offers-page.dark .filter-item select { background: #2a2a2a; border-color: #444; color: #d1d5db; }
 
 /* ─────────────────────────────────────────────────────────
    CHARTS & INSIGHTS
 ────────────────────────────────────────────────────────── */
-.rejections-page .charts-grid {
+.offers-page .charts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
-.rejections-page .chart-card {
+.offers-page .chart-card {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   border: 1px solid #e2e8f0;
 }
+.offers-page.dark .chart-card { background: #1e1e1e; border-color: #333; }
 
-.rejections-page.dark .chart-card {
-  background: #1e1e1e;
-  border-color: #333;
-}
-
-.rejections-page .chart-card-wide {
-  grid-column: 1 / -1;
-}
+.offers-page .chart-card-wide { grid-column: 1 / -1; }
 
 @media (min-width: 1024px) {
-  .rejections-page .chart-card-wide {
-    grid-column: span 2;
-  }
+  .offers-page .chart-card-wide { grid-column: span 2; }
 }
 
-.rejections-page .chart-card h3 {
+.offers-page .chart-card h3 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -441,31 +407,23 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   color: #1e293b;
   margin: 0 0 1rem 0;
 }
+.offers-page.dark .chart-card h3 { color: #f8fafc; }
 
-.rejections-page.dark .chart-card h3 {
-  color: #f8fafc;
-}
+.offers-page .chart-wrapper { position: relative; height: 250px; width: 100%; }
 
-.rejections-page .chart-wrapper {
-  position: relative;
-  height: 250px;
-  width: 100%;
-}
-
-.rejections-page .insights-panel {
+.offers-page .insights-panel {
   background: linear-gradient(135deg, #fff7ed, #ffffff);
   border-radius: 12px;
   padding: 1.5rem;
   border: 1px solid #fed7aa;
   margin-bottom: 2rem;
 }
-
-.rejections-page.dark .insights-panel {
+.offers-page.dark .insights-panel {
   background: linear-gradient(135deg, #2c1a0c, #1e1e1e);
   border-color: #4a2a10;
 }
 
-.rejections-page .insights-panel h3 {
+.offers-page .insights-panel h3 {
   margin: 0 0 1.5rem 0;
   color: #ea580c;
   display: flex;
@@ -473,421 +431,244 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   gap: 0.5rem;
 }
 
-.rejections-page .insights-grid {
+.offers-page .insights-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
 }
 
-.rejections-page .insight-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
+.offers-page .insight-item { display: flex; flex-direction: column; gap: 0.4rem; }
 
-.rejections-page .insight-label {
+.offers-page .insight-label {
   font-size: 0.8rem;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
 }
+.offers-page.dark .insight-label { color: #94a3b8; }
 
-.rejections-page.dark .insight-label {
-  color: #94a3b8;
-}
-
-.rejections-page .insight-value {
+.offers-page .insight-value {
   font-size: 1.15rem;
   font-weight: 700;
   color: #1e293b;
 }
-
-.rejections-page.dark .insight-value {
-  color: #f8fafc;
-}
+.offers-page.dark .insight-value { color: #f8fafc; }
 
 /* ─────────────────────────────────────────────────────────
-   TABLE SECTION
+   DATA TABLE SECTION (Replaces Grid)
 ────────────────────────────────────────────────────────── */
-.rejections-page .table-section {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  border: 1px solid #e2e8f0;
-  margin-bottom: 2rem;
-}
+.offers-page .offers-section { margin-bottom: 2rem; }
 
-.rejections-page.dark .table-section {
-  background: #1e1e1e;
-  border-color: #333;
-}
-
-.rejections-page .table-header {
+.offers-page .section-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 1.5rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
 }
 
-.rejections-page .table-header h2 {
-  margin: 0 0 0.25rem 0;
-  color: #1e293b;
-  font-size: 1.25rem;
-  font-weight: 700;
+.offers-page .section-header h2 {
+  margin: 0 0 0.4rem 0;
+  color: #9a3412;
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
 }
+.offers-page.dark .section-header h2 { color: #f3f4f6; }
 
-.rejections-page.dark .table-header h2 {
-  color: #f8fafc;
-}
-
-.rejections-page .table-header p {
+.offers-page .section-header p {
   margin: 0;
-  color: #64748b;
-  font-size: 0.9rem;
+  color: #ea580c;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
 }
+.offers-page.dark .section-header p { color: #fb923c; }
 
-.rejections-page.dark .table-header p {
-  color: #94a3b8;
-}
-
-.rejections-page .table-wrapper {
+/* The Table Wrapper matching Orange styling */
+.offers-page .table-wrapper {
   overflow-x: auto;
+  background: white;
+  border-radius: 16px;
+  border: 1.5px solid #fed7aa;
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.06);
+}
+.offers-page.dark .table-wrapper {
+  background: #1e1e1e;
+  border-color: #404040;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-.rejections-page table {
+.offers-page .rejections-table {
   width: 100%;
   border-collapse: collapse;
   min-width: 900px;
-}
-
-.rejections-page th,
-.rejections-page td {
-  padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid #e2e8f0;
 }
 
-.rejections-page.dark th,
-.rejections-page.dark td {
-  border-color: #333;
-}
-
-.rejections-page th {
-  background: #f8fafc;
+.offers-page .rejections-table th {
+  padding: 1.25rem 1rem;
+  background: #fff7ed;
+  color: #9a3412;
   font-weight: 700;
+  font-size: 0.9rem;
+  border-bottom: 2px solid #fed7aa;
+  white-space: nowrap;
+}
+.offers-page.dark .rejections-table th {
+  background: #2c1a0c;
+  color: #fdba74;
+  border-bottom-color: #7c2d12;
+}
+
+.offers-page .rejections-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+  font-size: 0.9rem;
   color: #475569;
-  font-size: 0.85rem;
-  text-transform: uppercase;
+}
+.offers-page.dark .rejections-table td {
+  border-bottom-color: #333;
+  color: #cbd5e1;
 }
 
-.rejections-page.dark th {
-  background: #2a2a2a;
-  color: #d1d5db;
-}
+.offers-page .rejections-table tr:last-child td { border-bottom: none; }
 
-.rejections-page tbody tr:hover {
-  background: #f8fafc;
-}
+.offers-page .rejections-table tr { transition: background 0.2s; }
+.offers-page .rejections-table tr:hover { background: #fffcf8; }
+.offers-page.dark .rejections-table tr:hover { background: #262626; }
 
-.rejections-page.dark tbody tr:hover {
-  background: #2a2a2a;
-}
+.offers-page .rejections-table .selected-row { background: #fff7ed !important; }
+.offers-page.dark .rejections-table .selected-row { background: #2c1a0c !important; }
 
-/* Table Elements */
-.rejections-page input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #f97316;
-  cursor: pointer;
-}
-
-.rejections-page .candidate-cell {
+/* Table Inner Elements */
+.offers-page .td-candidate {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
 }
-
-.rejections-page .avatar {
-  width: 36px;
-  height: 36px;
-  background: #ffedd5;
-  color: #ea580c;
-  border-radius: 50%;
+.offers-page .td-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #f97316;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
+.offers-page .td-name { font-weight: 700; color: #1e293b; margin-bottom: 0.2rem; }
+.offers-page.dark .td-name { color: #f8fafc; }
+.offers-page .td-email { font-size: 0.8rem; color: #64748b; }
 
-.rejections-page.dark .avatar {
-  background: #4a2a10;
-  color: #fdba74;
-}
+.offers-page .td-primary { font-weight: 600; color: #334155; margin-bottom: 0.2rem; }
+.offers-page.dark .td-primary { color: #cbd5e1; }
+.offers-page .td-secondary { font-size: 0.8rem; color: #64748b; }
 
-.rejections-page .name {
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.rejections-page.dark .name {
-  color: #f8fafc;
-}
-
-.rejections-page .email {
-  font-size: 0.8rem;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.rejections-page.dark .email {
-  color: #94a3b8;
-}
-
-.rejections-page .position {
-  font-weight: 600;
-  color: #3b82f6;
-  margin-bottom: 0.25rem;
-}
-
-.rejections-page .category-tag,
-.rejections-page .company-type {
-  display: inline-block;
-  background: #f1f5f9;
-  color: #475569;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-}
-
-.rejections-page.dark .category-tag,
-.rejections-page.dark .company-type {
-  background: #333;
-  color: #cbd5e1;
-}
-
-.rejections-page .company {
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 0.25rem;
-}
-
-.rejections-page.dark .company {
-  color: #f8fafc;
-}
-
-.rejections-page .timeline div {
-  font-size: 0.8rem;
-  color: #64748b;
-  margin-bottom: 0.2rem;
-}
-
-.rejections-page.dark .timeline div {
-  color: #94a3b8;
-}
-
-.rejections-page .timeline span {
-  font-weight: 600;
-  color: #475569;
-}
-
-.rejections-page.dark .timeline span {
-  color: #cbd5e1;
-}
-
-.rejections-page .reason-badge {
+.offers-page .td-reason {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   background: #fee2e2;
   color: #dc2626;
   padding: 0.3rem 0.6rem;
-  border-radius: 20px;
+  border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
 }
+.offers-page.dark .td-reason { background: #450a0a; color: #f87171; }
 
-.rejections-page.dark .reason-badge {
-  background: #450a0a;
-  color: #f87171;
+.offers-page input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #f97316;
 }
 
-.rejections-page .score-display {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.rejections-page .score-text {
-  font-size: 0.8rem;
-  color: #475569;
-  font-weight: 500;
-}
-
-.rejections-page.dark .score-text {
-  color: #cbd5e1;
-}
-
-.rejections-page .score-bar {
-  width: 100px;
-  height: 6px;
-  background: #e2e8f0;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.rejections-page.dark .score-bar {
-  background: #333;
-}
-
-.rejections-page .score-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #f97316, #fbbf24);
-  border-radius: 3px;
-}
-
-.rejections-page .score-percent {
-  font-size: 0.75rem;
-  color: #f97316;
-  font-weight: 700;
-}
-
-.rejections-page .status-badge {
-  padding: 0.3rem 0.6rem;
+/* ─────────────────────────────────────────────────────────
+   STATUS BADGES
+────────────────────────────────────────────────────────── */
+.offers-page .status-badge {
+  display: inline-block;
+  padding: 0.35rem 0.8rem;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-align: center;
+  white-space: nowrap;
 }
+.offers-page .status-reconsidered { background: #dcfce7; color: #16a34a; }
+.offers-page.dark .status-reconsidered { background: #052e16; color: #4ade80; }
+.offers-page .status-reapplied { background: #dbeafe; color: #2563eb; }
+.offers-page.dark .status-reapplied { background: #1e3a8a; color: #60a5fa; }
+.offers-page .status-contacted { background: #f3e8ff; color: #9333ea; }
+.offers-page.dark .status-contacted { background: #3b0764; color: #c084fc; }
+.offers-page .status-archived { background: #f1f5f9; color: #475569; }
+.offers-page.dark .status-archived { background: #1f2937; color: #94a3b8; }
 
-.rejections-page .status-reconsidered {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.rejections-page .status-reapplied {
-  background: #fef3c7;
-  color: #d97706;
-}
-
-.rejections-page .status-contacted {
-  background: #e0f2fe;
-  color: #0284c7;
-}
-
-.rejections-page .status-archived {
-  background: #f1f5f9;
-  color: #475569;
-}
-
-.rejections-page.dark .status-reconsidered {
-  background: #052e16;
-  color: #4ade80;
-}
-
-.rejections-page.dark .status-reapplied {
-  background: #451a03;
-  color: #fbbf24;
-}
-
-.rejections-page.dark .status-contacted {
-  background: #0c4a6e;
-  color: #bae6fd;
-}
-
-.rejections-page.dark .status-archived {
-  background: #1f2937;
-  color: #9ca3af;
-}
-
-.rejections-page .actions {
+/* ─────────────────────────────────────────────────────────
+   ACTION BUTTONS (Table specific)
+────────────────────────────────────────────────────────── */
+.offers-page .td-actions {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
-.rejections-page .action-btn {
-  width: 28px;
-  height: 28px;
+.offers-page .action-icon {
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.2s;
   color: white;
 }
+.offers-page .action-icon:hover { opacity: 0.9; transform: translateY(-2px); }
 
-.rejections-page .action-purple {
-  background: #8b5cf6;
+.offers-page .btn-accept { background: #22c55e; box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3); }
+.offers-page .btn-negotiate { background: #8b5cf6; box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3); }
+.offers-page .btn-reject { background: #64748b; box-shadow: 0 2px 6px rgba(100, 116, 139, 0.3); }
+.offers-page .btn-view {
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fed7aa !important;
 }
-
-.rejections-page .action-emerald {
-  background: #10b981;
-}
-
-.rejections-page .action-rose {
-  background: #ef4444;
-}
-
-.rejections-page .action-btn:hover {
-  opacity: 0.8;
-  transform: translateY(-1px);
-}
-
-.rejections-page .empty-state {
-  text-align: center;
-  padding: 3rem;
-  color: #64748b;
-}
-
-.rejections-page.dark .empty-state {
-  color: #94a3b8;
-}
-
-.rejections-page .empty-state svg {
-  color: #cbd5e1;
-  margin-bottom: 1rem;
+.offers-page.dark .btn-view {
+  background: #2c1a0c;
+  color: #fb923c;
+  border-color: #7c2d12 !important;
 }
 
 /* ─────────────────────────────────────────────────────────
    PAGINATION
 ────────────────────────────────────────────────────────── */
-.rejections-page .pagination {
+.offers-page .pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
   flex-wrap: wrap;
   gap: 1rem;
 }
+.offers-page.dark .pagination { background: #1e1e1e; border-color: #333; }
 
-.rejections-page.dark .pagination {
-  border-top-color: #333;
-}
+.offers-page .pagination-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
-.rejections-page .pagination span {
-  font-size: 0.9rem;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.rejections-page.dark .pagination span {
-  color: #94a3b8;
-}
-
-.rejections-page .pagination-btns {
-  display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-}
-
-.rejections-page .pagination-btns button {
+.offers-page .pagination-btns button {
   padding: 0.4rem 0.8rem;
   border: 1px solid #cbd5e1;
   background: white;
@@ -895,30 +676,85 @@ and `OffersReceived` pages. ### `Rejections.css` ```css
   cursor: pointer;
   font-weight: 500;
   color: #475569;
-  transition: 0.2s;
 }
+.offers-page.dark .pagination-btns button { background: #2a2a2a; border-color: #444; color: #d1d5db; }
 
-.rejections-page.dark .pagination-btns button {
-  background: #2a2a2a;
-  border-color: #444;
-  color: #d1d5db;
-}
-
-.rejections-page .pagination-btns button.active {
+.offers-page .pagination-btns button.active {
   background: #f97316;
   color: white;
   border-color: #f97316;
 }
+.offers-page .pagination-btns button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.rejections-page .pagination-btns button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* ─────────────────────────────────────────────────────────
+   MODAL (DETAILS)
+────────────────────────────────────────────────────────── */
+.offers-page .modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
 }
 
-.rejections-page .pagination-btns button:hover:not(:disabled):not(.active) {
-  background: #f8fafc;
+.offers-page .modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
 }
+.offers-page.dark .modal-content { background: #1e1e1e; color: #f8fafc; }
 
-.rejections-page.dark .pagination-btns button:hover:not(:disabled):not(.active) {
-  background: #333;
+.offers-page .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
 }
+.offers-page.dark .modal-header { border-bottom-color: #333; background: #1e1e1e; }
+
+.offers-page .modal-header h2 { margin: 0; font-size: 1.25rem; color: #1e293b; }
+.offers-page.dark .modal-header h2 { color: #f8fafc; }
+
+.offers-page .modal-header button {
+  background: none; border: none; color: #64748b; cursor: pointer; display: flex; align-items: center; padding: 0.2rem;
+}
+.offers-page.dark .modal-header button { color: #94a3b8; }
+
+.offers-page .modal-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+.offers-page .detail-section h3 { margin: 0 0 1rem 0; font-size: 1.1rem; color: #f97316; }
+
+.offers-page .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+
+.offers-page .detail-grid div {
+  background: #f8fafc; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.9rem; border: 1px solid #e2e8f0;
+}
+.offers-page.dark .detail-grid div { background: #2a2a2a; border-color: #333; }
+
+.offers-page .detail-grid div strong {
+  color: #1e293b; display: block; margin-bottom: 0.2rem; font-size: 0.8rem; text-transform: uppercase;
+}
+.offers-page.dark .detail-grid div strong { color: #94a3b8; }
+
+.offers-page .recruiter-info {
+  display: flex; flex-direction: column; gap: 0.8rem; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0;
+}
+.offers-page.dark .recruiter-info { background: #2a2a2a; border-color: #333; }
+
+.offers-page .recruiter-info div { display: flex; align-items: center; gap: 0.75rem; color: #475569; font-weight: 500; }
+.offers-page.dark .recruiter-info div { color: #cbd5e1; }
