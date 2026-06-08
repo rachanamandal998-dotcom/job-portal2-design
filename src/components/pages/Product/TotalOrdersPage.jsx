@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import {
   ShoppingBag, Clock, Truck, CheckCircle, ArrowLeft,
   Search, Filter, TrendingUp, TrendingDown, AlertTriangle,
-  Star, DollarSign, BarChart2, Award, Zap, ChevronDown,
+  Star, DollarSign, BarChart2, Award, Zap, ChevronDown, Sun, Moon
 } from "lucide-react";
 import Chart from "chart.js/auto";
 import "../../styles/TotalOrders.css";
@@ -20,12 +20,11 @@ const WEEKDAY_FULL = [
 
 const TODAY = new Date();
 
-// FIX: Define STATUS_COLOR - this was missing and caused crashes
 const STATUS_COLOR = {
-  pending: { bg: "#fef3c7", text: "#92400e", border: "#fde68a" },
-  shipped: { bg: "#dbeafe", text: "#1e40af", border: "#bfdbfe" },
-  delivered: { bg: "#d1fae5", text: "#065f46", border: "#a7f3d0" },
-  cancelled: { bg: "#fee2e2", text: "#991b1b", border: "#fecaca" },
+  pending: { bg: "rgba(251, 191, 36, 0.15)", text: "#b45309", border: "#fde68a" },
+  shipped: { bg: "rgba(59, 130, 246, 0.15)", text: "#1d4ed8", border: "#bfdbfe" },
+  delivered: { bg: "rgba(34, 197, 94, 0.15)", text: "#15803d", border: "#a7f3d0" },
+  cancelled: { bg: "rgba(239, 68, 68, 0.15)", text: "#b91c1c", border: "#fecaca" },
 };
 
 /* ─── Sample Data ─── */
@@ -39,7 +38,6 @@ function generateSampleData() {
   ];
 
   const statuses = ["pending", "shipped", "delivered"];
-
   const data = [];
   let id = 9001;
 
@@ -50,7 +48,7 @@ function generateSampleData() {
 
     const product = products[Math.floor(Math.random() * products.length)];
     const status = i < 7
-     ? statuses[Math.floor(Math.random() * 2)]
+      ? statuses[Math.floor(Math.random() * 2)]
       : statuses[Math.floor(Math.random() * statuses.length)];
 
     const basePrice = {
@@ -63,7 +61,7 @@ function generateSampleData() {
 
     const revenue = basePrice;
     const cost = Math.random() > 0.85
-     ? Math.round(revenue * (1 + Math.random() * 0.3))
+      ? Math.round(revenue * (1 + Math.random() * 0.3))
       : Math.round(revenue * (0.3 + Math.random() * 0.4));
 
     data.push({
@@ -80,7 +78,6 @@ function generateSampleData() {
 
 export const SAMPLE_ORDERS = generateSampleData();
 
-/* ─── Helpers - FIX: Safe fallbacks for missing revenue/cost ─── */
 const fmt = (n) => `₹${Math.abs(n || 0).toLocaleString("en-IN")}`;
 
 function groupByWeekday(orders) {
@@ -89,7 +86,7 @@ function groupByWeekday(orders) {
   orders.forEach((o) => {
     const day = new Date(o.date).toLocaleDateString("en-US", { weekday: "long" });
     if (!map[day]) return;
-    const pl = (o.revenue || 0) - (o.cost || 0); // FIX: fallback to 0
+    const pl = (o.revenue || 0) - (o.cost || 0);
     map[day].orders.push(o);
     if (pl >= 0) map[day].profit += pl;
     else map[day].loss += Math.abs(pl);
@@ -100,15 +97,17 @@ function groupByWeekday(orders) {
 /* ─── Skeleton loader ─── */
 function LoadingPage() {
   return (
-    <div className="oa-loading-page">
-      <div className="oa-skel" style={{ height: 60, borderRadius: 12 }} />
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="oa-skel" style={{ height: 110, borderRadius: 16 }} />
-        ))}
+    <div className="orders-analytics-wrapper">
+      <div className="oa-loading-page">
+        <div className="oa-skel" style={{ height: 60, borderRadius: 12 }} />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="oa-skel" style={{ height: 110, borderRadius: 16 }} />
+          ))}
+        </div>
+        <div className="oa-skel" style={{ height: 280, borderRadius: 16 }} />
+        <div className="oa-skel" style={{ height: 280, borderRadius: 16 }} />
       </div>
-      <div className="oa-skel" style={{ height: 280, borderRadius: 16 }} />
-      <div className="oa-skel" style={{ height: 280, borderRadius: 16 }} />
     </div>
   );
 }
@@ -118,7 +117,7 @@ function KpiCard({ label, value, icon: Icon, color, sub }) {
   return (
     <div className="oa-kpi-card">
       <div className="oa-kpi-icon" style={{ background: color }}>
-        <Icon size={20} />
+        <Icon size={20} color="white" />
       </div>
       <div className="oa-kpi-body">
         <div className="oa-kpi-value">{value}</div>
@@ -160,7 +159,7 @@ function HeatmapSection({ orders }) {
           const isNeutral = net === 0 && dayOrders.length === 0;
           let bg, border, textColor, label;
           if (isNeutral) {
-            bg = "#fff7ed"; border = "#fed7aa"; textColor = "#9a3412"; label = "No data";
+            bg = "rgba(254, 247, 237, 0.8)"; border = "#fed7aa"; textColor = "#9a3412"; label = "No data";
           } else if (isProfit) {
             const intensity = Math.min(net / 10000, 1);
             bg = `rgba(249,115,22,${0.15 + intensity * 0.5})`; border = "#f97316"; textColor = "#9a3412"; label = `+${fmt(net)}`;
@@ -190,14 +189,14 @@ function HeatmapSection({ orders }) {
 function RevenueForecast({ orders }) {
   const forecast = useMemo(() => {
     const last7 = orders.filter((o) => (TODAY - new Date(o.date)) / 86400000 <= 7);
-    const dailyAvg = last7.length > 0? last7.reduce((s, o) => s + (o.revenue || 0), 0) / 7 : 0;
+    const dailyAvg = last7.length > 0 ? last7.reduce((s, o) => s + (o.revenue || 0), 0) / 7 : 0;
     const next30 = Math.round(dailyAvg * 30);
     const prev7 = orders.filter((o) => {
       const d = (TODAY - new Date(o.date)) / 86400000;
       return d > 7 && d <= 14;
     });
-    const prevAvg = prev7.length > 0? prev7.reduce((s, o) => s + (o.revenue || 0), 0) / 7 : 0;
-    const trend = dailyAvg > prevAvg? "up" : dailyAvg < prevAvg? "down" : "flat";
+    const prevAvg = prev7.length > 0 ? prev7.reduce((s, o) => s + (o.revenue || 0), 0) / 7 : 0;
+    const trend = dailyAvg > prevAvg ? "up" : dailyAvg < prevAvg ? "down" : "flat";
     return { next30, dailyAvg, trend };
   }, [orders]);
 
@@ -224,9 +223,9 @@ function RevenueForecast({ orders }) {
           <div className="oa-forecast-label">Trend</div>
           <div
             className="oa-forecast-value"
-            style={{ color: forecast.trend === "up"? "#22c55e" : forecast.trend === "down"? "#ef4444" : "#9a3412" }}
+            style={{ color: forecast.trend === "up" ? "#22c55e" : forecast.trend === "down" ? "#ef4444" : "#9a3412" }}
           >
-            {forecast.trend === "up"? "▲ Growing" : forecast.trend === "down"? "▼ Declining" : "― Stable"}
+            {forecast.trend === "up" ? "▲ Growing" : forecast.trend === "down" ? "▼ Declining" : "― Stable"}
           </div>
           <div className="oa-forecast-sub">vs last week</div>
         </div>
@@ -260,13 +259,13 @@ function FulfillmentSpeed({ orders }) {
             <Clock size={14} /> Avg Delivery Time
           </div>
           <div className="oa-forecast-value">{stats.avgDays} days</div>
-          <div className="oa-forecast-sub">{stats.avgDays <= 3? "Fast ✓" : "Slow down"}</div>
+          <div className="oa-forecast-sub">{stats.avgDays <= 3 ? "Fast ✓" : "Slow down"}</div>
         </div>
         <div className="oa-forecast-card">
           <div className="oa-forecast-label" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-            <AlertTriangle size={14} color={stats.slow > 0? "#ef4444" : "#22c55e"} /> Stuck Orders
+            <AlertTriangle size={14} color={stats.slow > 0 ? "#ef4444" : "#22c55e"} /> Stuck Orders
           </div>
-          <div className="oa-forecast-value" style={{ color: stats.slow > 0? "#ef4444" : "#22c55e" }}>
+          <div className="oa-forecast-value" style={{ color: stats.slow > 0 ? "#ef4444" : "#22c55e" }}>
             {stats.slow}
           </div>
           <div className="oa-forecast-sub">Pending 3+ days</div>
@@ -294,14 +293,14 @@ function ProductMatrix({ orders }) {
       map[o.product].revenue += (o.revenue || 0);
     });
     return Object.entries(map)
-     .map(([name, s]) => ({
+      .map(([name, s]) => ({
         name,
         units: s.units,
         profit: s.profit,
-        margin: s.revenue > 0? Math.round((s.profit / s.revenue) * 100) : 0,
+        margin: s.revenue > 0 ? Math.round((s.profit / s.revenue) * 100) : 0,
       }))
-     .sort((a, b) => b.profit - a.profit)
-     .slice(0, 6);
+      .sort((a, b) => b.profit - a.profit)
+      .slice(0, 6);
   }, [orders]);
 
   if (productStats.length === 0) {
@@ -335,7 +334,7 @@ function ProductMatrix({ orders }) {
           const isDog = p.profit < 0;
           let badge = "Average";
           let badgeColor = "#22c55e";
-          if (isCashCow) { badge = "Cash Cow ★"; badgeColor = "#22c55e"; }
+          if (isCashCow) { badge = "Cash Cow ★"; badgeColor = "#16a34a"; }
           if (isDog) { badge = "Loss Maker"; badgeColor = "#ef4444"; }
           return (
             <div key={p.name} className="oa-product-card">
@@ -348,8 +347,8 @@ function ProductMatrix({ orders }) {
                 </div>
                 <div className="oa-product-stat">
                   <span className="oa-product-stat-label">Total Profit</span>
-                  <span className="oa-product-stat-val" style={{ color: p.profit >= 0? "#22c55e" : "#ef4444" }}>
-                    {p.profit >= 0? "+" : "-"}{fmt(p.profit)}
+                  <span className="oa-product-stat-val" style={{ color: p.profit >= 0 ? "#16a34a" : "#ef4444" }}>
+                    {p.profit >= 0 ? "+" : ""}{fmt(p.profit)}
                   </span>
                 </div>
                 <div className="oa-product-stat">
@@ -374,7 +373,7 @@ function DayListSection({ orders }) {
     let result = orders.filter((o) => {
       const pl = (o.revenue || 0) - (o.cost || 0);
       const isProfit = pl >= 0;
-      const matchesType = listType === "profit"? isProfit :!isProfit;
+      const matchesType = listType === "profit" ? isProfit : !isProfit;
       if (!matchesType) return false;
       if (dayFilter === "all") return true;
       const orderDay = new Date(o.date).toLocaleDateString("en-US", { weekday: "long" });
@@ -386,17 +385,17 @@ function DayListSection({ orders }) {
   const stats = useMemo(() => {
     const total = filteredOrders.length;
     const totalPL = filteredOrders.reduce((sum, o) => sum + ((o.revenue || 0) - (o.cost || 0)), 0);
-    const avgPL = total > 0? totalPL / total : 0;
+    const avgPL = total > 0 ? totalPL / total : 0;
     return { total, totalPL, avgPL };
   }, [filteredOrders]);
 
   return (
     <div className="oa-section">
       <div className="oa-section-header">
-        <h3 className="oa-section-title">{listType === "profit"? "Profit Day List" : "Loss Day List"}</h3>
+        <h3 className="oa-section-title">{listType === "profit" ? "Profit Day List" : "Loss Day List"}</h3>
         <p className="oa-section-subtitle">
           {listType === "profit"
-           ? "All orders that made money, filterable by weekday"
+            ? "All orders that made money, filterable by weekday"
             : "All orders that lost money, filterable by weekday"}
         </p>
       </div>
@@ -404,16 +403,14 @@ function DayListSection({ orders }) {
       <div className="oa-filter-bar">
         <div className="oa-toggle-wrap">
           <button
-            className={`oa-toggle-btn ${listType === "profit"? "active" : ""}`}
+            className={`oa-toggle-btn ${listType === "profit" ? "active" : ""}`}
             onClick={() => { setListType("profit"); setDayFilter("all"); }}
-            style={{ background: listType === "profit"? "#22c55e" : "" }}
           >
             <TrendingUp size={14} /> Profit List
           </button>
           <button
-            className={`oa-toggle-btn ${listType === "loss"? "active" : ""}`}
+            className={`oa-toggle-btn ${listType === "loss" ? "active" : ""}`}
             onClick={() => { setListType("loss"); setDayFilter("all"); }}
-            style={{ background: listType === "loss"? "#ef4444" : "" }}
           >
             <TrendingDown size={14} /> Loss List
           </button>
@@ -431,20 +428,20 @@ function DayListSection({ orders }) {
         <div className="oa-daylist-stats">
           <div className="oa-daylist-stat"><strong>{stats.total}</strong> orders</div>
           <div className="oa-daylist-stat">
-            <strong style={{ color: stats.totalPL >= 0? "#22c55e" : "#ef4444" }}>
-              {stats.totalPL >= 0? "+" : "-"}{fmt(stats.totalPL)}
+            <strong style={{ color: stats.totalPL >= 0 ? "#16a34a" : "#ef4444" }}>
+              {stats.totalPL >= 0 ? "+" : ""}{fmt(stats.totalPL)}
             </strong> total
           </div>
           <div className="oa-daylist-stat"><strong>{fmt(Math.abs(stats.avgPL))}</strong> avg</div>
         </div>
       </div>
 
-      {filteredOrders.length === 0? (
+      {filteredOrders.length === 0 ? (
         <div className="oa-empty-state">
-          <div className="oa-empty-icon">{listType === "profit"? "💰" : "📉"}</div>
-          <div className="oa-empty-title">No {listType === "profit"? "profitable" : "loss"} orders</div>
+          <div className="oa-empty-icon">{listType === "profit" ? "💰" : "📉"}</div>
+          <div className="oa-empty-title">No {listType === "profit" ? "profitable" : "loss"} orders</div>
           <div className="oa-empty-sub">
-            {dayFilter === "all"? `No ${listType} orders found` : `No ${listType} orders on ${dayFilter}`}
+            {dayFilter === "all" ? `No ${listType} orders found` : `No ${listType} orders on ${dayFilter}`}
           </div>
         </div>
       ) : (
@@ -459,7 +456,7 @@ function DayListSection({ orders }) {
                 <th>Status</th>
                 <th>Revenue</th>
                 <th>Cost</th>
-                <th>{listType === "profit"? "Profit" : "Loss"}</th>
+                <th>{listType === "profit" ? "Profit" : "Loss"}</th>
               </tr>
             </thead>
             <tbody>
@@ -484,8 +481,8 @@ function DayListSection({ orders }) {
                     <td className="oa-revenue">{fmt(o.revenue)}</td>
                     <td className="oa-cost">{fmt(o.cost)}</td>
                     <td className="oa-pl">
-                      <span style={{ color: pl >= 0? "#22c55e" : "#ef4444", fontWeight: 800 }}>
-                        {pl >= 0? "+" : "-"}{fmt(pl)}
+                      <span style={{ color: pl >= 0 ? "#16a34a" : "#ef4444", fontWeight: 800 }}>
+                        {pl >= 0 ? "+" : ""}{fmt(pl)}
                       </span>
                     </td>
                   </tr>
@@ -503,10 +500,10 @@ function DayListSection({ orders }) {
 function TopLossOrders({ orders }) {
   const topLosses = useMemo(() => {
     return orders
-     .map((o) => ({...o, pl: (o.revenue || 0) - (o.cost || 0) }))
-     .filter((o) => o.pl < 0)
-     .sort((a, b) => a.pl - b.pl)
-     .slice(0, 5);
+      .map((o) => ({...o, pl: (o.revenue || 0) - (o.cost || 0) }))
+      .filter((o) => o.pl < 0)
+      .sort((a, b) => a.pl - b.pl)
+      .slice(0, 5);
   }, [orders]);
 
   if (topLosses.length === 0) return null;
@@ -534,7 +531,7 @@ function TopLossOrders({ orders }) {
           </thead>
           <tbody>
             {topLosses.map((o) => {
-              const lossPct = o.revenue > 0? Math.round((Math.abs(o.pl) / o.revenue) * 100) : 100;
+              const lossPct = o.revenue > 0 ? Math.round((Math.abs(o.pl) / o.revenue) * 100) : 100;
               return (
                 <tr key={o.id}>
                   <td className="oa-order-id">#{o.id}</td>
@@ -555,7 +552,7 @@ function TopLossOrders({ orders }) {
 }
 
 /* ─── Charts Section ─── */
-function ChartsSection({ orders }) {
+function ChartsSection({ orders, darkMode }) {
   const lineRef = useRef(null);
   const donutRef = useRef(null);
   const barRef = useRef(null);
@@ -566,14 +563,15 @@ function ChartsSection({ orders }) {
     Object.values(chartsRef.current).forEach((c) => c?.destroy());
     chartsRef.current = {};
 
-    const grid = "#fff7ed", tick = "#9a3412";
-    const green = "#22c55e", red = "#ef4444";
+    const grid = darkMode ? "#374151" : "#fff7ed";
+    const tick = darkMode ? "#9ca3af" : "#9a3412";
+    const green = "#16a34a", red = "#ef4444";
     const orange = "#f97316", orangeAlpha = "rgba(249,115,22,0.12)";
     const yellow = "#fbbf24";
 
     const dates = [...new Set(orders.map((o) => o.date))]
-     .sort((a, b) => new Date(a) - new Date(b))
-     .slice(-7);
+      .sort((a, b) => new Date(a) - new Date(b))
+      .slice(-7);
     const netByDay = dates.map((d) =>
       orders.filter((o) => o.date === d).reduce((sum, o) => sum + ((o.revenue || 0) - (o.cost || 0)), 0)
     );
@@ -587,7 +585,7 @@ function ChartsSection({ orders }) {
             label: "Net Profit", data: netByDay,
             borderColor: orange, backgroundColor: orangeAlpha,
             fill: true, tension: 0.4, borderWidth: 2,
-            pointBackgroundColor: netByDay.map((v) => (v >= 0? green : red)),
+            pointBackgroundColor: netByDay.map((v) => (v >= 0 ? green : red)),
             pointRadius: 5,
           }],
         },
@@ -614,7 +612,7 @@ function ChartsSection({ orders }) {
               orders.filter((o) => o.status === "delivered").length,
             ],
             backgroundColor: [yellow, orange, green],
-            borderWidth: 3, borderColor: "#fff",
+            borderWidth: 2, borderColor: darkMode ? "#1e1e1e" : "#fff",
           }],
         },
         options: {
@@ -660,7 +658,7 @@ function ChartsSection({ orders }) {
           labels: WEEKDAY_FULL.map((d) => d.slice(0, 3)),
           datasets: [
             { label: "Profit", data: profits, backgroundColor: "rgba(34,197,94,0.8)", borderRadius: { topLeft: 6, topRight: 6 }, stack: "pl" },
-            { label: "Loss", data: losses, backgroundColor: "rgba(239,68,0.8)", borderRadius: { bottomLeft: 6, bottomRight: 6 }, stack: "pl" },
+            { label: "Loss", data: losses, backgroundColor: "rgba(239,68,68,0.8)", borderRadius: { bottomLeft: 6, bottomRight: 6 }, stack: "pl" },
           ],
         },
         options: {
@@ -678,7 +676,7 @@ function ChartsSection({ orders }) {
     }
 
     return () => { Object.values(chartsRef.current).forEach((c) => c?.destroy()); };
-  }, [orders]);
+  }, [orders, darkMode]);
 
   return (
     <div className="oa-charts-outer">
@@ -725,7 +723,7 @@ function OrdersTable({ orders }) {
   const filtered = useMemo(() => {
     let result = orders.filter((o) => {
       const matchStatus = statusFilter === "all" || o.status === statusFilter;
-     const matchSearch = o.product.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchSearch = o.product.toLowerCase().includes(searchQuery.toLowerCase());
       let matchDate = true;
       if (dateFilter === "7") matchDate = (TODAY - new Date(o.date)) / 86400000 <= 7;
       if (dateFilter === "30") matchDate = (TODAY - new Date(o.date)) / 86400000 <= 30;
@@ -738,19 +736,19 @@ function OrdersTable({ orders }) {
       else if (sortKey === "status") { va = a.status; vb = b.status; }
       else if (sortKey === "revenue") { va = (a.revenue || 0); vb = (b.revenue || 0); }
       else { va = a[sortKey]; vb = b[sortKey]; }
-      return sortDir === "asc"? (va > vb? 1 : -1) : (va < vb? 1 : -1);
+      return sortDir === "asc" ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
     });
     return result;
   }, [orders, statusFilter, dateFilter, searchQuery, sortKey, sortDir]);
 
   const toggleSort = (key) => {
-    if (sortKey === key) setSortDir((d) => (d === "asc"? "desc" : "asc"));
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir("desc"); }
   };
 
   const SortIcon = ({ k }) => (
-    <span style={{ marginLeft: 4, fontSize: "0.7rem", opacity: sortKey === k? 1 : 0.4 }}>
-      {sortKey === k? (sortDir === "asc"? "▲" : "▼") : "▼"}
+    <span style={{ marginLeft: 4, fontSize: "0.7rem", opacity: sortKey === k ? 1 : 0.4 }}>
+      {sortKey === k ? (sortDir === "asc" ? "▲" : "▼") : "▼"}
     </span>
   );
 
@@ -795,7 +793,7 @@ function OrdersTable({ orders }) {
         <div className="oa-result-count">{filtered.length} results</div>
       </div>
 
-      {filtered.length === 0? (
+      {filtered.length === 0 ? (
         <div className="oa-empty-state">
           <div className="oa-empty-icon">📦</div>
           <div className="oa-empty-title">No orders found</div>
@@ -835,8 +833,8 @@ function OrdersTable({ orders }) {
                     <td className="oa-revenue">{fmt(o.revenue)}</td>
                     <td className="oa-cost">{fmt(o.cost)}</td>
                     <td className="oa-pl">
-                      <span style={{ color: pl >= 0? "#22c55e" : "#ef4444" }}>
-                        {pl >= 0? "+" : "-"}{fmt(pl)}
+                      <span style={{ color: pl >= 0 ? "#16a34a" : "#ef4444" }}>
+                        {pl >= 0 ? "+" : ""}{fmt(pl)}
                       </span>
                     </td>
                   </tr>
@@ -854,6 +852,7 @@ function OrdersTable({ orders }) {
 export default function TotalOrdersPage({ orders: propOrders, onBack }) {
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState("all");
+  const [darkMode, setDarkMode] = useState(false);
   const allOrders = propOrders || SAMPLE_ORDERS;
 
   const orders = useMemo(() => {
@@ -874,10 +873,10 @@ export default function TotalOrdersPage({ orders: propOrders, onBack }) {
     const profits = orders.map((o) => (o.revenue || 0) - (o.cost || 0));
     const totalProfit = profits.filter((p) => p > 0).reduce((a, b) => a + b, 0);
     const totalLoss = profits.filter((p) => p < 0).reduce((a, b) => a + b, 0);
-    const margin = revenue > 0? Math.round(((revenue - cost) / revenue) * 100) : 0;
+    const margin = revenue > 0 ? Math.round(((revenue - cost) / revenue) * 100) : 0;
     const delivered = orders.filter((o) => o.status === "delivered").length;
-    const deliveryRate = total > 0? Math.round((delivered / total) * 100) : 0;
-    const aov = total > 0? Math.round(revenue / total) : 0;
+    const deliveryRate = total > 0 ? Math.round((delivered / total) * 100) : 0;
+    const aov = total > 0 ? Math.round(revenue / total) : 0;
     return { total, revenue, cost, totalProfit, totalLoss, margin, deliveryRate, aov };
   }, [orders]);
 
@@ -908,137 +907,140 @@ export default function TotalOrdersPage({ orders: propOrders, onBack }) {
   if (loading) return <LoadingPage />;
 
   return (
-    <div className="oa-page">
-      <div className="oa-container">
-        {/* Header */}
-        <div className="oa-page-header">
-          {onBack && (
-            <button className="oa-back-btn" onClick={onBack}>
-              <ArrowLeft size={16} /> Back
-            </button>
-          )}
-          <div className="oa-header-text">
-            <h1 className="oa-page-title">Orders Analytics</h1>
-            <p className="oa-page-subtitle">Profit, loss, and performance deep-dive</p>
-          </div>
-          <div className="oa-header-actions">
-            <div className="oa-select-wrap">
-              <Clock size={14} color="#ea580c" />
-              <select className="oa-filter-select" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
-                <option value="all">All Time</option>
-                <option value="7">Last 7 Days</option>
-                <option value="30">Last 30 Days</option>
-                <option value="90">Last 90 Days</option>
-              </select>
-              <ChevronDown size={14} className="oa-select-icon" />
+    <div className={`orders-analytics-wrapper ${darkMode ? "dark" : ""}`}>
+      <div className="oa-page">
+        <div className="oa-container">
+          {/* Header */}
+          <div className="oa-page-header">
+            {onBack && (
+              <button className="oa-back-btn" onClick={onBack}>
+                <ArrowLeft size={16} /> Back
+              </button>
+            )}
+            <div className="oa-header-text">
+              <h1 className="oa-page-title">Orders Analytics</h1>
+              <p className="oa-page-subtitle">Profit, loss, and performance deep-dive</p>
             </div>
-            <div className="oa-overview-badge">{orders.length} Orders</div>
+            <div className="oa-header-actions">
+             
+              <div className="oa-select-wrap">
+               
+                <select className="oa-filter-select" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+                  <option value="all">All Time</option>
+                  <option value="7">Last 7 Days</option>
+                  <option value="30">Last 30 Days</option>
+                  <option value="90">Last 90 Days</option>
+                </select>
+                <ChevronDown size={14} className="oa-select-icon" />
+              </div>
+              <div className="oa-overview-badge">{orders.length} Orders</div>
+            </div>
           </div>
-        </div>
 
-        {/* KPIs */}
-        <div className="oa-kpi-grid">
-          <KpiCard label="Total Orders" value={kpis.total} icon={ShoppingBag} color="#f97316" />
-          <KpiCard label="Revenue" value={fmt(kpis.revenue)} icon={DollarSign} color="#22c55e" />
-          <KpiCard label="Total Cost" value={fmt(kpis.cost)} icon={BarChart2} color="#ea580c" />
-          <KpiCard label="Total Profit" value={fmt(kpis.totalProfit)} icon={TrendingUp} color="#16a34a" />
-          <KpiCard
-            label="Margin"
-            value={`${kpis.margin}%`}
-            icon={Star}
-            color={kpis.margin > 0? "#22c55e" : "#ef4444"}
-            sub={kpis.margin > 30? "Healthy ✓" : kpis.margin > 0? "Watch" : "At risk ⚠"}
-          />
-          <KpiCard
-            label="Delivery Rate"
-            value={`${kpis.deliveryRate}%`}
-            icon={Truck}
-            color={kpis.deliveryRate > 70? "#22c55e" : "#ef4444"}
-          />
-          <KpiCard
-            label="Avg Order Value"
-            value={fmt(kpis.aov)}
-            icon={DollarSign}
-            color="#f97316"
-            sub={kpis.aov > 2000? "Strong ✓" : "Can improve"}
-          />
-        </div>
-
-        {/* Charts */}
-        <ChartsSection orders={orders} />
-
-        {/* Heatmap */}
-        <HeatmapSection orders={orders} />
-
-        {/* Forecast */}
-        <RevenueForecast orders={orders} />
-
-        {/* Fulfillment */}
-        <FulfillmentSpeed orders={orders} />
-
-        {/* Product matrix */}
-        <ProductMatrix orders={orders} />
-
-        {/* Day list */}
-        <DayListSection orders={orders} />
-
-        {/* Top losses */}
-        <TopLossOrders orders={orders} />
-
-        {/* Insights */}
-        <div className="oa-section">
-          <div className="oa-section-header">
-            <h3 className="oa-section-title">📊 Smart Insights</h3>
-          </div>
-          <div className="oa-insights-grid">
-            {insights.bestDay && (
-              <InsightCard
-                icon={<Award size={18} color="#f97316" />}
-                title="Best Day"
-                text={`${insights.bestDay.day} leads with ${fmt(insights.bestDay.net)} net profit`}
-                color="#fff7ed" border="#fed7aa"
-              />
-            )}
-            {insights.worstDay && (
-              <InsightCard
-                icon={<TrendingDown size={18} color="#ef4444" />}
-                title="Worst Day"
-                text={`${insights.worstDay.day}: ${
-                  insights.worstDay.net < 0
-                  ? `-${fmt(Math.abs(insights.worstDay.net))} loss`
-                    : `${fmt(insights.worstDay.net)} net`
-                }`}
-                color={insights.worstDay.net < 0? "#fef2f2" : "#fff7ed"}
-                border={insights.worstDay.net < 0? "#fecaca" : "#fed7aa"}
-              />
-            )}
-            <InsightCard
-              icon={<CheckCircle size={18} color="#22c55e" />}
-              title="Delivery Rate"
-              text={`${kpis.deliveryRate}% orders delivered successfully`}
-              color="#f0fdf4" border="#a7f3d0"
+          {/* KPIs */}
+          <div className="oa-kpi-grid">
+            <KpiCard label="Total Orders" value={kpis.total} icon={ShoppingBag} color="#f97316" />
+            <KpiCard label="Revenue" value={fmt(kpis.revenue)} icon={DollarSign} color="#22c55e" />
+            <KpiCard label="Total Cost" value={fmt(kpis.cost)} icon={BarChart2} color="#ea580c" />
+            <KpiCard label="Total Profit" value={fmt(kpis.totalProfit)} icon={TrendingUp} color="#16a34a" />
+            <KpiCard
+              label="Margin"
+              value={`${kpis.margin}%`}
+              icon={Star}
+              color={kpis.margin > 0 ? "#22c55e" : "#ef4444"}
+              sub={kpis.margin > 30 ? "Healthy ✓" : kpis.margin > 0 ? "Watch" : "At risk ⚠"}
             />
-            {insights.bestProduct && (
-              <InsightCard
-                icon={<Star size={18} color="#f97316" />}
-                title="Top Product"
-                text={`${insights.bestProduct[0]} earned ${fmt(insights.bestProduct[1])} total profit`}
-                color="#fff7ed" border="#fed7aa"
-              />
-            )}
-            {insights.oldPending > 0 && (
-              <InsightCard
-                icon={<AlertTriangle size={18} color="#ef4444" />}
-                title="Stuck Orders"
-                text={`${insights.oldPending} orders pending for 3+ days — follow up now`}
-                color="#fef2f2" border="#fecaca"
-              />
-            )}
+            <KpiCard
+              label="Delivery Rate"
+              value={`${kpis.deliveryRate}%`}
+              icon={Truck}
+              color={kpis.deliveryRate > 70 ? "#22c55e" : "#ef4444"}
+            />
+            <KpiCard
+              label="Avg Order Value"
+              value={fmt(kpis.aov)}
+              icon={DollarSign}
+              color="#f97316"
+              sub={kpis.aov > 2000 ? "Strong ✓" : "Can improve"}
+            />
           </div>
-        </div>
 
-        {/* Orders Table */}
-        <OrdersTable orders={orders} />
+          {/* Charts */}
+          <ChartsSection orders={orders} darkMode={darkMode} />
+
+          {/* Heatmap */}
+          <HeatmapSection orders={orders} />
+
+          {/* Forecast */}
+          <RevenueForecast orders={orders} />
+
+          {/* Fulfillment */}
+          <FulfillmentSpeed orders={orders} />
+
+          {/* Product matrix */}
+          <ProductMatrix orders={orders} />
+
+          {/* Day list */}
+          <DayListSection orders={orders} />
+
+          {/* Top losses */}
+          <TopLossOrders orders={orders} />
+
+          {/* Insights */}
+          <div className="oa-section">
+            <div className="oa-section-header">
+              <h3 className="oa-section-title">📊 Smart Insights</h3>
+            </div>
+            <div className="oa-insights-grid">
+              {insights.bestDay && (
+                <InsightCard
+                  icon={<Award size={18} color="#f97316" />}
+                  title="Best Day"
+                  text={`${insights.bestDay.day} leads with ${fmt(insights.bestDay.net)} net profit`}
+                  color={darkMode ? "#2c1a0c" : "#fff7ed"} border={darkMode ? "#7c2d12" : "#fed7aa"}
+                />
+              )}
+              {insights.worstDay && (
+                <InsightCard
+                  icon={<TrendingDown size={18} color="#ef4444" />}
+                  title="Worst Day"
+                  text={`${insights.worstDay.day}: ${
+                    insights.worstDay.net < 0
+                    ? `-${fmt(Math.abs(insights.worstDay.net))} loss`
+                      : `${fmt(insights.worstDay.net)} net`
+                  }`}
+                  color={insights.worstDay.net < 0 ? (darkMode ? "#450a0a" : "#fef2f2") : (darkMode ? "#2c1a0c" : "#fff7ed")}
+                  border={insights.worstDay.net < 0 ? "#fecaca" : "#fed7aa"}
+                />
+              )}
+              <InsightCard
+                icon={<CheckCircle size={18} color="#22c55e" />}
+                title="Delivery Rate"
+                text={`${kpis.deliveryRate}% orders delivered successfully`}
+                color={darkMode ? "#052e16" : "#f0fdf4"} border={darkMode ? "#065f46" : "#a7f3d0"}
+              />
+              {insights.bestProduct && (
+                <InsightCard
+                  icon={<Star size={18} color="#f97316" />}
+                  title="Top Product"
+                  text={`${insights.bestProduct[0]} earned ${fmt(insights.bestProduct[1])} total profit`}
+                  color={darkMode ? "#2c1a0c" : "#fff7ed"} border={darkMode ? "#7c2d12" : "#fed7aa"}
+                />
+              )}
+              {insights.oldPending > 0 && (
+                <InsightCard
+                  icon={<AlertTriangle size={18} color="#ef4444" />}
+                  title="Stuck Orders"
+                  text={`${insights.oldPending} orders pending for 3+ days — follow up now`}
+                  color={darkMode ? "#450a0a" : "#fef2f2"} border="#fecaca"
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Orders Table */}
+          <OrdersTable orders={orders} />
+        </div>
       </div>
     </div>
   );

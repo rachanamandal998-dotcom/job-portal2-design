@@ -22,7 +22,6 @@ const NAMES = [
   "Laxmi Chhetri", "Nishant Dhakal", "Meena Sapkota", "Prabin Koirala", "Sarita Bajracharya"
 ];
 
-
 const POSITIONS = [
   "Frontend Developer", "Backend Engineer", "UI/UX Designer", "Product Manager",
   "Data Analyst", "DevOps Engineer", "QA Engineer", "Marketing Manager",
@@ -132,9 +131,9 @@ const getDateRange = (chip) => {
 
 /* ─────────────────── STATUS BADGE COLORS ─────────────────── */
 const STATUS_CLASS = {
-  applied: "badge-applied", screening: "badge-screening", assessment: "badge-assessment",
-  shortlisted: "badge-shortlisted", interview: "badge-interview", selected: "badge-selected",
-  offer_sent: "badge-offer", joined: "badge-joined", rejected: "badge-rejected", withdrawn: "badge-withdrawn",
+  applied: "apps-badge-applied", screening: "apps-badge-screening", assessment: "apps-badge-assessment",
+  shortlisted: "apps-badge-shortlisted", interview: "apps-badge-interview", selected: "apps-badge-selected",
+  offer_sent: "apps-badge-offer", joined: "apps-badge-joined", rejected: "apps-badge-rejected", withdrawn: "apps-badge-withdrawn",
 };
 
 /* ─────────────────── MAIN COMPONENT ─────────────────── */
@@ -245,6 +244,7 @@ export default function Applications() {
     }
 
     // Status doughnut
+    // Status doughnut
     if (chartRefs.status.current) {
       const sColors = ["#f97316", "#3b82f6", "#fbbf24", "#8b5cf6", "#ec4899", "#22c55e", "#10b981", "#14b8a6", "#ef4444", "#6b7280"];
       chartInstances.current.status = new Chart(chartRefs.status.current, {
@@ -253,10 +253,14 @@ export default function Applications() {
           labels: STATUSES.map((s) => s.replace("_", " ")),
           datasets: [{ data: STATUSES.map((s) => src.filter((a) => a.status === s).length), backgroundColor: sColors, borderWidth: 2 }],
         },
-        options: { responsive: true, maintainAspectRatio: false, cutout: "55%", plugins: { legend: { position: "right", labels: { font: { size: 9 }, boxWidth: 10, padding: 4 } } } },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "55%",
+          plugins: { legend: { position: "right", labels: { font: { size: 9 }, boxWidth: 10, padding: 4 } } }
+        },
       });
     }
-
     // Experience bar
     if (chartRefs.exp.current) {
       chartInstances.current.exp = new Chart(chartRefs.exp.current, {
@@ -382,29 +386,29 @@ export default function Applications() {
   return (
     <div className={`apps-page ${darkMode ? 'dark' : ''}`}>
       {/* ── Header ── */}
-      <div className="apps-header glass-card">
-        <button className="btn-back" onClick={() => navigate("/")}>
+      <div className="apps-header apps-glass-card">
+        <button className="apps-btn-back" onClick={() => navigate("/")}>
           <ArrowLeft size={18} /> Back
         </button>
-        <div className="header-title">
+        <div className="apps-header-title">
           <h1>Applications Management</h1>
           <p>Manage, filter, evaluate and track all {applications.length} candidates</p>
         </div>
-        <div className="header-actions">
-          <button className="btn-icon" onClick={() => setDarkMode(!darkMode)} title="Toggle dark mode">
+        <div className="apps-header-actions">
+          <button className="apps-btn-icon" onClick={() => setDarkMode(!darkMode)} title="Toggle dark mode">
             {darkMode ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <button className="btn-icon" onClick={() => setApplications(generateApplications())} title="Refresh data">
+          <button className="apps-btn-icon" onClick={() => setApplications(generateApplications())} title="Refresh data">
             <RefreshCw size={18} />
           </button>
-          <button className="btn-primary" onClick={() => exportCSV()}>
+          <button className="apps-btn-primary" onClick={() => exportCSV()}>
             <Download size={16} /> Export CSV
           </button>
         </div>
       </div>
 
       {/* ── KPI Cards ── */}
-      <div className="kpi-grid">
+      <div className="apps-kpi-grid">
         {[
           { label: "Total applications", value: kpis.total, icon: Users, color: "#f97316", trend: "+12%" },
           { label: "New today", value: kpis.newToday, icon: TrendingUp, color: "#22c55e", trend: "+5%" },
@@ -417,45 +421,45 @@ export default function Applications() {
           { label: "Avg experience", value: `${kpis.avgExp}y`, icon: Briefcase, color: "#14b8a6", trend: "0%" },
         ].map((k, i) => (
           <motion.div
-            key={k.label} className="kpi-card glass-card"
+            key={k.label} className="apps-kpi-card apps-glass-card"
             style={{ borderLeftColor: k.color }}
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
             whileHover={{ y: -4, scale: 1.02 }}
           >
-            <div className="kpi-icon" style={{ background: k.color + "20" }}>
+            <div className="apps-kpi-icon" style={{ background: k.color + "20" }}>
               <k.icon size={20} style={{ color: k.color }} />
             </div>
-            <div className="kpi-value">{k.value}</div>
-            <div className="kpi-label">{k.label}</div>
-            <div className={`kpi-trend ${k.trend.startsWith("+") ? "up" : k.trend === "0%" ? "" : "dn"}`}>{k.trend}</div>
+            <div className="apps-kpi-value">{k.value}</div>
+            <div className="apps-kpi-label">{k.label}</div>
+            <div className={`apps-kpi-trend ${k.trend.startsWith("+") ? "up" : k.trend === "0%" ? "" : "dn"}`}>{k.trend}</div>
           </motion.div>
         ))}
       </div>
 
       {/* ── Filters ── */}
-      <div className="filters-card glass-card">
-        <div className="filter-row-top">
-          <div className="search-box">
+      <div className="apps-filters-card apps-glass-card">
+        <div className="apps-filter-row-top">
+          <div className="apps-search-box">
             <Search size={16} />
             <input
               type="text" placeholder="Search name, email, skill, position…"
               value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
             />
           </div>
-          <button className="btn-secondary" onClick={() => setShowFilters((s) => !s)}>
+          <button className="apps-btn-secondary" onClick={() => setShowFilters((s) => !s)}>
             <Filter size={15} /> Filters {showFilters ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
           </button>
-          <button className="btn-secondary" onClick={resetFilters}>
+          <button className="apps-btn-secondary" onClick={resetFilters}>
             <XCircle size={15} /> Reset
           </button>
         </div>
 
         {/* Date chips */}
-        <div className="chip-row">
+        <div className="apps-chip-row">
           {DATE_CHIPS.map((c) => (
             <button
               key={c.val}
-              className={`chip${activeDateChip === c.val ? " active" : ""}`}
+              className={`apps-chip${activeDateChip === c.val ? " active" : ""}`}
               onClick={() => { setActiveDateChip(c.val); setCurrentPage(1); }}
             >{c.label}</button>
           ))}
@@ -465,7 +469,7 @@ export default function Applications() {
         <AnimatePresence>
           {showFilters && (
             <motion.div
-              className="advanced-filters"
+              className="apps-advanced-filters"
               initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
             >
               {[
@@ -505,7 +509,7 @@ export default function Applications() {
       {/* ── Bulk Action Bar ── */}
       <AnimatePresence>
         {selectedIds.size > 0 && (
-          <motion.div className="bulk-bar" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
+          <motion.div className="apps-bulk-bar" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
             <span>{selectedIds.size} selected</span>
             <button onClick={() => bulkAction("shortlisted")}><CheckCircle size={14} /> Shortlist</button>
             <button onClick={() => bulkAction("interview")}><Calendar size={14} /> Interview</button>
@@ -517,24 +521,24 @@ export default function Applications() {
       </AnimatePresence>
 
       {/* ── Charts ── */}
-      <div className="charts-grid">
-        <div className="chart-card glass-card">
+      <div className="apps-charts-grid">
+        <div className="apps-chart-card apps-glass-card">
           <h3>Applications by department</h3>
-          <div className="chart-wrap"><canvas ref={chartRefs.dept} /></div>
+          <div className="apps-chart-wrap"><canvas ref={chartRefs.dept} /></div>
         </div>
-        <div className="chart-card glass-card">
+        <div className="apps-chart-card apps-glass-card">
           <h3>Status distribution</h3>
-          <div className="chart-wrap"><canvas ref={chartRefs.status} /></div>
+          <div className="apps-chart-wrap"><canvas ref={chartRefs.status} /></div>
         </div>
-        <div className="chart-card glass-card">
+        <div className="apps-chart-card apps-glass-card">
           <h3>Hiring funnel</h3>
-          <div className="funnel-chart">
+          <div className="apps-funnel-chart">
             {funnelCounts.map((c, i) => (
-              <div key={i} className="funnel-row">
-                <span className="funnel-label">{funnelLabels[i]}</span>
-                <div className="funnel-bg">
+              <div key={i} className="apps-funnel-row">
+                <span className="apps-funnel-label">{funnelLabels[i]}</span>
+                <div className="apps-funnel-bg">
                   <motion.div
-                    className="funnel-fill"
+                    className="apps-funnel-fill"
                     initial={{ width: 0 }} animate={{ width: `${Math.round((c / maxFunnel) * 100)}%` }}
                     transition={{ duration: 0.6, delay: i * 0.08 }}
                   >{c}</motion.div>
@@ -543,27 +547,27 @@ export default function Applications() {
             ))}
           </div>
         </div>
-        <div className="chart-card glass-card">
+        <div className="apps-chart-card apps-glass-card">
           <h3>Experience distribution</h3>
-          <div className="chart-wrap"><canvas ref={chartRefs.exp} /></div>
+          <div className="apps-chart-wrap"><canvas ref={chartRefs.exp} /></div>
         </div>
-        <div className="chart-card glass-card">
+        <div className="apps-chart-card apps-glass-card">
           <h3>Candidate sources</h3>
-          <div className="chart-wrap"><canvas ref={chartRefs.source} /></div>
+          <div className="apps-chart-wrap"><canvas ref={chartRefs.source} /></div>
         </div>
-        <div className="chart-card glass-card">
+        <div className="apps-chart-card apps-glass-card">
           <h3>Daily trend — last 14 days</h3>
-          <div className="chart-wrap"><canvas ref={chartRefs.trend} /></div>
+          <div className="apps-chart-wrap"><canvas ref={chartRefs.trend} /></div>
         </div>
       </div>
 
       {/* ── Table ── */}
-      <div className="table-card glass-card">
-        <div className="table-toolbar">
-          <span className="table-info">
+      <div className="apps-table-card apps-glass-card">
+        <div className="apps-table-toolbar">
+          <span className="apps-table-info">
             Showing {((currentPage - 1) * perPage) + 1}–{Math.min(currentPage * perPage, filtered.length)} of {filtered.length} candidates
           </span>
-          <div className="table-controls">
+          <div className="apps-table-controls">
             <select value={perPage} onChange={(e) => { setPerPage(Number(e.target.value)); setCurrentPage(1); }}>
               <option value={10}>10 / page</option>
               <option value={25}>25 / page</option>
@@ -582,7 +586,7 @@ export default function Applications() {
           </div>
         </div>
 
-        <div className="table-scroll">
+        <div className="apps-table-scroll">
           <table>
             <thead>
               <tr>
@@ -628,49 +632,49 @@ export default function Applications() {
                     />
                   </td>
                   <td>
-                    <div className="candidate-cell">
-                      <div className="avatar">{app.name.charAt(0)}</div>
+                    <div className="apps-candidate-cell">
+                      <div className="apps-avatar">{app.name.charAt(0)}</div>
                       <div>
-                        <div className="cand-name">{app.name}</div>
-                        <div className="cand-email">{app.email}</div>
+                        <div className="apps-cand-name">{app.name}</div>
+                        <div className="apps-cand-email">{app.email}</div>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <div className="cand-name">{app.position}</div>
-                    <div className="cand-email">{app.department}</div>
+                    <div className="apps-cand-name">{app.position}</div>
+                    <div className="apps-cand-email">{app.department}</div>
                   </td>
                   <td>{app.experienceLabel}</td>
                   <td>{app.location}</td>
                   <td>{app.appliedDate}</td>
                   <td>
-                    <div className="score-cell">
-                      <div className="score-track">
+                    <div className="apps-score-cell">
+                      <div className="apps-score-track">
                         <div
-                          className={`score-fill ${app.matchScore >= 80 ? "high" : app.matchScore >= 60 ? "mid" : "low"}`}
+                          className={`apps-score-fill ${app.matchScore >= 80 ? "high" : app.matchScore >= 60 ? "mid" : "low"}`}
                           style={{ width: `${app.matchScore}%` }}
                         />
                       </div>
-                      <span className="score-num">{app.matchScore}%</span>
+                      <span className="apps-score-num">{app.matchScore}%</span>
                     </div>
                   </td>
                   <td>
-                    <span className={`status-badge ${STATUS_CLASS[app.status] || ""}`}>
+                    <span className={`apps-status-badge ${STATUS_CLASS[app.status] || ""}`}>
                       {app.status.replace("_", " ")}
                     </span>
                   </td>
                   <td>
-                    <div className="action-row">
-                      <button className="act-btn" title="View" onClick={() => { setSelectedCandidate(app); setNoteText(app.notes); }}>
+                    <div className="apps-action-row">
+                      <button className="apps-act-btn" title="View" onClick={() => { setSelectedCandidate(app); setNoteText(app.notes); }}>
                         <Eye size={14} />
                       </button>
-                      <button className="act-btn" title="Shortlist" onClick={() => setStatus(app.id, "shortlisted")}>
+                      <button className="apps-act-btn" title="Shortlist" onClick={() => setStatus(app.id, "shortlisted")}>
                         <CheckCircle size={14} />
                       </button>
-                      <button className="act-btn" title={app.bookmarked ? "Unbookmark" : "Bookmark"} onClick={() => toggleBookmark(app.id)}>
+                      <button className="apps-act-btn" title={app.bookmarked ? "Unbookmark" : "Bookmark"} onClick={() => toggleBookmark(app.id)}>
                         <Star size={14} fill={app.bookmarked ? "#fbbf24" : "none"} color={app.bookmarked ? "#fbbf24" : "currentColor"} />
                       </button>
-                      <button className="act-btn danger" title="Reject" onClick={() => setStatus(app.id, "rejected")}>
+                      <button className="apps-act-btn danger" title="Reject" onClick={() => setStatus(app.id, "rejected")}>
                         <XCircle size={14} />
                       </button>
                     </div>
@@ -683,7 +687,7 @@ export default function Applications() {
 
         {/* Pagination Controls Footer */}
         {totalPages > 1 && (
-          <div className="pagination-footer">
+          <div className="apps-pagination">
             <button disabled={currentPage === 1} onClick={() => setCurrentPage(c => c - 1)}>Prev</button>
             <span>Page {currentPage} of {totalPages}</span>
             <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(c => c + 1)}>Next</button>
@@ -695,28 +699,28 @@ export default function Applications() {
       <AnimatePresence>
         {selectedCandidate && (
           <>
-            <motion.div className="drawer-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedCandidate(null)} />
-            <motion.div className="drawer glass-card" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", damping: 25, stiffness: 200 }}>
-              <div className="drawer-header">
+            <motion.div className="apps-drawer-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedCandidate(null)} />
+            <motion.div className="apps-drawer apps-glass-card" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", damping: 25, stiffness: 200 }}>
+              <div className="apps-drawer-header">
                 <h2>Candidate Details</h2>
-                <button className="btn-icon" onClick={() => setSelectedCandidate(null)}><X size={18} /></button>
+                <button className="apps-btn-icon" onClick={() => setSelectedCandidate(null)}><X size={18} /></button>
               </div>
-              <div className="drawer-body">
-                <div className="drawer-profile">
-                  <div className="avatar-large">{selectedCandidate.name.charAt(0)}</div>
+              <div className="apps-drawer-body">
+                <div className="apps-profile-hero">
+                  <div className="apps-profile-avatar">{selectedCandidate.name.charAt(0)}</div>
                   <h3>{selectedCandidate.name}</h3>
                   <p>{selectedCandidate.position} • {selectedCandidate.department}</p>
-                  <span className="tag-ai">{aiTag(selectedCandidate.matchScore)}</span>
+                  <span className="apps-tag-ai">{aiTag(selectedCandidate.matchScore)}</span>
                 </div>
                 <hr />
-                <div className="drawer-info-section">
+                <div className="apps-drawer-section">
                   <h4>Contact Information</h4>
                   <p><Mail size={14} /> {selectedCandidate.email}</p>
                   <p><Phone size={14} /> {selectedCandidate.phone}</p>
                   <p><MapPin size={14} /> {selectedCandidate.location}</p>
                 </div>
                 <hr />
-                <div className="drawer-info-section">
+                <div className="apps-drawer-section">
                   <h4>Application Details</h4>
                   <p><Briefcase size={14} /> Experience: {selectedCandidate.experienceLabel} ({selectedCandidate.experience} years)</p>
                   <p><BookOpen size={14} /> Education: {selectedCandidate.education}</p>
@@ -724,23 +728,23 @@ export default function Applications() {
                   <p><Activity size={14} /> Source: {selectedCandidate.source}</p>
                 </div>
                 <hr />
-                <div className="drawer-info-section">
+                <div className="apps-drawer-section">
                   <h4>Skills</h4>
-                  <div className="skills-wrap">
+                  <div className="apps-skills-wrap">
                     {selectedCandidate.skills.map(skill => (
-                      <span key={skill} className="skill-chip">{skill}</span>
+                      <span key={skill} className="apps-skill-chip">{skill}</span>
                     ))}
                   </div>
                 </div>
                 <hr />
-                <div className="drawer-info-section">
+                <div className="apps-drawer-section">
                   <h4>Notes</h4>
-                  <textarea 
-                    value={noteText} 
-                    onChange={(e) => setNoteText(e.target.value)} 
+                  <textarea
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
                     placeholder="Add private evaluation notes here..."
                   />
-                  <button className="btn-secondary" style={{ marginTop: '8px' }} onClick={() => saveNote(selectedCandidate.id)}>
+                  <button className="apps-btn-secondary" style={{ marginTop: '8px' }} onClick={() => saveNote(selectedCandidate.id)}>
                     <Save size={14} /> Save Note
                   </button>
                 </div>

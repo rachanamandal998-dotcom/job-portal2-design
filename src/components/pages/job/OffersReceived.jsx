@@ -1,18 +1,8 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
+  Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement,
+  ArcElement, RadialLinearScale, Title, Tooltip, Legend, Filler
 } from 'chart.js';
 import { Line, Bar, Doughnut, Pie, Radar } from 'react-chartjs-2';
 import {
@@ -59,7 +49,7 @@ const generateOffers = () => {
     const joiningDate = new Date(offerDate.getTime() + joiningDays * 24 * 60 * 60 * 1000);
 
     const baseSalary = Math.floor(Math.random() * 15) + 5;
-    const status = i <= 4? 'Accepted' : i <= 7? 'Rejected' : i <= 9? 'Negotiation' : 'Pending';
+    const status = i <= 4 ? 'Accepted' : i <= 7 ? 'Rejected' : i <= 9 ? 'Negotiation' : 'Pending';
 
     offers.push({
       id: `OFF-2026-${1000 + i}`,
@@ -110,15 +100,8 @@ export default function OffersReceived() {
   const itemsPerPage = 6;
 
   const [filters, setFilters] = useState({
-    dateRange: 'All',
-    month: 'All',
-    year: 'All',
-    day: 'All',
-    salary: 'All',
-    workMode: 'All',
-    company: 'All',
-    status: 'All',
-    quarter: 'All'
+    dateRange: 'All', month: 'All', year: 'All', day: 'All',
+    salary: 'All', workMode: 'All', company: 'All', status: 'All', quarter: 'All'
   });
 
   const [activeStatusFilter, setActiveStatusFilter] = useState('All');
@@ -131,6 +114,7 @@ export default function OffersReceived() {
     setSearch('');
     setActiveStatusFilter('All');
     setCurrentPage(1);
+    setIsFilterOpen(false);
   };
 
   // FILTERING LOGIC
@@ -143,16 +127,16 @@ export default function OffersReceived() {
         offer.location.toLowerCase().includes(search.toLowerCase());
 
       if (!matchesSearch) return false;
-      if (activeStatusFilter!== 'All' && offer.status!== activeStatusFilter) return false;
-      if (filters.status!== 'All' && offer.status!== filters.status) return false;
-      if (filters.month!== 'All' && offer.month!== filters.month) return false;
-      if (filters.year!== 'All' && offer.year!== filters.year) return false;
-      if (filters.day!== 'All' && offer.dayOfWeek!== filters.day) return false;
-      if (filters.workMode!== 'All' && offer.workMode!== filters.workMode) return false;
-      if (filters.company!== 'All' && offer.company!== filters.company) return false;
-      if (filters.quarter!== 'All' && offer.quarter!== filters.quarter) return false;
+      if (activeStatusFilter !== 'All' && offer.status !== activeStatusFilter) return false;
+      if (filters.status !== 'All' && offer.status !== filters.status) return false;
+      if (filters.month !== 'All' && offer.month !== filters.month) return false;
+      if (filters.year !== 'All' && offer.year !== filters.year) return false;
+      if (filters.day !== 'All' && offer.dayOfWeek !== filters.day) return false;
+      if (filters.workMode !== 'All' && offer.workMode !== filters.workMode) return false;
+      if (filters.company !== 'All' && offer.company !== filters.company) return false;
+      if (filters.quarter !== 'All' && offer.quarter !== filters.quarter) return false;
 
-      if (filters.salary!== 'All') {
+      if (filters.salary !== 'All') {
         const s = offer.salary;
         if (filters.salary === 'Below ₹3 LPA' && s >= 3) return false;
         if (filters.salary === '₹3L–₹5L' && (s < 3 || s > 5)) return false;
@@ -161,17 +145,18 @@ export default function OffersReceived() {
         if (filters.salary === '₹15L+' && s < 15) return false;
       }
 
-      if (filters.dateRange!== 'All') {
+      if (filters.dateRange !== 'All') {
         const offerDate = new Date(offer.offerDate);
         const today = new Date();
         const diffDays = Math.ceil((today - offerDate) / (1000 * 60 * 60 * 24));
         switch(filters.dateRange) {
           case 'Today': if (diffDays > 1) return false; break;
-          case 'Yesterday': if (diffDays!== 2) return false; break;
+          case 'Yesterday': if (diffDays !== 2) return false; break;
           case 'Last 7 Days': if (diffDays > 7) return false; break;
           case 'Last 30 Days': if (diffDays > 30) return false; break;
           case 'Last 90 Days': if (diffDays > 90) return false; break;
           case 'Last Year': if (diffDays > 365) return false; break;
+          default: break;
         }
       }
       return true;
@@ -194,8 +179,8 @@ export default function OffersReceived() {
     const negotiation = offers.filter(o => o.status === 'Negotiation').length;
     const maxSalary = Math.max(...offers.map(o => o.salary));
     const uniqueCompanies = new Set(offers.map(o => o.company)).size;
-    const avgSalary = (offers.reduce((sum, o) => sum + o.salary, 0) / total).toFixed(1);
-    const acceptanceRate = total > 0? ((accepted / total) * 100).toFixed(0) : 0;
+    const avgSalary = total > 0 ? (offers.reduce((sum, o) => sum + o.salary, 0) / total).toFixed(1) : 0;
+    const acceptanceRate = total > 0 ? ((accepted / total) * 100).toFixed(0) : 0;
 
     return { total, accepted, rejected, pending, negotiation, maxSalary, uniqueCompanies, avgSalary, acceptanceRate };
   }, [offers]);
@@ -219,7 +204,7 @@ export default function OffersReceived() {
       data: [metrics.accepted, metrics.rejected, metrics.pending, metrics.negotiation],
       backgroundColor: ['#22c55e', '#ef4444', '#fbbf24', '#3b82f6'],
       borderWidth: 2,
-      borderColor: '#fff'
+      borderColor: darkMode ? '#1e1e1e' : '#ffffff'
     }]
   };
 
@@ -239,7 +224,7 @@ export default function OffersReceived() {
       data: [4, 3, 2, 1, 1, 1],
       backgroundColor: ['#3b82f6', '#10b981', '#f97316', '#ec4899', '#8b5cf6', '#fbbf24'],
       borderWidth: 2,
-      borderColor: '#fff'
+      borderColor: darkMode ? '#1e1e1e' : '#ffffff'
     }]
   };
 
@@ -270,34 +255,38 @@ export default function OffersReceived() {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { labels: { color: darkMode? '#9ca3af' : '#475569', font: { family: 'Inter' } } },
-      tooltip: { backgroundColor: darkMode? '#1f2937' : '#fff', titleColor: darkMode? '#fff' : '#1f2937', bodyColor: darkMode? '#d1d5db' : '#475569' }
+      legend: { labels: { color: darkMode ? '#9ca3af' : '#475569', font: { family: 'Inter' } } },
+      tooltip: { backgroundColor: darkMode ? '#1f2937' : '#fff', titleColor: darkMode ? '#fff' : '#1f2937', bodyColor: darkMode ? '#d1d5db' : '#475569' }
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: darkMode? '#9ca3af' : '#64748b' } },
-      y: { grid: { color: darkMode? '#374151' : '#f1f5f9' }, ticks: { color: darkMode? '#9ca3af' : '#64748b' } }
+      x: { grid: { display: false }, ticks: { color: darkMode ? '#9ca3af' : '#64748b' } },
+      y: { grid: { color: darkMode ? '#374151' : '#f1f5f9' }, ticks: { color: darkMode ? '#9ca3af' : '#64748b' } }
     }
   };
 
   // HANDLERS
   const handleStatusChange = (id, newStatus) => {
-    setOffers(prev => prev.map(o => o.id === id? {...o, status: newStatus} : o));
+    setOffers(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
   };
 
   const toggleBookmark = (id) => {
-    setOffers(prev => prev.map(o => o.id === id? {...o, bookmarked:!o.bookmarked} : o));
+    setOffers(prev => prev.map(o => o.id === id ? { ...o, bookmarked: !o.bookmarked } : o));
   };
 
   const toggleCompare = (id) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
-      next.has(id)? next.delete(id) : next.add(id);
+      next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
   };
 
-  const handleExport = (type) => {
-    alert(`Exporting ${filteredOffers.length} offers as ${type.toUpperCase()}`);
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedIds(new Set(paginatedOffers.map(item => item.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
   };
 
   const selectedOffers = offers.filter(o => selectedIds.has(o.id));
@@ -306,13 +295,13 @@ export default function OffersReceived() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className={`offers-page ${darkMode? 'dark' : ''}`}
+      className={`offers-page ${darkMode ? 'dark' : ''}`}
     >
       {/* HEADER */}
       <header className="page-header">
         <div className="header-left">
           <button className="back-btn" onClick={() => window.history.back()}>
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} /> Back
           </button>
           <div>
             <h1>
@@ -325,7 +314,7 @@ export default function OffersReceived() {
         <div className="header-right">
           <span className="offers-badge">{metrics.total} Offers</span>
           <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
-            {darkMode? <Sun size={18} /> : <Moon size={18} />}
+            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         </div>
       </header>
@@ -345,7 +334,7 @@ export default function OffersReceived() {
             whileHover={{ y: -4, scale: 1.02 }}
             className="stat-card"
             onClick={() => card.filter && setActiveStatusFilter(card.filter)}
-            style={{ cursor: card.filter? 'pointer' : 'default' }}
+            style={{ cursor: card.filter ? 'pointer' : 'default' }}
           >
             <div className="stat-icon" style={{ background: `${card.color}20`, color: card.color }}>
               {card.icon}
@@ -373,11 +362,11 @@ export default function OffersReceived() {
           <div className="filter-actions">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className={`filter-btn ${isFilterOpen? 'active' : ''}`}
+              className={`filter-btn ${isFilterOpen ? 'active' : ''}`}
             >
               <Filter size={16} />
               Advanced Filters
-              {isFilterOpen? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              {isFilterOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
             <button onClick={resetFilters} className="reset-btn">
               <RefreshCw size={18} />
@@ -399,8 +388,8 @@ export default function OffersReceived() {
                 { label: 'Day', key: 'day', options: ['All', 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] },
                 { label: 'Salary', key: 'salary', options: ['All', 'Below ₹3 LPA', '₹3L–₹5L', '₹5L–₹10L', '₹10L–₹15L', '₹15L+'] },
                 { label: 'Work Mode', key: 'workMode', options: ['All', 'Remote', 'Hybrid', 'On-site'] },
-                { label: 'Company', key: 'company', options: ['All',...COMPANIES.map(c => c.name)] },
-                { label: 'Status', key: 'status', options: ['All',...STATUSES] },
+                { label: 'Company', key: 'company', options: ['All', ...COMPANIES.map(c => c.name)] },
+                { label: 'Status', key: 'status', options: ['All', ...STATUSES] },
                 { label: 'Year', key: 'year', options: ['All', '2026', '2025', '2024'] },
                 { label: 'Quarter', key: 'quarter', options: ['All', 'Q1', 'Q2', 'Q3', 'Q4'] },
               ].map(filter => (
@@ -491,14 +480,14 @@ export default function OffersReceived() {
                     <td className="attr-name">{attr}</td>
                     {selectedOffers.map(o => (
                       <td key={o.id}>
-                        {attr === 'Role'? o.role :
-                         attr === 'Salary'? o.salaryDisplay :
-                         attr === 'Bonus'? `₹${o.bonus}L` :
-                         attr === 'Stocks'? `${o.stocks}%` :
-                         attr === 'Location'? o.location :
-                         attr === 'Work Mode'? o.workMode :
-                         attr === 'Joining Date'? o.joiningDate :
-                         attr === 'Benefits'? o.benefits.join(', ') : '-'}
+                        {attr === 'Role' ? o.role :
+                         attr === 'Salary' ? o.salaryDisplay :
+                         attr === 'Bonus' ? `₹${o.bonus}L` :
+                         attr === 'Stocks' ? `${o.stocks}%` :
+                         attr === 'Location' ? o.location :
+                         attr === 'Work Mode' ? o.workMode :
+                         attr === 'Joining Date' ? o.joiningDate :
+                         attr === 'Benefits' ? o.benefits.join(', ') : '-'}
                       </td>
                     ))}
                   </tr>
@@ -509,10 +498,10 @@ export default function OffersReceived() {
         </section>
       )}
 
-      {/* OFFERS GRID */}
+      {/* OFFERS TABLE (Replaces Grid) */}
       <section className="offers-section">
         <div className="section-header">
-          <div>
+          <div className="header-info1">
             <h2>All Offers ({filteredOffers.length})</h2>
             <p>Showing {paginatedOffers.length} of {filteredOffers.length} offers</p>
           </div>
@@ -525,84 +514,101 @@ export default function OffersReceived() {
           </div>
         </div>
 
-        <div className="offers-grid">
-          {paginatedOffers.map((offer) => (
-            <motion.div
-              key={offer.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="offer-card"
-            >
-              <div className="offer-header">
-                <div className="company-info">
-                  <div className="company-logo">{offer.logo}</div>
-                  <div>
-                    <h3>{offer.company}</h3>
-                    <p className="role">{offer.role}</p>
-                  </div>
-                <div className="offer-actions-top">
-                  <button onClick={() => toggleBookmark(offer.id)} className={`bookmark-btn ${offer.bookmarked? 'active' : ''}`}>
-                    <Bookmark size={16} fill={offer.bookmarked? 'currentColor' : 'none'} />
-                  </button>
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(offer.id)}
-                    onChange={() => toggleCompare(offer.id)}
+        <div className="table-wrapper">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th style={{ width: '40px' }}>
+                  <input 
+                    type="checkbox" 
+                    onChange={(e) => toggleSelectAll(e.target.checked)}
+                    checked={paginatedOffers.length > 0 && paginatedOffers.every(item => selectedIds.has(item.id))}
                   />
-                </div>
-              </div>
-              </div>
-
-              <div className="offer-details">
-                <div className="detail-row">
-                  <DollarSign size={14} />
-                  <span className="salary">{offer.salaryDisplay}</span>
-                  <span className="badge">{offer.workMode}</span>
-                </div>
-                <div className="detail-row">
-                  <MapPin size={14} />
-                  <span>{offer.location}</span>
-                </div>
-                <div className="detail-row">
-                  <Calendar size={14} />
-                  <span>Join: {offer.joiningDate}</span>
-                </div>
-                <div className="detail-row">
-                  <Clock size={14} />
-                  <span className={offer.expiryDays <= 3? 'expiring' : ''}>
-                    Expires: {offer.expiryDate} ({offer.expiryDays}d)
-                  </span>
-                </div>
-                <div className="detail-row">
-                  <User size={14} />
-                  <span>{offer.recruiter}</span>
-                </div>
-              </div>
-
-              <div className={`status-badge status-${offer.status.toLowerCase()}`}>
-                {offer.status}
-              </div>
-
-              <div className="offer-actions">
-                {offer.status === 'Pending' && (
-                  <>
-                    <button onClick={() => handleStatusChange(offer.id, 'Accepted')} className="btn-accept">
-                      <CheckCircle size={14} /> Accept
-                    </button>
-                    <button onClick={() => handleStatusChange(offer.id, 'Negotiation')} className="btn-negotiate">
-                      <MessageSquare size={14} /> Negotiate
-                    </button>
-                    <button onClick={() => handleStatusChange(offer.id, 'Rejected')} className="btn-reject">
-                      <XCircle size={14} /> Reject
-                    </button>
-                  </>
-                )}
-                <button onClick={() => setSelectedOffer(offer)} className="btn-view">
-                  <Eye size={14} /> Details
-                </button>
-              </div>
-            </motion.div>
-          ))}
+                </th>
+                <th>Company & Role</th>
+                <th>Package & Mode</th>
+                <th>Timeline</th>
+                <th>Contact</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedOffers.length === 0 ? (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
+                    <Briefcase size={48} style={{ opacity: 0.5, marginBottom: '1rem', display: 'block', margin: '0 auto' }} />
+                    <h3 style={{ margin: 0 }}>No offers match your filters</h3>
+                  </td>
+                </tr>
+              ) : paginatedOffers.map((offer) => (
+                <tr key={offer.id} className={selectedIds.has(offer.id) ? 'selected-row' : ''}>
+                  <td>
+                    <input 
+                      type="checkbox" 
+                      checked={selectedIds.has(offer.id)} 
+                      onChange={() => toggleSelect(offer.id)} 
+                    />
+                  </td>
+                  <td>
+                    <div className="td-candidate">
+                      <div className="td-avatar" style={{ background: 'transparent', border: `1px solid ${darkMode ? '#7c2d12' : '#fed7aa'}`, color: '#f97316' }}>
+                        {offer.logo}
+                      </div>
+                      <div>
+                        <div className="td-name" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          {offer.company}
+                          <button onClick={() => toggleBookmark(offer.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                            <Bookmark size={14} fill={offer.bookmarked ? '#f59e0b' : 'none'} color={offer.bookmarked ? '#f59e0b' : '#cbd5e1'} />
+                          </button>
+                        </div>
+                        <div className="td-email">{offer.role}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="td-primary salary">{offer.salaryDisplay}</div>
+                    <div className="badge" style={{ display: 'inline-block', marginTop: '0.2rem' }}>{offer.workMode}</div>
+                  </td>
+                  <td>
+                    <div className="td-secondary">Join: {offer.joiningDate}</div>
+                    <div className={`td-secondary ${offer.expiryDays <= 3 ? 'expiring' : ''}`}>
+                      Exp: {offer.expiryDate}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="td-primary">{offer.location}</div>
+                    <div className="td-secondary"><User size={12}/> {offer.recruiter}</div>
+                  </td>
+                  <td>
+                    <span className={`status-badge status-${offer.status.toLowerCase()}`}>
+                      {offer.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="td-actions">
+                      {offer.status === 'Pending' && (
+                        <>
+                          <button title="Accept" onClick={() => handleStatusChange(offer.id, 'Accepted')} className="action-icon btn-accept">
+                            <CheckCircle size={14} />
+                          </button>
+                          <button title="Negotiate" onClick={() => handleStatusChange(offer.id, 'Negotiation')} className="action-icon btn-negotiate" style={{ background: '#f97316' }}>
+                            <MessageSquare size={14} />
+                          </button>
+                          <button title="Reject" onClick={() => handleStatusChange(offer.id, 'Rejected')} className="action-icon btn-reject" style={{ background: '#ef4444' }}>
+                            <XCircle size={14} />
+                          </button>
+                        </>
+                      )}
+                      <button title="View Details" onClick={() => setSelectedOffer(offer)} className="action-icon btn-view">
+                        <Eye size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* PAGINATION */}
@@ -614,12 +620,12 @@ export default function OffersReceived() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={currentPage === page? 'active' : ''}
+                className={currentPage === page ? 'active' : ''}
               >
                 {page}
               </button>
             ))}
-            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>Next</button>
+            <button disabled={currentPage === totalPages || totalPages === 0} onClick={() => setCurrentPage(p => p + 1)}>Next</button>
           </div>
         </div>
       </section>
@@ -658,7 +664,6 @@ export default function OffersReceived() {
                     <div><strong>Probation:</strong> {selectedOffer.probation}</div>
                   </div>
                 </div>
-                </div>
                 <div className="detail-section">
                   <h3>Benefits</h3>
                   <div className="benefits-list">
@@ -666,6 +671,7 @@ export default function OffersReceived() {
                       <span key={i} className="benefit-tag">{b}</span>
                     ))}
                   </div>
+                </div>
                 <div className="detail-section">
                   <h3>Recruiter Information</h3>
                   <div className="recruiter-info">

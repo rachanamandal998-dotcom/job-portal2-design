@@ -10,23 +10,17 @@ import "../styles/ServiceListing.css";
 import { ListingFormModal } from "../shared/ListingFormModal";
 import { DashboardShell } from "../shared/DashboardShell";
 
-// Import analytics pages
 import ServiceAnalytics from "../pages/service/ServiceAnalytics";
 import BookingAnalytics from "../pages/service/BookingAnalytics";
 import ServiceStore from "../pages/service/ServiceStore";
 import RatingAnalytics from "../pages/service/RatingAnalytics";
 import CompletionAnalytics from "../pages/service/CompletionAnalytics";
 
-const getBookingStatus = (status) => {
-  return status; // pending | confirmed | completed | cancelled
-};
-
 export default function ServiceListing() {
   const [modalOpen, setModalOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("all"); // all | pending | confirmed | completed | cancelled
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  // ROUTING STATE
   const [showServiceAnalytics, setShowServiceAnalytics] = useState(false);
   const [showBookingAnalytics, setShowBookingAnalytics] = useState(false);
   const [showServiceStore, setShowServiceStore] = useState(false);
@@ -34,36 +28,9 @@ export default function ServiceListing() {
   const [showCompletionAnalytics, setShowCompletionAnalytics] = useState(false);
 
   const [services, setServices] = useState([
-    {
-      id: 1,
-      name: "House Cleaning",
-      price: "120",
-      category: "Home",
-      description: "Professional home cleaning service",
-      bookings: 12,
-      rating: 4.8,
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
-    },
-    {
-      id: 2,
-      name: "Plumbing",
-      price: "90",
-      category: "Repair",
-      description: "Expert plumbing repairs",
-      bookings: 8,
-      rating: 4.6,
-      image: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=400&q=80",
-    },
-    {
-      id: 3,
-      name: "Electrical Repair",
-      price: "150",
-      category: "Repair",
-      description: "Electrical maintenance and repair",
-      bookings: 10,
-      rating: 4.9,
-      image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400&q=80",
-    },
+    { id: 1, name: "House Cleaning", price: "120", category: "Home", description: "Professional home cleaning service", bookings: 12, rating: 4.8, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" },
+    { id: 2, name: "Plumbing", price: "90", category: "Repair", description: "Expert plumbing repairs", bookings: 8, rating: 4.6, image: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=400&q=80" },
+    { id: 3, name: "Electrical Repair", price: "150", category: "Repair", description: "Electrical maintenance and repair", bookings: 10, rating: 4.9, image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400&q=80" },
   ]);
 
   const [bookings, setBookings] = useState([
@@ -75,272 +42,127 @@ export default function ServiceListing() {
   ]);
 
   const handleAddService = (data) => {
-    setServices((prev) => [
-    ...prev,
-      {...data, id: Date.now(), bookings: 0, rating: 0 },
-    ]);
+    setServices(prev => [...prev, {...data, id: Date.now(), bookings: 0, rating: 0 }]);
     setFormOpen(false);
     setModalOpen(false);
   };
 
   const bookingStats = useMemo(() => ({
-    pending: bookings.filter((b) => b.status === "pending").length,
-    confirmed: bookings.filter((b) => b.status === "confirmed").length,
-    completed: bookings.filter((b) => b.status === "completed").length,
-    cancelled: bookings.filter((b) => b.status === "cancelled").length,
+    pending: bookings.filter(b => b.status === "pending").length,
+    confirmed: bookings.filter(b => b.status === "confirmed").length,
+    completed: bookings.filter(b => b.status === "completed").length,
+    cancelled: bookings.filter(b => b.status === "cancelled").length,
   }), [bookings]);
 
-  const filteredBookings = useMemo(() => {
-    if (statusFilter === "all") return bookings;
-    return bookings.filter((b) => b.status === statusFilter);
-  }, [bookings, statusFilter]);
+  const filteredBookings = useMemo(() => statusFilter === "all"? bookings : bookings.filter(b => b.status === statusFilter), [bookings, statusFilter]);
 
-  const completed = bookings.filter((b) => b.status === "completed").length;
-  const completionRate = bookings.length > 0? Math.round((completed / bookings.length) * 100) : 0;
-  const avgRating = services.length > 0
-  ? (services.reduce((a, s) => a + s.rating, 0) / services.length).toFixed(1)
-    : "0.0";
   const totalBookings = Object.values(bookingStats).reduce((a, b) => a + b, 0);
+  const completed = bookingStats.completed;
+  const completionRate = totalBookings > 0? Math.round((completed / totalBookings) * 100) : 0;
+  const avgRating = services.length > 0? (services.reduce((a, s) => a + s.rating, 0) / services.length).toFixed(1) : "0.0";
 
-  // CONDITIONAL RENDERING - NAVIGATE TO PAGES
-  if (showServiceAnalytics) {
-    return <ServiceAnalytics services={services} bookings={bookings} onBack={() => setShowServiceAnalytics(false)} />;
-  }
-  if (showBookingAnalytics) {
-    return <BookingAnalytics services={services} bookings={bookings} onBack={() => setShowBookingAnalytics(false)} />;
-  }
-  if (showServiceStore) {
-    return <ServiceStore services={services} bookings={bookings} onBack={() => setShowServiceStore(false)} />;
-  }
-  if (showRatingAnalytics) {
-    return <RatingAnalytics services={services} onBack={() => setShowRatingAnalytics(false)} />;
-  }
-  if (showCompletionAnalytics) {
-    return <CompletionAnalytics bookings={bookings} services={services} onBack={() => setShowCompletionAnalytics(false)} />;
-  }
+  // DYNAMIC CONFIGS
+  const circles = [
+    { primary: true, icon: <Plus size={32} strokeWidth={3} />, label: "Add Service", sub: "Create listing", onClick: () => setFormOpen(true) },
+    { icon: <Eye size={32} strokeWidth={3} />, label: "View Services", sub: "Manage all", badge: services.length, color: "#f97316", onClick: () => setShowServiceAnalytics(true) },
+    { icon: <Calendar size={32} strokeWidth={3} />, label: "Track Bookings", sub: "Updates", badge: bookings.length, color: "#f97316", onClick: () => setShowBookingAnalytics(true) },
+    { icon: <Store size={32} strokeWidth={3} />, label: "Open Store", sub: "Showcase", color: "#f97316", onClick: () => setShowServiceStore(true) },
+  ];
+
+  const overviewStats = [
+    { key: "pending", label: "Pending", value: bookingStats.pending, color: "#fbbf24" },
+    { key: "confirmed", label: "Confirmed", value: bookingStats.confirmed, color: "#3b82f6" },
+    { key: "completed", label: "Completed", value: bookingStats.completed, color: "#22c55e" },
+    { key: "cancelled", label: "Cancelled", value: bookingStats.cancelled, color: "#ef4444" },
+  ];
+
+  const quickCards = [
+    { icon: <Calendar size={24} />, value: bookings.length, label: "Total Bookings", onClick: () => setShowBookingAnalytics(true) },
+    { icon: <Wrench size={24} />, value: services.length, label: "Active Services", onClick: () => setShowServiceAnalytics(true) },
+    { icon: <Star size={24} />, value: avgRating, label: "Avg. Rating", onClick: () => setShowRatingAnalytics(true) },
+    { icon: <TrendingUp size={24} />, value: `${completionRate}%`, label: "Completion Rate", onClick: () => setShowCompletionAnalytics(true) },
+  ];
+
+  const serviceCharts = [
+    { id: 'trend', title: 'Weekly Booking Trend', subtitle: 'Bookings over the last 7 days', type: 'line', data: (orange, orangeAlpha) => ({ labels: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], datasets: [{ label: "Bookings", data: [1,3,2,5,4,6,7], borderColor: orange, backgroundColor: orangeAlpha, fill: true, tension: 0.4, borderWidth: 2 }] }) },
+    { id: 'status', title: 'Status Breakdown', subtitle: 'Current booking distribution', type: 'doughnut', data: () => ({ labels: ["Pending","Confirmed","Completed","Cancelled"], datasets: [{ data: [bookingStats.pending, bookingStats.confirmed, bookingStats.completed, bookingStats.cancelled], backgroundColor: ["#fbbf24","#3b82f6","#22c55e","#ef4444"], borderWidth: 2, borderColor: "#fff" }] }) },
+    { id: 'revenue', title: 'Revenue By Service', subtitle: 'Top performing services', type: 'bar', data: () => ({ labels: services.map(s => s.name), datasets: [{ label: "Revenue", data: services.map(s => Number(s.price) * s.bookings), backgroundColor: services.map((_, i) => `rgba(249,115,22,${0.85 - i * 0.2})`), borderRadius: 6 }] }) }
+  ];
+
+  if (showServiceAnalytics) return <ServiceAnalytics services={services} bookings={bookings} onBack={() => setShowServiceAnalytics(false)} />;
+  if (showBookingAnalytics) return <BookingAnalytics services={services} bookings={bookings} onBack={() => setShowBookingAnalytics(false)} />;
+  if (showServiceStore) return <ServiceStore services={services} bookings={bookings} onBack={() => setShowServiceStore(false)} />;
+  if (showRatingAnalytics) return <RatingAnalytics services={services} onBack={() => setShowRatingAnalytics(false)} />;
+  if (showCompletionAnalytics) return <CompletionAnalytics bookings={bookings} services={services} onBack={() => setShowCompletionAnalytics(false)} />;
 
   return (
     <DashboardShell>
-      <motion.div
-        className="service-page"
-        style={{ paddingTop: "2px" }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
+      <motion.div className="service-page" style={{ paddingTop: "2px" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
         <div className="container">
-
-          {/* Page Header */}
           <div className="page-header">
             <h1 className="page-title">Hi, Rachana!</h1>
             <p className="page-subtitle">Manage your service listings</p>
             <span className="verified-badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <polyline
-                  points="22 4 12 14.01 9 11.01"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <svg width="16" height="16" viewBox="0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 0 1 1-5.93-9.14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><polyline points="22 4 12 14.01 9 11.01" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
               Verified
             </span>
           </div>
 
-          {/* Action Circles */}
           <div className="action-circles">
-            <motion.button
-              className="action-circle-btn primary"
-              onClick={() => setFormOpen(true)}
-              whileHover={{ y: -8, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="action-circle-content">
-                <div className="circle-icon-wrapper">
-                  <Plus size={32} strokeWidth={3} />
+            {circles.map((c, i) => (
+              <motion.button key={i} className={`action-circle-btn ${c.primary? 'primary' : ''}`} onClick={c.onClick} whileHover={{ y: -8, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <div className="action-circle-content">
+                  <div className="circle-icon-wrapper" style={c.color? {color: c.color} : {}}>{c.icon}</div>
+                  <h3 className="circle-label">{c.label}</h3>
+                  <p className="circle-sublabel">{c.sub}</p>
+                  {c.badge && <span className="circle-badge">{c.badge}</span>}
                 </div>
-                <h3 className="circle-label">Add Service</h3>
-                <p className="circle-sublabel">Create listing</p>
-              </div>
-            </motion.button>
-
-            <motion.button
-              className="action-circle-btn"
-              onClick={() => setShowServiceAnalytics(true)}
-              whileHover={{ y: -8, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="action-circle-content">
-                <div className="circle-icon-wrapper">
-                  <Eye size={32} strokeWidth={3} style={{ color: "#f97316" }} />
-                </div>
-                <h3 className="circle-label">View Services</h3>
-                <p className="circle-sublabel">Manage all</p>
-                <span className="circle-badge">{services.length}</span>
-              </div>
-            </motion.button>
-
-            <motion.button
-              className="action-circle-btn"
-              onClick={() => setShowBookingAnalytics(true)}
-              whileHover={{ y: -8, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="action-circle-content">
-                <div className="circle-icon-wrapper">
-                  <Calendar size={32} strokeWidth={3} style={{ color: "#f97316" }} />
-                </div>
-                <h3 className="circle-label">Track Bookings</h3>
-                <p className="circle-sublabel">Updates</p>
-                <span className="circle-badge">{bookings.length}</span>
-              </div>
-            </motion.button>
-
-            <motion.button
-              className="action-circle-btn"
-              onClick={() => setShowServiceStore(true)}
-              whileHover={{ y: -8, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="action-circle-content">
-                <div className="circle-icon-wrapper">
-                  <Store size={32} strokeWidth={3} style={{ color: "#f97316" }} />
-                </div>
-                <h3 className="circle-label">Open Store</h3>
-                <p className="circle-sublabel">Showcase</p>
-              </div>
-            </motion.button>
+              </motion.button>
+            ))}
           </div>
 
-          {/* Booking Stats */}
           <div className="booking-stats-section">
             <div className="overview-header">
               <h2 className="overview-title">Booking Overview</h2>
               <span className="overview-badge">{totalBookings} Total</span>
             </div>
-
             <div className="stats-content">
-              <DonutChart stats={bookingStats} />
-
+              <DonutChart stats={bookingStats} total={totalBookings} label="Bookings" />
               <div className="stats-bars">
-                {Object.entries(bookingStats).map(([key, value]) => {
-                  const colors = {
-                    pending: "#fbbf24",
-                    confirmed: "#3b82f6",
-                    completed: "#22c55e",
-                    cancelled: "#ef4444",
-                  };
-                  const labels = {
-                    pending: "Pending",
-                    confirmed: "Confirmed",
-                    completed: "Completed",
-                    cancelled: "Cancelled",
-                  };
-                  return (
-                    <div
-                      key={key}
-                      className={`stat-row ${statusFilter === key? 'active-filter' : ''}`}
-                      onClick={() => setStatusFilter(key)}
-                      title={`Show ${labels[key]} bookings`}
-                    >
-                      <div className="stat-header">
-                        <div className="stat-label">
-                          <span className="stat-dot" style={{ background: colors[key] }} />
-                          {labels[key]}
-                        </div>
-                        <span className="stat-value">{value}</span>
-                      </div>
-                      <div className="stat-bar-bg">
-                        <div
-                          className="stat-bar"
-                          style={{
-                            width: `${totalBookings > 0? (value / totalBookings) * 100 : 0}%`,
-                            background: colors[key],
-                          }}
-                        />
-                      </div>
+                {overviewStats.map(s => (
+                  <div key={s.key} className={`stat-row ${statusFilter === s.key? 'active-filter' : ''}`} onClick={() => setStatusFilter(s.key)} title={`Show ${s.label} bookings`}>
+                    <div className="stat-header">
+                      <div className="stat-label"><span className="stat-dot" style={{ background: s.color }} />{s.label}</div>
+                      <span className="stat-value">{s.value}</span>
                     </div>
-                  );
-                })}
+                    <div className="stat-bar-bg"><div className="stat-bar" style={{ width: `${totalBookings? (s.value / totalBookings) * 100 : 0}%`, background: s.color }} /></div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Quick Stats - CLICKABLE */}
           <div className="quick-stats">
-            <motion.div
-              className="stat-card clickable"
-              onClick={() => setShowBookingAnalytics(true)}
-              whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="stat-icon"><Calendar size={24} /></div>
-              <div className="stat-value">{bookings.length}</div>
-              <div className="stat-label-text">Total Bookings</div>
-            </motion.div>
-
-            <motion.div
-              className="stat-card clickable"
-              onClick={() => setShowServiceAnalytics(true)}
-              whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="stat-icon"><Wrench size={24} /></div>
-              <div className="stat-value">{services.length}</div>
-              <div className="stat-label-text">Active Services</div>
-            </motion.div>
-
-            <motion.div
-              className="stat-card clickable"
-              onClick={() => setShowRatingAnalytics(true)}
-              whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="stat-icon"><Star size={24} /></div>
-              <div className="stat-value">{avgRating}</div>
-              <div className="stat-label-text">Avg. Rating</div>
-            </motion.div>
-
-            <motion.div
-              className="stat-card clickable"
-              onClick={() => setShowCompletionAnalytics(true)}
-              whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="stat-icon"><TrendingUp size={24} /></div>
-              <div className="stat-value">{completionRate}%</div>
-              <div className="stat-label-text">Completion Rate</div>
-            </motion.div>
+            {quickCards.map((card, i) => (
+              <motion.div key={i} className="stat-card clickable" onClick={card.onClick} whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(249,115,22,0.15)" }} whileTap={{ scale: 0.98 }}>
+                <div className="stat-icon">{card.icon}</div>
+                <div className="stat-value">{card.value}</div>
+                <div className="stat-label-text">{card.label}</div>
+              </motion.div>
+            ))}
           </div>
 
-          {/* Charts */}
-          <ChartsSection bookings={bookings} services={services} />
+          <ChartsGrid charts={serviceCharts} />
 
-          {/* Bookings List - WITH FILTER */}
           <div className="products-section">
             <div className="section-header">
               <div>
                 <h2 className="section-title">My Bookings</h2>
-                <p className="section-subtitle">
-                  {statusFilter === "all"
-                  ? "Latest bookings — manage and confirm them here."
-                    : `Showing ${filteredBookings.length} ${statusFilter} bookings`
-                  }
-                </p>
+                <p className="section-subtitle">{statusFilter === "all"? "Latest bookings — manage and confirm them here." : `Showing ${filteredBookings.length} ${statusFilter} bookings`}</p>
               </div>
               <div className="section-actions">
                 <div className="filter-wrapper">
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="btn filter-select"
-                  >
+                  <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="btn filter-select">
                     <option value="all">All Status ({totalBookings})</option>
                     <option value="pending">Pending ({bookingStats.pending})</option>
                     <option value="confirmed">Confirmed ({bookingStats.confirmed})</option>
@@ -349,147 +171,77 @@ export default function ServiceListing() {
                   </select>
                   <Filter size={16} className="filter-icon" />
                 </div>
-
-                <motion.button
-                  className="btn btn-primary"
-                  onClick={() => setFormOpen(true)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Plus size={16} />
-                  Add Service
-                </motion.button>
+                <motion.button className="btn btn-primary" onClick={() => setFormOpen(true)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}><Plus size={16} />Add Service</motion.button>
               </div>
             </div>
 
             {filteredBookings.length === 0? (
-              <div className="empty-state">
-                <Calendar size={48} style={{ margin: "0 auto 1rem", opacity: 0.3 }} />
-                <p>No bookings found with this status.</p>
-                {statusFilter!== "all" && (
-                  <button className="btn" onClick={() => setStatusFilter("all")} style={{ marginTop: "1rem" }}>
-                    Show All Bookings
-                  </button>
-                )}
-              </div>
+              <div className="empty-state"><Calendar size={48} style={{ margin: "0 auto 1rem", opacity: 0.3 }} /><p>No bookings found with this status.</p>{statusFilter!== "all" && (<button className="btn" onClick={() => setStatusFilter("all")} style={{ marginTop: "1rem" }}>Show All Bookings</button>)}</div>
             ) : (
               <div className="bookings-list">
                 {filteredBookings.map((booking, i) => (
-                  <motion.div
-                    key={booking.id}
-                    className="booking-item"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                  >
-                    <div className="booking-info">
-                      <h3 className="booking-service-name">{booking.serviceName}</h3>
-                      <p className="booking-meta">{booking.customer} • {booking.date}</p>
-                    </div>
-                    <div className={`booking-status ${booking.status}`}>
-                      {booking.status === "pending" && <Clock size={14} />}
-                      {booking.status === "confirmed" && <CheckCircle size={14} />}
-                      {booking.status === "completed" && <CheckCircle size={14} />}
-                      {booking.status === "cancelled" && <XCircle size={14} />}
-                      {booking.status}
-                    </div>
+                  <motion.div key={booking.id} className="booking-item" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+                    <div className="booking-info"><h3 className="booking-service-name">{booking.serviceName}</h3><p className="booking-meta">{booking.customer} • {booking.date}</p></div>
+                    <div className={`booking-status ${booking.status}`}>{booking.status === "pending" && <Clock size={14} />}{booking.status === "confirmed" && <CheckCircle size={14} />}{booking.status === "completed" && <CheckCircle size={14} />}{booking.status === "cancelled" && <XCircle size={14} />}{booking.status}</div>
                   </motion.div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Services Grid */}
           <div className="products-section">
             <div className="section-header">
-              <div>
-                <h2 className="section-title">My Services</h2>
-                <p className="section-subtitle">Manage your services with a polished view.</p>
-              </div>
+              <div><h2 className="section-title">My Services</h2><p className="section-subtitle">Manage your services with a polished view.</p></div>
             </div>
-
             <div className="services-grid">
               {services.map((service, i) => (
-                <motion.div
-                  key={service.id}
-                  className="service-card"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05 }}
-                  whileHover={{ y: -8 }}
-                >
-                  {service.image && (
-                    <img
-                      src={service.image}
-                      alt={service.name}
-                      className="service-image"
-                    />
-                  )}
+                <motion.div key={service.id} className="service-card" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }} whileHover={{ y: -8 }}>
+                  {service.image && (<img src={service.image} alt={service.name} className="service-image" />)}
                   <div className="service-body">
-                    <div className="service-header">
-                      <h3 className="service-name">{service.name}</h3>
-                      <div className="service-price">Rs {service.price}</div>
-                    </div>
+                    <div className="service-header"><h3 className="service-name">{service.name}</h3><div className="service-price">Rs {service.price}</div></div>
                     <p className="service-description">{service.description}</p>
-                    <div className="service-footer">
-                      <div className="service-meta">
-                        <span>{service.bookings} bookings</span>
-                        <div className="service-rating">
-                          <Star size={14} fill="#fbbf24" color="#fbbf24" />
-                          {service.rating}
-                        </div>
-                      </div>
-                    </div>
+                    <div className="service-footer"><div className="service-meta"><span>{service.bookings} bookings</span><div className="service-rating"><Star size={14} fill="#fbbf24" color="#fbbf24" />{service.rating}</div></div></div>
                   </div>
                 </motion.div>
               ))}
             </div>
           </div>
-
         </div>
 
-        <Modal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onSubmit={handleAddService}
-          type="service"
-        />
-
-        <AnimatePresence>
-          {formOpen && (
-            <ListingFormModal
-              kind="service"
-              onClose={() => setFormOpen(false)}
-              onSubmit={handleAddService}
-            />
-          )}
-        </AnimatePresence>
+        <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleAddService} type="service" />
+        <AnimatePresence>{formOpen && (<ListingFormModal kind="service" onClose={() => setFormOpen(false)} onSubmit={handleAddService} />)}</AnimatePresence>
       </motion.div>
     </DashboardShell>
   );
 }
 
-// ── Donut Chart ──
-function DonutChart({ stats }) {
+export function DonutChart({ stats, total, label = "Total" }) {
+  // works for any stats object - uses fallback colors
   const colors = {
     pending: "#fbbf24",
     confirmed: "#3b82f6",
     completed: "#22c55e",
     cancelled: "#ef4444",
+    applied: "#f97316",
+    shortlisted: "#22c55e",
+    rejected: "#ef4444",
+    inStock: "#22c55e",
+    lowStock: "#fbbf24",
+    outOfStock: "#ef4444",
   };
 
-  const total = Object.values(stats).reduce((a, b) => a + b, 0);
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
   let offset = 0;
 
   const segments = Object.entries(stats).map(([key, value]) => {
-    const dash = (total > 0? value / total : 0) * circumference;
+    const percent = total > 0? value / total : 0;
+    const dash = percent * circumference;
     const segment = {
-      key, value,
-      color: colors[key],
+      key,
       dasharray: `${dash} ${circumference - dash}`,
       offset: -offset,
+      color: colors[key] || "#94a3b8",
     };
     offset += dash;
     return segment;
@@ -497,12 +249,14 @@ function DonutChart({ stats }) {
 
   return (
     <div className="donut-container">
-      <svg width="140" height="140" viewBox="0 0 120 120">
+      <svg width="140" height="140" viewBox="0 120 120">
         <circle cx="60" cy="60" r={radius} fill="none" stroke="#f1f5f9" strokeWidth="12" />
         {segments.map((s) => (
           <circle
             key={s.key}
-            cx="60" cy="60" r={radius}
+            cx="60"
+            cy="60"
+            r={radius}
             fill="none"
             stroke={s.color}
             strokeWidth="12"
@@ -515,134 +269,80 @@ function DonutChart({ stats }) {
       </svg>
       <div className="donut-center">
         <div className="donut-number">{total}</div>
-        <div className="donut-label">Bookings</div>
+        <div className="donut-label">{label}</div>
       </div>
     </div>
   );
 }
 
-// ── Charts Section ──
-function ChartsSection({ bookings, services }) {
-  const lineRef = useRef(null);
-  const pieRef = useRef(null);
-  const barRef = useRef(null);
-  const chartsRef = useRef({});
+export function ChartsGrid({ charts }) {
+  const refs = useRef({});
+  const instances = useRef({});
 
   useEffect(() => {
+    // cleanup old charts
+    Object.values(instances.current).forEach((c) => c?.destroy());
+    instances.current = {};
+
     const orange = "rgb(249,115,22)";
     const orangeAlpha = "rgba(249,115,22,0.12)";
     const grid = "#f1f5f9";
     const tick = "#94a3b8";
 
-    Object.values(chartsRef.current).forEach((c) => c?.destroy());
+    charts.forEach((chart) => {
+      const canvas = refs.current[chart.id];
+      if (!canvas) return;
 
-    if (lineRef.current) {
-      chartsRef.current.line = new Chart(lineRef.current, {
-        type: "line",
-        data: {
-          labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-          datasets: [{
-            label: "Bookings",
-            data: [1, 3, 2, 5, 4, 6, 7],
-            borderColor: orange,
-            backgroundColor: orangeAlpha,
-            fill: true,
-            tension: 0.4,
-            borderWidth: 2,
-          }],
-        },
+      instances.current[chart.id] = new Chart(canvas, {
+        type: chart.type,
+        data: chart.data(orange, orangeAlpha),
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { grid: { color: grid }, ticks: { color: tick } },
-            y: { beginAtZero: true, grid: { color: grid }, ticks: { color: tick } },
+          plugins: {
+            legend: { display: false },
           },
-        },
-      });
-    }
-
-    if (pieRef.current) {
-      chartsRef.current.pie = new Chart(pieRef.current, {
-        type: "doughnut",
-        data: {
-          labels: ["Pending", "Confirmed", "Completed", "Cancelled"],
-          datasets: [{
-            data: [
-              bookings.filter((b) => b.status === "pending").length,
-              bookings.filter((b) => b.status === "confirmed").length,
-              bookings.filter((b) => b.status === "completed").length,
-              bookings.filter((b) => b.status === "cancelled").length,
-            ],
-            backgroundColor: ["#fbbf24", "#3b82f6", "#22c55e", "#ef4444"],
-            borderWidth: 2,
-            borderColor: "#fff",
-          }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          cutout: "60%",
-        },
-      });
-    }
-
-    if (barRef.current) {
-      chartsRef.current.bar = new Chart(barRef.current, {
-        type: "bar",
-        data: {
-          labels: services.map((s) => s.name),
-          datasets: [{
-            label: "Revenue",
-            data: services.map((s) => Number(s.price) * s.bookings),
-            backgroundColor: services.map((_, i) => `rgba(249,115,22,${0.85 - i * 0.2})`),
-            borderRadius: 6,
-          }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
           scales: {
-            x: { grid: { display: false }, ticks: { color: tick } },
-            y: { beginAtZero: true, grid: { color: grid }, ticks: { color: tick } },
+            x: {
+              grid: {
+                color: grid,
+                display: chart.type!== "doughnut",
+              },
+              ticks: { color: tick },
+            },
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: grid,
+                display: chart.type!== "doughnut",
+              },
+              ticks: { color: tick },
+            },
           },
+          cutout: chart.type === "doughnut"? "60%" : undefined,
         },
       });
-    }
+    });
 
     return () => {
-      Object.values(chartsRef.current).forEach((c) => c?.destroy());
+      Object.values(instances.current).forEach((c) => c?.destroy());
     };
-  }, [bookings, services]);
+  }, [charts]);
 
   return (
     <div className="charts-grid">
-      <div className="chart-card">
-        <div className="chart-header">
-          <h3 className="chart-title">Weekly Booking Trend</h3>
-          <p className="chart-subtitle">Bookings over the last 7 days</p>
+      {charts.map((chart) => (
+        <div key={chart.id} className="chart-card">
+          <div className="chart-header">
+            <h3 className="chart-title">{chart.title}</h3>
+            <p className="chart-subtitle">{chart.subtitle}</p>
+          </div>
+          <div className="chart-container">
+            <canvas ref={(el) => (refs.current[chart.id] = el)} />
+          </div>
         </div>
-        <div className="chart-container"><canvas ref={lineRef} /></div>
-      </div>
-
-      <div className="chart-card">
-        <div className="chart-header">
-          <h3 className="chart-title">Status Breakdown</h3>
-          <p className="chart-subtitle">Current booking distribution</p>
-        </div>
-        <div className="chart-container"><canvas ref={pieRef} /></div>
-      </div>
-
-      <div className="chart-card">
-        <div className="chart-header">
-          <h3 className="chart-title">Revenue By Service</h3>
-          <p className="chart-subtitle">Top performing services</p>
-        </div>
-        <div className="chart-container"><canvas ref={barRef} /></div>
-      </div>
+      ))}
     </div>
   );
 }
+

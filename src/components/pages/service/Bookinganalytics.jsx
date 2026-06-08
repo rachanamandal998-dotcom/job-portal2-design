@@ -8,33 +8,30 @@ import {
   BarChart2, PieChart,
 } from "lucide-react";
 import Chart from "chart.js/auto";
-import "../../styles/Bookinganalytics.css"
+import "../../styles/BookingAnalytics.css";
 
-/* ─────────────────────────────────────
-   SAMPLE / DEFAULT DATA
-───────────────────────────────────── */
 const DEFAULT_BOOKINGS = [
-  { id: 1001, serviceName: "House Cleaning",    customer: "John",    date: "May 10", status: "pending",   revenue: 120 },
-  { id: 1002, serviceName: "Plumbing",           customer: "Sarah",   date: "May 11", status: "confirmed", revenue: 90  },
-  { id: 1003, serviceName: "Electrical Repair",  customer: "Mike",    date: "May 12", status: "completed", revenue: 150 },
-  { id: 1004, serviceName: "House Cleaning",    customer: "Emily",   date: "May 13", status: "completed", revenue: 120 },
-  { id: 1005, serviceName: "Plumbing",           customer: "John",    date: "May 14", status: "cancelled", revenue: 90  },
-  { id: 1006, serviceName: "House Cleaning",    customer: "Priya",   date: "May 15", status: "confirmed", revenue: 120 },
-  { id: 1007, serviceName: "Electrical Repair",  customer: "Raj",     date: "May 16", status: "pending",   revenue: 150 },
-  { id: 1008, serviceName: "Garden Care",        customer: "Sarah",   date: "May 16", status: "completed", revenue: 80  },
-  { id: 1009, serviceName: "Plumbing",           customer: "Mike",    date: "May 17", status: "confirmed", revenue: 90  },
-  { id: 1010, serviceName: "House Cleaning",    customer: "Anita",   date: "May 17", status: "completed", revenue: 120 },
+  { id: 1001, serviceName: "House Cleaning", customer: "John", date: "May 10", status: "pending", revenue: 120 },
+  { id: 1002, serviceName: "Plumbing", customer: "Sarah", date: "May 11", status: "confirmed", revenue: 90 },
+  { id: 1003, serviceName: "Electrical Repair", customer: "Mike", date: "May 12", status: "completed", revenue: 150 },
+  { id: 1004, serviceName: "House Cleaning", customer: "Emily", date: "May 13", status: "completed", revenue: 120 },
+  { id: 1005, serviceName: "Plumbing", customer: "John", date: "May 14", status: "cancelled", revenue: 90 },
+  { id: 1006, serviceName: "House Cleaning", customer: "Priya", date: "May 15", status: "confirmed", revenue: 120 },
+  { id: 1007, serviceName: "Electrical Repair", customer: "Raj", date: "May 16", status: "pending", revenue: 150 },
+  { id: 1008, serviceName: "Garden Care", customer: "Sarah", date: "May 16", status: "completed", revenue: 80 },
+  { id: 1009, serviceName: "Plumbing", customer: "Mike", date: "May 17", status: "confirmed", revenue: 90 },
+  { id: 1010, serviceName: "House Cleaning", customer: "Anita", date: "May 17", status: "completed", revenue: 120 },
 ];
 
 const DEFAULT_SERVICES = [
-  { id: 1, name: "House Cleaning",   price: "120", category: "Home",       bookings: 12, rating: 4.8 },
-  { id: 2, name: "Plumbing",          price: "90",  category: "Repair",     bookings: 8,  rating: 4.6 },
-  { id: 3, name: "Electrical Repair", price: "150", category: "Repair",     bookings: 10, rating: 4.9 },
-  { id: 4, name: "Garden Care",       price: "80",  category: "Outdoor",    bookings: 5,  rating: 4.7 },
+  { id: 1, name: "House Cleaning", price: "120", category: "Home", bookings: 12, rating: 4.8 },
+  { id: 2, name: "Plumbing", price: "90", category: "Repair", bookings: 8, rating: 4.6 },
+  { id: 3, name: "Electrical Repair", price: "150", category: "Repair", bookings: 10, rating: 4.9 },
+  { id: 4, name: "Garden Care", price: "80", category: "Outdoor", bookings: 5, rating: 4.7 },
 ];
 
 const STATUS_COLORS = {
-  pending:   { bg: "#fef3c7", text: "#92400e", border: "#fde68a" },
+  pending: { bg: "#fef3c7", text: "#92400e", border: "#fde68a" },
   confirmed: { bg: "#dbeafe", text: "#1e40af", border: "#bfdbfe" },
   completed: { bg: "#d1fae5", text: "#065f46", border: "#a7f3d0" },
   cancelled: { bg: "#fee2e2", text: "#991b1b", border: "#fecaca" },
@@ -42,9 +39,6 @@ const STATUS_COLORS = {
 
 const ITEMS_PER_PAGE = 6;
 
-/* ─────────────────────────────────────
-   HELPERS
-───────────────────────────────────── */
 const fmt = (n) => `₹${Number(n || 0).toLocaleString("en-IN")}`;
 
 function useDebounce(value, delay) {
@@ -56,16 +50,10 @@ function useDebounce(value, delay) {
   return debounced;
 }
 
-/* ─────────────────────────────────────
-   SUB-COMPONENTS
-───────────────────────────────────── */
-
-// ── Skeleton ──
 function Skeleton({ w = "100%", h = 16, r = 8 }) {
   return <div className="ba-skeleton" style={{ width: w, height: h, borderRadius: r }} />;
 }
 
-// ── KPI Card ──
 function KpiCard({ icon: Icon, color, value, label, trend, delay = 0 }) {
   return (
     <motion.div
@@ -91,7 +79,6 @@ function KpiCard({ icon: Icon, color, value, label, trend, delay = 0 }) {
   );
 }
 
-// ── Insight Card ──
 function InsightCard({ type, icon: Icon, title, text, delay = 0 }) {
   return (
     <motion.div
@@ -112,14 +99,13 @@ function InsightCard({ type, icon: Icon, title, text, delay = 0 }) {
   );
 }
 
-// ── Charts ──
 function ChartsSection({ bookings, services }) {
-  const statusRef   = useRef(null);
-  const weeklyRef   = useRef(null);
-  const peakRef     = useRef(null);
+  const statusRef = useRef(null);
+  const weeklyRef = useRef(null);
+  const peakRef = useRef(null);
   const customerRef = useRef(null);
-  const growthRef   = useRef(null);
-  const chartsRef   = useRef({});
+  const growthRef = useRef(null);
+  const chartsRef = useRef({});
 
   useEffect(() => {
     Object.values(chartsRef.current).forEach((c) => c?.destroy());
@@ -127,7 +113,6 @@ function ChartsSection({ bookings, services }) {
 
     const grid = "#f1f5f9", tick = "#94a3b8";
 
-    // Status Doughnut
     if (statusRef.current) {
       chartsRef.current.status = new Chart(statusRef.current, {
         type: "doughnut",
@@ -154,7 +139,6 @@ function ChartsSection({ bookings, services }) {
       });
     }
 
-    // Weekly Trend Line
     if (weeklyRef.current) {
       chartsRef.current.weekly = new Chart(weeklyRef.current, {
         type: "line",
@@ -180,7 +164,6 @@ function ChartsSection({ bookings, services }) {
       });
     }
 
-    // Peak Hours Bar
     if (peakRef.current) {
       chartsRef.current.peak = new Chart(peakRef.current, {
         type: "bar",
@@ -208,7 +191,6 @@ function ChartsSection({ bookings, services }) {
       });
     }
 
-    // Customer Frequency Pie
     if (customerRef.current) {
       const custMap = {};
       bookings.forEach(b => { custMap[b.customer || "Unknown"] = (custMap[b.customer || "Unknown"] || 0) + 1; });
@@ -234,7 +216,6 @@ function ChartsSection({ bookings, services }) {
       });
     }
 
-    // Monthly Growth Bar (wide)
     if (growthRef.current) {
       chartsRef.current.growth = new Chart(growthRef.current, {
         type: "bar",
@@ -244,8 +225,8 @@ function ChartsSection({ bookings, services }) {
             label: "Bookings",
             data: [5, 8, 12, 15, 18, bookings.length],
             backgroundColor: bookings.length >= 18
-              ? ["#bbf7d0","#86efac","#4ade80","#22c55e","#16a34a","#15803d"]
-              : ["#bbf7d0","#86efac","#4ade80","#22c55e","#16a34a", "rgba(34,197,94,0.5)"],
+              ? ["#bbf7d0", "#86efac", "#4ade80", "#22c55e", "#16a34a", "#15803d"]
+              : ["#bbf7d0", "#86efac", "#4ade80", "#22c55e", "#16a34a", "rgba(34,197,94,0.5)"],
             borderRadius: 8,
           }],
         },
@@ -267,11 +248,11 @@ function ChartsSection({ bookings, services }) {
   }, [bookings]);
 
   const cards = [
-    { ref: statusRef,   title: "Booking Status",           subtitle: "Current distribution",         icon: PieChart,  wide: false },
-    { ref: weeklyRef,   title: "Weekly Booking Trend",     subtitle: "Bookings over last 7 days",    icon: TrendingUp, wide: false },
-    { ref: peakRef,     title: "Peak Booking Hours",       subtitle: "Which hours are busiest",      icon: Clock,     wide: false },
-    { ref: customerRef, title: "Customer Frequency",       subtitle: "Repeat vs new customers",      icon: Users,     wide: false },
-    { ref: growthRef,   title: "Monthly Booking Growth",   subtitle: "6-month booking trajectory",   icon: BarChart2, wide: true  },
+    { ref: statusRef, title: "Booking Status", subtitle: "Current distribution", icon: PieChart, wide: false },
+    { ref: weeklyRef, title: "Weekly Booking Trend", subtitle: "Bookings over last 7 days", icon: TrendingUp, wide: false },
+    { ref: peakRef, title: "Peak Booking Hours", subtitle: "Which hours are busiest", icon: Clock, wide: false },
+    { ref: customerRef, title: "Customer Frequency", subtitle: "Repeat vs new customers", icon: Users, wide: false },
+    { ref: growthRef, title: "Monthly Booking Growth", subtitle: "6-month booking trajectory", icon: BarChart2, wide: true },
   ];
 
   return (
@@ -299,20 +280,17 @@ function ChartsSection({ bookings, services }) {
   );
 }
 
-/* ─────────────────────────────────────
-   MAIN COMPONENT
-───────────────────────────────────── */
 export default function BookingAnalytics({ services: propServices, bookings: propBookings, onBack }) {
   const bookings = propBookings?.length ? propBookings : DEFAULT_BOOKINGS;
   const services = propServices?.length ? propServices : DEFAULT_SERVICES;
 
   const [statusFilter, setStatusFilter] = useState("all");
-  const [dateFilter,   setDateFilter]   = useState("all");
-  const [searchRaw,    setSearchRaw]    = useState("");
-  const [sortKey,      setSortKey]      = useState("id");
-  const [sortDir,      setSortDir]      = useState("desc");
-  const [page,         setPage]         = useState(1);
-  const [loading,      setLoading]      = useState(true);
+  const [dateFilter, setDateFilter] = useState("all");
+  const [searchRaw, setSearchRaw] = useState("");
+  const [sortKey, setSortKey] = useState("id");
+  const [sortDir, setSortDir] = useState("desc");
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   const searchQuery = useDebounce(searchRaw, 300);
 
@@ -321,24 +299,22 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
     return () => clearTimeout(t);
   }, []);
 
-  // ── KPIs ──
   const kpis = useMemo(() => {
-    const total     = bookings.length;
-    const pending   = bookings.filter(b => b.status === "pending").length;
+    const total = bookings.length;
+    const pending = bookings.filter(b => b.status === "pending").length;
     const confirmed = bookings.filter(b => b.status === "confirmed").length;
     const completed = bookings.filter(b => b.status === "completed").length;
     const cancelled = bookings.filter(b => b.status === "cancelled").length;
-    const compRate  = total > 0 ? Math.round((completed / total) * 100) : 0;
-    const revenue   = bookings.filter(b => b.status === "completed").reduce((s, b) => s + Number(b.revenue || 0), 0);
+    const compRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+    const revenue = bookings.filter(b => b.status === "completed").reduce((s, b) => s + Number(b.revenue || 0), 0);
     const uniqueCust = new Set(bookings.map(b => b.customer)).size;
     return { total, pending, confirmed, completed, cancelled, compRate, revenue, uniqueCust };
   }, [bookings]);
 
-  // ── Filtered + sorted + paginated ──
   const filtered = useMemo(() => {
     let result = bookings.filter(b => {
       const matchStatus = statusFilter === "all" || b.status === statusFilter;
-      const matchSearch = !searchQuery || 
+      const matchSearch = !searchQuery ||
         b.serviceName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         b.customer?.toLowerCase().includes(searchQuery.toLowerCase());
       return matchStatus && matchSearch;
@@ -352,7 +328,7 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
   }, [bookings, statusFilter, searchQuery, sortKey, sortDir]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paginated  = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
   const toggleSort = (key) => {
     if (sortKey === key) setSortDir(d => d === "asc" ? "desc" : "asc");
@@ -362,19 +338,17 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
 
   useEffect(() => setPage(1), [statusFilter, searchQuery]);
 
-  // ── CSV Export ──
   const exportCSV = useCallback(() => {
     const headers = ["ID", "Service", "Customer", "Date", "Status", "Revenue"];
     const rows = filtered.map(b => [b.id, b.serviceName, b.customer || "Unknown", b.date, b.status, Number(b.revenue || 0)]);
     const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
     a.href = url; a.download = "booking_analytics.csv"; a.click();
     URL.revokeObjectURL(url);
   }, [filtered]);
 
-  // ── Insights ──
   const insights = useMemo(() => [
     {
       type: "success", icon: Award, title: "Completion Rate",
@@ -415,7 +389,7 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
 
   return (
     <motion.div
-      className="ba-page"
+      className="booking-analytics-page"
       initial={{ opacity: 0, x: 60 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -60 }}
@@ -423,7 +397,6 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
     >
       <div className="ba-container">
 
-        {/* ── Header ── */}
         <div className="ba-header">
           {onBack && (
             <motion.button
@@ -454,19 +427,56 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
           </div>
         </div>
 
-        {/* ── KPI Grid ── */}
         <div className="ba-kpi-grid">
-          <KpiCard icon={Clock}       color="#fbbf24" value={kpis.pending}            label="Pending"         trend={+5}  delay={0.05} />
-          <KpiCard icon={CheckCircle} color="#3b82f6" value={kpis.confirmed}          label="Confirmed"       trend={+12} delay={0.10} />
-          <KpiCard icon={CheckCircle} color="#22c55e" value={kpis.completed}          label="Completed"       trend={+8}  delay={0.15} />
-          <KpiCard icon={TrendingUp}  color="#f97316" value={`${kpis.compRate}%`}     label="Completion Rate" trend={kpis.compRate > 50 ? +3 : -2} delay={0.20} />
-          <KpiCard icon={DollarSign}  color="#8b5cf6" value={fmt(kpis.revenue)}       label="Total Revenue"   trend={+15} delay={0.25} />
-          <KpiCard icon={Users}       color="#ec4899" value={kpis.uniqueCust}          label="Unique Customers"            delay={0.30} />
+          <KpiCard icon={Clock} color="#fbbf24" value={kpis.pending} label="Pending" trend={+5} delay={0.05} />
+          <KpiCard icon={CheckCircle} color="#3b82f6" value={kpis.confirmed} label="Confirmed" trend={+12} delay={0.10} />
+          <KpiCard icon={CheckCircle} color="#22c55e" value={kpis.completed} label="Completed" trend={+8} delay={0.15} />
+          <KpiCard icon={TrendingUp} color="#f97316" value={`${kpis.compRate}%`} label="Completion Rate" trend={kpis.compRate > 50 ? +3 : -2} delay={0.20} />
+          <KpiCard icon={DollarSign} color="#8b5cf6" value={fmt(kpis.revenue)} label="Total Revenue" trend={+15} delay={0.25} />
+          <KpiCard icon={Users} color="#ec4899" value={kpis.uniqueCust} label="Unique Customers" delay={0.30} />
         </div>
 
-       
+        <motion.div
+          className="ba-filters-bar"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.35 }}
+        >
+          <div className="ba-search-wrap">
+            <Search size={15} className="ba-search-icon" />
+            <input
+              className="ba-search-input"
+              placeholder="Search service or customer…"
+              value={searchRaw}
+              onChange={e => setSearchRaw(e.target.value)}
+            />
+          </div>
+          <div className="ba-filter-row">
+            <div className="ba-filter-select-wrap">
+              <Filter size={14} className="ba-filter-prefix-icon" />
+              <select className="ba-filter-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <ChevronDown size={14} className="ba-chevron" />
+            </div>
+            <div className="ba-filter-select-wrap">
+              <Calendar size={14} className="ba-filter-prefix-icon" />
+              <select className="ba-filter-select" value={dateFilter} onChange={e => setDateFilter(e.target.value)}>
+                <option value="all">All Time</option>
+                <option value="7d">Last 7 Days</option>
+                <option value="30d">Last 30 Days</option>
+                <option value="90d">Last 90 Days</option>
+              </select>
+              <ChevronDown size={14} className="ba-chevron" />
+            </div>
+          </div>
+          <span className="ba-result-count">{filtered.length} bookings</span>
+        </motion.div>
 
-        {/* ── Charts ── */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.4 }}>
           <div className="ba-section-label">
             <Activity size={16} /> Performance Charts
@@ -474,7 +484,6 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
           <ChartsSection bookings={bookings} services={services} />
         </motion.div>
 
-        {/* ── Insights ── */}
         <motion.div
           className="ba-insights-section"
           initial={{ opacity: 0, y: 20 }}
@@ -493,47 +502,7 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
             ))}
           </div>
         </motion.div>
-         {/* ── Filters ── */}
-        <motion.div
-          className="ba-filters-bar"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.35 }}
-        >
-          <div className="ba-search-wrap">
-            <Search size={15} className="ba-search-icon" />
-            <input
-              className="ba-search-input"
-              placeholder="Search service or customer…"
-              value={searchRaw}
-              onChange={e => setSearchRaw(e.target.value)}
-            />
-          </div>
-          <div className="ba-filter-select-wrap">
-            <Filter size={14} className="ba-filter-prefix-icon" />
-            <select className="ba-filter-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-            <ChevronDown size={14} className="ba-chevron" />
-          </div>
-          <div className="ba-filter-select-wrap">
-            <Calendar size={14} className="ba-filter-prefix-icon" />
-            <select className="ba-filter-select" value={dateFilter} onChange={e => setDateFilter(e.target.value)}>
-              <option value="all">All Time</option>
-              <option value="7d">Last 7 Days</option>
-              <option value="30d">Last 30 Days</option>
-              <option value="90d">Last 90 Days</option>
-            </select>
-            <ChevronDown size={14} className="ba-chevron" />
-          </div>
-          <span className="ba-result-count">{filtered.length} bookings</span>
-        </motion.div>
 
-        {/* ── Table ── */}
         <motion.div
           className="ba-table-section"
           initial={{ opacity: 0, y: 20 }}
@@ -601,8 +570,8 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
                               className="ba-status-badge"
                               style={{
                                 background: STATUS_COLORS[b.status]?.bg,
-                                color:      STATUS_COLORS[b.status]?.text,
-                                border:     `1px solid ${STATUS_COLORS[b.status]?.border}`,
+                                color: STATUS_COLORS[b.status]?.text,
+                                border: `1px solid ${STATUS_COLORS[b.status]?.border}`,
                               }}
                             >
                               {b.status.charAt(0).toUpperCase() + b.status.slice(1)}
@@ -616,7 +585,6 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
                 </table>
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="ba-pagination">
                   <motion.button
@@ -659,12 +627,9 @@ export default function BookingAnalytics({ services: propServices, bookings: pro
   );
 }
 
-/* ─────────────────────────────────────
-   LOADING SKELETON
-───────────────────────────────────── */
 function LoadingSkeleton() {
   return (
-    <div className="ba-page">
+    <div className="booking-analytics-page">
       <div className="ba-container">
         <div className="ba-header" style={{ marginBottom: "2rem" }}>
           <Skeleton w={80} h={40} r={12} />

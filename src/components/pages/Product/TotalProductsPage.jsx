@@ -1,75 +1,39 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Package, AlertTriangle, TrendingUp, DollarSign, ArrowLeft, BarChart2,
+  Package, AlertTriangle, TrendingUp, DollarSign, ArrowLeft, BarChart3,
   Star, Archive, Zap, Calendar, Download, RefreshCw, Search,
   Sun, Moon, Activity, Target, Percent, Clock, AlertCircle, CheckCircle2,
   Bell, Brain, Flame, Award, TrendingDown, ChevronRight, ChevronDown,
-  ArrowUpRight, ArrowDownRight, Filter, X, Menu
+  ArrowUpRight, ArrowDownRight, Filter, X
 } from "lucide-react";
 import Chart from "chart.js/auto";
 import { TreemapController, TreemapElement } from "chartjs-chart-treemap";
 import { MatrixController, MatrixElement } from "chartjs-chart-matrix";
-
+import "../../styles/TotalProductsPage.css";
 
 Chart.register(TreemapController, TreemapElement, MatrixController, MatrixElement);
 
 /* ─── Design Tokens ─── */
 const ORANGE = {
-  50:  "#fff7ed",
-  100: "#ffedd5",
-  200: "#fed7aa",
-  300: "#fdba74",
-  400: "#fb923c",
-  500: "#f97316",
-  600: "#ea580c",
-  700: "#c2410c",
-  800: "#9a3412",
-  900: "#7c2d12",
+  50: "#fff7ed", 100: "#ffedd5", 200: "#fed7aa", 300: "#fdba74", 400: "#fb923c",
+  500: "#f97316", 600: "#ea580c", 700: "#c2410c", 800: "#9a3412", 900: "#7c2d12",
 };
 
 const THEME = {
   light: {
-    bg:        "#fafaf9",
-    surface:   "#ffffff",
-    surfaceAlt:"#fff7ed",
-    border:    "#e7e5e4",
-    borderSoft:"#f5f5f4",
-    text:      "#1c1917",
-    textSec:   "#78716c",
-    textTer:   "#a8a29e",
-    accent:    ORANGE[500],
-    accentDark:ORANGE[700],
-    accentBg:  ORANGE[50],
-    success:   "#16a34a",
-    successBg: "#f0fdf4",
-    danger:    "#dc2626",
-    dangerBg:  "#fef2f2",
-    warning:   "#d97706",
-    warningBg: "#fffbeb",
-    info:      "#2563eb",
-    infoBg:    "#eff6ff",
+    bg: "#fafaf9", surface: "#ffffff", surfaceAlt:"#fff7ed", border: "#e7e5e4", borderSoft:"#f5f4",
+    text: "#1c1917", textSec: "#78716c", textTer: "#a8a29e",
+    accent: ORANGE[500], accentDark:ORANGE[700], accentBg: ORANGE[50],
+    success: "#16a34a", successBg: "#f0fdf4", danger: "#dc2626", dangerBg: "#fef2f2",
+    warning: "#d97706", warningBg: "#fffbeb", info: "#2563eb", infoBg: "#eff6ff",
   },
   dark: {
-    bg:        "#0c0a09",
-    surface:   "#1c1917",
-    surfaceAlt:"#292524",
-    border:    "#292524",
-    borderSoft:"#1c1917",
-    text:      "#fafaf9",
-    textSec:   "#a8a29e",
-    textTer:   "#78716c",
-    accent:    ORANGE[400],
-    accentDark:ORANGE[300],
-    accentBg:  "#1c1917",
-    success:   "#4ade80",
-    successBg: "#052e16",
-    danger:    "#f87171",
-    dangerBg:  "#450a0a",
-    warning:   "#fbbf24",
-    warningBg: "#451a03",
-    info:      "#60a5fa",
-    infoBg:    "#172554",
+    bg: "#0c0a09", surface: "#1c1917", surfaceAlt:"#292524", border: "#292524", borderSoft:"#1c1917",
+    text: "#fafaf9", textSec: "#a8a29e", textTer: "#78716c",
+    accent: ORANGE[400], accentDark:ORANGE[300], accentBg: "#1c1917",
+    success: "#4ade80", successBg: "#052e16", danger: "#f87171", dangerBg: "#450a0a",
+    warning: "#fbbf24", warningBg: "#451a03", info: "#60a5fa", infoBg: "#172554",
   },
 };
 
@@ -78,8 +42,8 @@ const fmt = (n) => `₹${Math.abs(Number(n)||0).toLocaleString("en-IN")}`;
 const fmtShort = (n) => {
   const num = Number(n)||0;
   if(num>=10000000) return `₹${(num/10000000).toFixed(1)}Cr`;
-  if(num>=100000)   return `₹${(num/100000).toFixed(1)}L`;
-  if(num>=1000)     return `₹${(num/1000).toFixed(1)}K`;
+  if(num>=100000) return `₹${(num/100000).toFixed(1)}L`;
+  if(num>=1000) return `₹${(num/1000).toFixed(1)}K`;
   return `₹${num}`;
 };
 const fmtPct = (n) => `${Number(n).toFixed(1)}%`;
@@ -87,9 +51,9 @@ const fmtPct = (n) => `${Number(n).toFixed(1)}%`;
 /* ─── Theme ─── */
 function useTheme() {
   const [dark, setDark] = useState(() =>
-    typeof window !== "undefined" ? localStorage.getItem("tp-theme")==="dark" : false
+    typeof window!== "undefined"? localStorage.getItem("tp-theme")==="dark" : false
   );
-  const t = dark ? THEME.dark : THEME.light;
+  const t = dark? THEME.dark : THEME.light;
   useEffect(() => { localStorage.setItem("tp-theme", dark?"dark":"light"); }, [dark]);
   return [t, dark, () => setDark(d=>!d)];
 }
@@ -105,16 +69,16 @@ function ThemeInjector({ t }) {
 
 /* ─── Product Score ─── */
 function calcScore(p) {
-  const price  = Number(p.price)||0;
-  const cost   = Number(p.cost)||0;
-  const sold   = Number(p.soldCount)||0;
-  const stock  = Number(p.stock)||0;
-  const vel    = Number(p.avgDailySales)||0;
-  const margin = price>0 ? (price-cost)/price*100 : 0;
+  const price = Number(p.price)||0;
+  const cost = Number(p.cost)||0;
+  const sold = Number(p.soldCount)||0;
+  const stock = Number(p.stock)||0;
+  const vel = Number(p.avgDailySales)||0;
+  const margin = price>0? (price-cost)/price*100 : 0;
   return Math.round(
     Math.min(margin/100*40,40) +
     Math.min(vel*10,30) +
-    (stock>0 ? Math.min(sold/(sold+stock)*20,20) : 0) +
+    (stock>0? Math.min(sold/(sold+stock)*20,20) : 0) +
     Math.min(sold/10,10)
   );
 }
@@ -149,7 +113,7 @@ function useAIInsights(products) {
 
     const deadStock=products.filter(p=>{
       if(!p.dateAdded) return false;
-      const daysOld=(new Date()-new Date(p.dateAdded))/(1000*60*60*24);
+      const daysOld=(new Date()-new Date(p.dateAdded))/(1000*60*24);
       return daysOld>90&&Number(p.soldCount||0)<3;
     });
     if(deadStock.length) {
@@ -159,9 +123,9 @@ function useAIInsights(products) {
     }
 
     const gems=products
-      .map(p=>({...p,margin:Number(p.price)>0?(Number(p.price)-Number(p.cost||0))/Number(p.price)*100:0}))
-      .filter(p=>p.margin>60&&Number(p.soldCount||0)<10)
-      .sort((a,b)=>b.margin-a.margin);
+    .map(p=>({...p,margin:Number(p.price)>0?(Number(p.price)-Number(p.cost||0))/Number(p.price)*100:0}))
+    .filter(p=>p.margin>60&&Number(p.soldCount||0)<10)
+    .sort((a,b)=>b.margin-a.margin);
     if(gems.length) insights.push({ type:"success", icon:Star,
       title:"Hidden Gem", text:`${gems[0].name} has ${fmtPct(gems[0].margin)} margin`,
       metric:fmtPct(gems[0].margin) });
@@ -244,65 +208,39 @@ function KpiCard({ label, value, icon:Icon, color, bg, trend, sparkline, sub }) 
       initial={{opacity:0,y:16}}
       animate={{opacity:1,y:0}}
       whileHover={{y:-3,transition:{duration:0.15}}}
-      style={{
-        background:"var(--tp-surface)", borderRadius:16,
-        border:"1px solid var(--tp-border)", padding:"1.1rem 1.2rem",
-        display:"flex", flexDirection:"column", gap:8, overflow:"hidden",
-        position:"relative", cursor:"default"
-      }}
+      className="total-products-kpi-card"
     >
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-        <div style={{
-          width:40,height:40,borderRadius:12,
-          background:bg||"var(--tp-accentBg)",
-          display:"flex",alignItems:"center",justifyContent:"center",
-          color:color||"var(--tp-accent)"
-        }}>
+      <div className="total-products-kpi-top">
+        <div className="total-products-kpi-icon" style={{background:bg,color}}>
           <Icon size={20} />
         </div>
-        <div style={{
-          display:"flex",alignItems:"center",gap:3,fontSize:12,fontWeight:600,
-          color:up?"var(--tp-success)":"var(--tp-danger)",
-          background:up?"var(--tp-successBg)":"var(--tp-dangerBg)",
-          padding:"2px 8px",borderRadius:20
-        }}>
+        <div className={`total-products-kpi-trend ${up?'up':'down'}`}>
           {up?<ArrowUpRight size={12}/>:<ArrowDownRight size={12}/>}
           {fmtPct(Math.abs(Number(trend)||0))}
         </div>
       </div>
       <div>
-        <div style={{fontSize:22,fontWeight:700,color:"var(--tp-text)",lineHeight:1.2}}>
-          <Count value={value}/>
-        </div>
-        <div style={{fontSize:12,color:"var(--tp-textSec)",marginTop:2}}>{label}</div>
-        {sub&&<div style={{fontSize:11,color:"var(--tp-textTer)",marginTop:1}}>{sub}</div>}
+        <div className="total-products-kpi-value"><Count value={value}/></div>
+        <div className="total-products-kpi-label">{label}</div>
+        {sub&&<div className="total-products-kpi-sub">{sub}</div>}
       </div>
-      {sparkline&&<div style={{marginTop:4,height:36}}><Sparkline data={sparkline} color={color||"var(--tp-accent)"} h={36}/></div>}
+      {sparkline&&<div className="total-products-kpi-spark"><Sparkline data={sparkline} color={bg} h={36}/></div>}
     </motion.div>
   );
 }
 
 /* ─── Alert Badge ─── */
 function AlertBadge({ alert }) {
-  const colors={
-    danger:  { bg:"var(--tp-dangerBg)",  color:"var(--tp-danger)",  border:"#fca5a5" },
-    warning: { bg:"var(--tp-warningBg)", color:"var(--tp-warning)", border:"#fcd34d" },
-    info:    { bg:"var(--tp-infoBg)",    color:"var(--tp-info)",    border:"#93c5fd" },
-  };
-  const c=colors[alert.type]||colors.info;
   return (
     <motion.div
       initial={{opacity:0,x:-12}}
       animate={{opacity:1,x:0}}
-      style={{
-        display:"flex",alignItems:"flex-start",gap:10,padding:"10px 14px",
-        background:c.bg,borderRadius:12,border:`1px solid ${c.border}`
-      }}
+      className={`total-products-alert ${alert.type}`}
     >
-      <div style={{color:c.color,flexShrink:0,paddingTop:1}}><alert.icon size={16}/></div>
+      <div className="total-products-alert-icon"><alert.icon size={16}/></div>
       <div>
-        <div style={{fontSize:13,fontWeight:600,color:c.color}}>{alert.title}</div>
-        <div style={{fontSize:12,color:"var(--tp-textSec)",marginTop:2}}>{alert.text}</div>
+        <div className="total-products-alert-title">{alert.title}</div>
+        <div className="total-products-alert-text">{alert.text}</div>
       </div>
     </motion.div>
   );
@@ -310,36 +248,17 @@ function AlertBadge({ alert }) {
 
 /* ─── Insight Card ─── */
 function InsightCard({ ins }) {
-  const acc={
-    opportunity:{bg:"var(--tp-accentBg)",color:"var(--tp-accent)"},
-    success:    {bg:"var(--tp-successBg)",color:"var(--tp-success)"},
-    info:       {bg:"var(--tp-infoBg)",   color:"var(--tp-info)"},
-    warning:    {bg:"var(--tp-warningBg)",color:"var(--tp-warning)"},
-  };
-  const c=acc[ins.type]||acc.info;
   return (
     <motion.div
       initial={{opacity:0,scale:0.95}}
       animate={{opacity:1,scale:1}}
-      style={{
-        background:"var(--tp-surface)",border:"1px solid var(--tp-border)",
-        borderRadius:14,padding:"12px 16px",display:"flex",
-        alignItems:"flex-start",gap:12
-      }}
+      className={`total-products-insight ${ins.type}`}
     >
-      <div style={{
-        width:34,height:34,borderRadius:10,flexShrink:0,
-        background:c.bg,color:c.color,
-        display:"flex",alignItems:"center",justifyContent:"center"
-      }}>
-        <ins.icon size={16}/>
-      </div>
-      <div style={{flex:1,minWidth:0}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <div style={{fontSize:13,fontWeight:600,color:"var(--tp-text)"}}>{ins.title}</div>
-          {ins.metric&&<div style={{fontSize:12,fontWeight:700,color:c.color,flexShrink:0}}>{ins.metric}</div>}
-        </div>
-        <div style={{fontSize:12,color:"var(--tp-textSec)",marginTop:2}}>{ins.text}</div>
+      <div className="total-products-insight-icon"><ins.icon size={16}/></div>
+      <div className="total-products-insight-content">
+        <div className="total-products-insight-title">{ins.title}</div>
+        <div className="total-products-insight-text">{ins.text}</div>
+        {ins.metric&&<div className="total-products-insight-metric">{ins.metric}</div>}
       </div>
     </motion.div>
   );
@@ -357,8 +276,6 @@ function ChartSection({ products }) {
     const isDark=localStorage.getItem("tp-theme")==="dark";
     const tick=isDark?"#a8a29e":"#78716c";
     const grid=isDark?"#292524":"#f5f5f4";
-    const orange=ORANGE[500];
-    const green="#16a34a",blue="#2563eb";
 
     if(tab==="treemap") {
       const el=document.getElementById("tp-treemap");
@@ -377,9 +294,9 @@ function ChartSection({ products }) {
           tree:Object.entries(catData).map(([cat,d])=>({cat,value:d.rev||1,profit:d.profit})),
           key:"value", groups:["cat"],
           backgroundColor:(ctx)=>{
-            if(!ctx.raw) return orange;
+            if(!ctx.raw) return ORANGE[500];
             const m=ctx.raw._data.value>0?ctx.raw._data.profit/ctx.raw._data.value*100:0;
-            return m>40?green:m>20?orange:"#dc2626";
+            return m>40?"#16a34a":m>20?ORANGE[500]:"#dc2626";
           },
           borderWidth:2,borderColor:isDark?"#0c0a09":"#fff",
           labels:{ display:true, formatter:(ctx)=>ctx.raw._data.cat,
@@ -400,28 +317,53 @@ function ChartSection({ products }) {
     if(tab==="bubble") {
       const el=document.getElementById("tp-bubble");
       if(!el) return;
+
+      // Sort by velocity for proper line connection
+      const bubbleData = products.map(p=>({
+        x:Number(p.avgDailySales)||0,
+        y:Number(p.price)>0?(Number(p.price)-Number(p.cost||0))/Number(p.price)*100:0,
+        r:Math.max(5,Math.sqrt(Number(p.soldCount||0))),
+        label:p.name
+      })).sort((a,b)=>a.x-b.x); // Sort by velocity so line flows left->right
+
       charts.current.bubble=new Chart(el,{
         type:"bubble",
-        data:{ datasets:[{
-          label:"Products",
-          data:products.map(p=>({
-            x:Number(p.avgDailySales)||0,
-            y:Number(p.price)>0?(Number(p.price)-Number(p.cost||0))/Number(p.price)*100:0,
-            r:Math.max(5,Math.sqrt(Number(p.soldCount||0))),
-            label:p.name
-          })),
-          backgroundColor:products.map(p=>{
-            const vel=Number(p.avgDailySales)||0;
-            const m=Number(p.price)>0?(Number(p.price)-Number(p.cost||0))/Number(p.price)*100:0;
-            return(vel>5&&m>40?green:vel>5?blue:m>40?orange:"#dc2626")+"bb";
-          }),
-          borderWidth:0
-        }]},
+        data:{
+          datasets:[
+            {
+              label:"Products",
+              type: "line", // Add line type first
+              data: bubbleData,
+              borderColor: ORANGE[500],
+              backgroundColor: ORANGE[500] + "20",
+              borderWidth: 2,
+              pointRadius: 0,
+              fill: false,
+              tension: 0.4,
+              order: 1
+            },
+            {
+              label:"Products",
+              type: "bubble", // Then bubbles on top
+              data: bubbleData,
+              backgroundColor:products.map(p=>{
+                const vel=Number(p.avgDailySales)||0;
+                const m=Number(p.price)>0?(Number(p.price)-Number(p.cost||0))/Number(p.price)*100:0;
+                return(vel>5&&m>40?"#16a34a":vel>5?"#2563eb":m>40?ORANGE[500]:"#dc2626")+"bb";
+              }),
+              borderWidth:0,
+              order: 0
+            }
+          ]
+        },
         options:{
           responsive:true,maintainAspectRatio:false,
           plugins:{
             legend:{display:false},
-            tooltip:{ callbacks:{ label:(ctx)=>[ctx.raw.label,`Velocity: ${ctx.raw.x.toFixed(1)}/day`,`Margin: ${ctx.raw.y.toFixed(1)}%`]}}
+            tooltip:{ callbacks:{ label:(ctx)=>{
+              if(ctx.dataset.type === "line") return null;
+              return[ctx.raw.label,`Velocity: ${ctx.raw.x.toFixed(1)}/day`,`Margin: ${ctx.raw.y.toFixed(1)}%`]
+            }}}
           },
           scales:{
             x:{ title:{display:true,text:"Sales Velocity",color:tick},grid:{color:grid},ticks:{color:tick}},
@@ -444,7 +386,7 @@ function ChartSection({ products }) {
           labels:["Revenue","COGS","Shipping","Discounts","Returns","Net Profit"],
           datasets:[{
             data:[rev,-cost,-ship,-disc,-ret,net],
-            backgroundColor:[green,"#ef4444","#ef4444","#ef4444","#ef4444",blue],
+            backgroundColor:["#16a34a","#ef4444","#ef4444","#ef4444","#ef4444","#2563eb"],
             borderRadius:8
           }]
         },
@@ -462,30 +404,25 @@ function ChartSection({ products }) {
   },[products,tab]);
 
   const tabs=[
-    { id:"treemap", label:"Revenue Map", icon:BarChart2 },
-    { id:"bubble",  label:"Product Matrix", icon:Activity },
+    { id:"treemap", label:"Revenue Map", icon:BarChart3 },
+    { id:"bubble", label:"Product Matrix", icon:Activity },
     { id:"waterfall",label:"P&L Breakdown", icon:TrendingUp },
   ];
 
   return (
-    <div style={{background:"var(--tp-surface)",border:"1px solid var(--tp-border)",borderRadius:16,overflow:"hidden"}}>
-      <div style={{display:"flex",gap:0,borderBottom:"1px solid var(--tp-border)",overflowX:"auto"}}>
+    <div className="total-products-chart-card">
+      <div className="total-products-chart-tabs">
         {tabs.map(t=>(
-          <button key={t.id} onClick={()=>setTab(t.id)} style={{
-            display:"flex",alignItems:"center",gap:6,padding:"12px 18px",
-            background:"none",border:"none",borderBottom:`2px solid ${tab===t.id?"var(--tp-accent)":"transparent"}`,
-            color:tab===t.id?"var(--tp-accent)":"var(--tp-textSec)",
-            fontSize:13,fontWeight:tab===t.id?600:400,cursor:"pointer",
-            whiteSpace:"nowrap",transition:"all 0.15s"
-          }}>
+          <button key={t.id} onClick={()=>setTab(t.id)}
+            className={`total-products-chart-tab ${tab===t.id?'active':''}`}>
             <t.icon size={14}/>{t.label}
           </button>
         ))}
       </div>
-      <div style={{padding:"1rem",height:320}}>
-        {tab==="treemap"  &&<canvas id="tp-treemap"   style={{width:"100%",height:"100%"}}/>}
-        {tab==="bubble"   &&<canvas id="tp-bubble"    style={{width:"100%",height:"100%"}}/>}
-        {tab==="waterfall"&&<canvas id="tp-waterfall" style={{width:"100%",height:"100%"}}/>}
+      <div className="total-products-chart-body">
+        {tab==="treemap" &&<canvas id="tp-treemap"/>}
+        {tab==="bubble" &&<canvas id="tp-bubble"/>}
+        {tab==="waterfall"&&<canvas id="tp-waterfall"/>}
       </div>
     </div>
   );
@@ -499,55 +436,22 @@ function ProductRow({ p, expanded, onToggle }) {
   const score=calcScore(p);
   const revenue=price*sold,profit=(price-cost)*sold;
   const stockStatus=stock===0?"danger":stock<10?"warning":"success";
-  const statusColor={danger:"var(--tp-danger)",warning:"var(--tp-warning)",success:"var(--tp-success)"};
 
   return (
-    <motion.div
-      layout
-      style={{borderBottom:"1px solid var(--tp-borderSoft)"}}
-    >
-      <div
-        onClick={onToggle}
-        style={{
-          display:"grid",
-          gridTemplateColumns:"1fr 60px 70px 80px 80px 70px",
-          gap:12,padding:"12px 16px",cursor:"pointer",
-          background:expanded?"var(--tp-accentBg)":"transparent",
-          transition:"background 0.15s",
-          alignItems:"center"
-        }}
-      >
-        <div style={{display:"flex",alignItems:"center",gap:10,minWidth:0}}>
-          <div style={{
-            width:36,height:36,borderRadius:10,flexShrink:0,
-            background:"var(--tp-accentBg)",
-            display:"flex",alignItems:"center",justifyContent:"center",
-            color:"var(--tp-accent)",fontSize:14,fontWeight:700
-          }}>
-            {(p.name||"?")[0].toUpperCase()}
-          </div>
-          <div style={{minWidth:0}}>
-            <div style={{fontSize:13,fontWeight:600,color:"var(--tp-text)",
-              overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.name}</div>
-            <div style={{fontSize:11,color:"var(--tp-textTer)"}}>{p.category||"Uncategorized"}</div>
+    <motion.div layout className="total-products-table-row">
+      <div onClick={onToggle} className="total-products-row-main">
+        <div className="total-products-product-cell">
+          <div className="total-products-avatar">{(p.name||"?")[0].toUpperCase()}</div>
+          <div className="total-products-product-info">
+            <div className="total-products-product-name">{p.name}</div>
+            <div className="total-products-product-cat">{p.category||"Uncategorized"}</div>
           </div>
         </div>
-        <div style={{
-          width:34,height:22,borderRadius:20,
-          background:score>75?"var(--tp-successBg)":score>50?"var(--tp-warningBg)":"var(--tp-dangerBg)",
-          color:score>75?"var(--tp-success)":score>50?"var(--tp-warning)":"var(--tp-danger)",
-          display:"flex",alignItems:"center",justifyContent:"center",
-          fontSize:11,fontWeight:700
-        }}>{score}</div>
-        <div style={{fontSize:12,color:"var(--tp-text)",textAlign:"right"}}>{fmt(price)}</div>
-        <div style={{fontSize:12,fontWeight:600,color:margin>40?"var(--tp-success)":"var(--tp-warning)",textAlign:"right"}}>
-          {fmtPct(margin)}</div>
-        <div style={{fontSize:12,color:"var(--tp-text)",textAlign:"right"}}>{fmtShort(revenue)}</div>
-        <div style={{
-          padding:"3px 8px",borderRadius:20,fontSize:11,fontWeight:600,textAlign:"center",
-          color:statusColor[stockStatus],
-          background:stockStatus==="danger"?"var(--tp-dangerBg)":stockStatus==="warning"?"var(--tp-warningBg)":"var(--tp-successBg)"
-        }}>{stock}</div>
+        <div className={`total-products-score ${score>75?"high":score>50?"mid":"low"}`}>{score}</div>
+        <div className="total-products-cell-right">{fmt(price)}</div>
+        <div className={`total-products-cell-right total-products-margin-${margin>40?"high":margin>20?"mid":"low"}`}>{fmtPct(margin)}</div>
+        <div className="total-products-cell-right">{fmtShort(revenue)}</div>
+        <div className={`total-products-stock-badge ${stockStatus}`}>{stock}</div>
       </div>
       <AnimatePresence>
         {expanded&&(
@@ -555,12 +459,9 @@ function ProductRow({ p, expanded, onToggle }) {
             initial={{height:0,opacity:0}}
             animate={{height:"auto",opacity:1}}
             exit={{height:0,opacity:0}}
-            style={{overflow:"hidden"}}
+            className="total-products-row-expanded"
           >
-            <div style={{
-              padding:"12px 16px 16px",background:"var(--tp-surfaceAlt)",
-              display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10
-            }}>
+            <div className="total-products-expanded-grid">
               {[
                 {label:"Total Sold",value:sold},
                 {label:"Gross Profit",value:fmtShort(profit)},
@@ -569,12 +470,9 @@ function ProductRow({ p, expanded, onToggle }) {
                 {label:"SKU",value:p.sku||"N/A"},
                 {label:"Rec",value:stock<10?"Reorder":margin>50?"Boost Ads":"Monitor"},
               ].map(item=>(
-                <div key={item.label} style={{
-                  background:"var(--tp-surface)",borderRadius:10,padding:"8px 12px",
-                  border:"1px solid var(--tp-border)"
-                }}>
-                  <div style={{fontSize:11,color:"var(--tp-textSec)"}}>{item.label}</div>
-                  <div style={{fontSize:13,fontWeight:600,color:"var(--tp-text)",marginTop:2}}>{item.value}</div>
+                <div key={item.label} className="total-products-expanded-item">
+                  <div className="total-products-expanded-label">{item.label}</div>
+                  <div className="total-products-expanded-value">{item.value}</div>
                 </div>
               ))}
             </div>
@@ -594,12 +492,12 @@ function ProductTable({ products, search }) {
 
   const sorted=useMemo(()=>{
     return products
-      .filter(p=>(p.name||"").toLowerCase().includes(search.toLowerCase()))
-      .map(p=>({...p,score:calcScore(p),
+    .filter(p=>(p.name||"").toLowerCase().includes(search.toLowerCase()))
+    .map(p=>({...p,score:calcScore(p),
         revenue:(Number(p.price)||0)*(Number(p.soldCount)||0),
         margin:(Number(p.price)>0?(Number(p.price)-Number(p.cost||0))/Number(p.price)*100:0)
       }))
-      .sort((a,b)=>(sort.dir==="asc"?1:-1)*(a[sort.key]>b[sort.key]?1:-1));
+    .sort((a,b)=>(sort.dir==="asc"?1:-1)*(a[sort.key]>b[sort.key]?1:-1));
   },[products,search,sort]);
 
   const paged=sorted.slice(page*PER,(page+1)*PER);
@@ -615,59 +513,48 @@ function ProductTable({ products, search }) {
   ];
 
   return (
-    <div style={{background:"var(--tp-surface)",border:"1px solid var(--tp-border)",borderRadius:16,overflow:"hidden"}}>
-      <div style={{padding:"14px 16px",borderBottom:"1px solid var(--tp-border)",
-        display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-        <div style={{fontSize:14,fontWeight:600,color:"var(--tp-text)"}}>
-          Product Performance
-        </div>
-        <div style={{fontSize:12,color:"var(--tp-textSec)"}}>{sorted.length} items</div>
+    <div className="total-products-table-card">
+      <div className="total-products-table-header">
+        <div className="total-products-section-title">Product Performance</div>
+        <div className="total-products-table-count">{sorted.length} items</div>
       </div>
-      <div style={{
-        display:"grid",
-        gridTemplateColumns:"1fr 60px 70px 80px 80px 70px",
-        gap:12,padding:"8px 16px",
-        borderBottom:"1px solid var(--tp-border)",
-        background:"var(--tp-bg)"
-      }}>
-        {headers.map(h=>(
-          <button key={h.key} onClick={()=>setSort(s=>({key:h.key,dir:s.key===h.key&&s.dir==="desc"?"asc":"desc"}))}
-            style={{
-              background:"none",border:"none",padding:0,cursor:"pointer",
-              fontSize:11,fontWeight:600,color:"var(--tp-textSec)",
-              textAlign:h.key==="name"?"left":"right",
-              display:"flex",alignItems:"center",justifyContent:h.key==="name"?"flex-start":"flex-end",gap:3
-            }}>
-            {h.label}
-            {sort.key===h.key&&(sort.dir==="desc"?<ChevronDown size={10}/>:<ChevronDown size={10} style={{transform:"rotate(180deg)"}}/>)}
-          </button>
-        ))}
-      </div>
+      
+      {/* SCROLL WRAPPER - THIS FIXES MOBILE */}
+      <div className="total-products-table-scroll">
+        <div className="total-products-table-inner">
+          <div className="total-products-table-header-row">
+            {headers.map(h=>(
+              <button key={h.key} onClick={()=>setSort(s=>({key:h.key,dir:s.key===h.key&&s.dir==="desc"?"asc":"desc"}))}
+                className={`total-products-th ${h.key==="name"?'left':'right'}`}>
+                {h.label}
+                {sort.key===h.key&&(sort.dir==="desc"?<ChevronDown size={10}/>:<ChevronDown size={10} style={{transform:"rotate(180deg)"}}/>)}
+              </button>
+            ))}
+          </div>
 
-      {paged.length===0?(
-        <div style={{textAlign:"center",padding:"3rem",color:"var(--tp-textSec)"}}>
-          <Package size={40} style={{margin:"0 auto 12px",opacity:0.3}}/>
-          <div>No products found</div>
+          {paged.length===0?(
+            <div className="total-products-empty">
+              <Package size={40} className="total-products-empty-icon"/>
+              <div>No products found</div>
+            </div>
+          ):(
+            paged.map(p=>(
+              <ProductRow key={p.id||p.name} p={p}
+                expanded={expanded===p.id}
+                onToggle={()=>setExpanded(expanded===p.id?null:p.id)}
+              />
+            ))
+          )}
         </div>
-      ):(
-        paged.map(p=>(
-          <ProductRow key={p.id||p.name} p={p}
-            expanded={expanded===p.id}
-            onToggle={()=>setExpanded(expanded===p.id?null:p.id)}
-          />
-        ))
-      )}
+      </div>
 
       {pages>1&&(
-        <div style={{padding:"12px 16px",borderTop:"1px solid var(--tp-border)",
-          display:"flex",justifyContent:"center",gap:8}}>
+        <div className="total-products-pagination">
           {Array.from({length:pages},(_,i)=>(
-            <button key={i} onClick={()=>setPage(i)} style={{
-              width:28,height:28,borderRadius:8,border:"1px solid var(--tp-border)",
-              background:page===i?"var(--tp-accent)":"none",
-              color:page===i?"#fff":"var(--tp-textSec)",
-              fontSize:12,cursor:"pointer"
-            }}>{i+1}</button>
+            <button key={i} onClick={()=>setPage(i)}
+              className={`total-products-page-btn ${page===i?'active':''}`}>
+              {i+1}
+            </button>
           ))}
         </div>
       )}
@@ -675,13 +562,12 @@ function ProductTable({ products, search }) {
   );
 }
 
-/* ─── Main ─── */
+/* ─── Main Component ─── */
 export default function TotalProductsPage({ products=[], onBack }) {
   const [t,dark,toggleTheme]=useTheme();
   const [search,setSearch]=useState("");
   const [category,setCategory]=useState("all");
   const [dateRange,setDateRange]=useState("all");
-  const [sidebarOpen,setSidebarOpen]=useState(false);
 
   const cats=useMemo(()=>{
     const s=new Set(products.map(p=>p.category||"Uncategorized"));
@@ -690,7 +576,7 @@ export default function TotalProductsPage({ products=[], onBack }) {
 
   const filtered=useMemo(()=>{
     const now=new Date(), past=new Date();
-    if(dateRange==="7d")  past.setDate(now.getDate()-7);
+    if(dateRange==="7d") past.setDate(now.getDate()-7);
     else if(dateRange==="30d") past.setDate(now.getDate()-30);
     else if(dateRange==="90d") past.setDate(now.getDate()-90);
     return products.filter(p=>{
@@ -735,7 +621,7 @@ export default function TotalProductsPage({ products=[], onBack }) {
       p.name,p.category||"",p.price,p.cost||0,p.stock,p.soldCount||0,calcScore(p)
     ]);
     const csv=[["Name","Category","Price","Cost","Stock","Sold","Score"],...rows]
-      .map(r=>r.join(",")).join("\n");
+    .map(r=>r.join(",")).join("\n");
     const a=document.createElement("a");
     a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
     a.download=`products_${dateRange}.csv`;
@@ -758,118 +644,49 @@ export default function TotalProductsPage({ products=[], onBack }) {
   ];
 
   return (
-    <div style={{
-      minHeight:"100vh",background:"var(--tp-bg)",color:"var(--tp-text)",
-      fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"
-    }}>
+    <div className="total-products-page">
       <ThemeInjector t={t}/>
 
       {/* ─ Header ─ */}
-      <div style={{
-        position:"sticky",top:0,zIndex:50,
-        background:dark?"rgba(12,10,9,0.95)":"rgba(250,250,249,0.95)",
-        backdropFilter:"blur(12px)",
-        borderBottom:"1px solid var(--tp-border)",
-        padding:"0 1rem"
-      }}>
-        <div style={{
-          maxWidth:1400,margin:"0 auto",
-          display:"flex",alignItems:"center",gap:12,height:60
-        }}>
+      <div className="total-products-header">
+        <div className="total-products-header-inner">
           {onBack&&(
-            <button onClick={onBack} style={{
-              display:"flex",alignItems:"center",gap:6,
-              background:"none",border:"1px solid var(--tp-border)",
-              borderRadius:10,padding:"6px 12px",cursor:"pointer",
-              color:"var(--tp-textSec)",fontSize:13
-            }}>
-              <ArrowLeft size={14}/>Back
+            <button onClick={onBack} className="total-products-back-btn">
+              <ArrowLeft size={20}/>Back
             </button>
           )}
-
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <div style={{
-              width:32,height:32,borderRadius:10,
-              background:`linear-gradient(135deg,${ORANGE[500]},${ORANGE[700]})`,
-              display:"flex",alignItems:"center",justifyContent:"center"
-            }}>
-              <BarChart2 size={16} color="#fff"/>
-            </div>
+          <div className="total-products-header-left">
+            
             <div>
-              <div style={{fontSize:15,fontWeight:700,color:"var(--tp-text)"}}>Total Products </div>
-              <div style={{fontSize:11,color:"var(--tp-textSec)"}}>AI-powered inventory intelligence</div>
+              <h1 className="total-products-title">Total Products Analytics</h1>
+              <p className="total-products-subtitle">AI-powered inventory intelligence</p>
             </div>
           </div>
-
-          <div style={{flex:1}}/>
-
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <button onClick={toggleTheme} style={{
-              width:34,height:34,borderRadius:10,
-              border:"1px solid var(--tp-border)",background:"none",
-              cursor:"pointer",color:"var(--tp-textSec)",
-              display:"flex",alignItems:"center",justifyContent:"center"
-            }}>
+          <div className="total-products-header-actions">
+            <button onClick={toggleTheme} className="total-products-icon-btn">
               {dark?<Sun size={16}/>:<Moon size={16}/>}
             </button>
-            <button onClick={handleExport} style={{
-              display:"flex",alignItems:"center",gap:6,
-              border:"1px solid var(--tp-border)",background:"none",
-              borderRadius:10,padding:"6px 12px",cursor:"pointer",
-              color:"var(--tp-textSec)",fontSize:12
-            }}>
-              <Download size={14}/>Export
-            </button>
-            <button onClick={()=>window.print()} style={{
-              display:"flex",alignItems:"center",gap:6,
-              background:`linear-gradient(135deg,${ORANGE[500]},${ORANGE[600]})`,
-              border:"none",borderRadius:10,padding:"6px 14px",
-              cursor:"pointer",color:"#fff",fontSize:12,fontWeight:600
-            }}>
-              <Download size={14}/>PDF
+            <button onClick={handleExport} className="total-products-export-btn">
+              <Download size={18}/>Export
             </button>
           </div>
         </div>
       </div>
 
-      <div style={{maxWidth:1400,margin:"0 auto",padding:"1.5rem 1rem"}}>
+      <div className="total-products-container">
 
         {/* ─ Filters ─ */}
-        <div style={{
-          display:"grid",
-          gridTemplateColumns:"1fr auto auto",
-          gap:10,marginBottom:"1.5rem",
-          "@media (max-width: 600px)":{gridTemplateColumns:"1fr"}
-        }}>
-          <div style={{
-            display:"flex",alignItems:"center",gap:8,
-            background:"var(--tp-surface)",border:"1px solid var(--tp-border)",
-            borderRadius:12,padding:"0 12px",height:40
-          }}>
-            <Search size={15} style={{color:"var(--tp-textTer)"}}/>
+        <div className="total-products-filters">
+          <div className="total-products-search-box">
+            <Search size={18}/>
             <input value={search} onChange={e=>setSearch(e.target.value)}
-              placeholder="Search products..." style={{
-                flex:1,border:"none",background:"none",outline:"none",
-                fontSize:13,color:"var(--tp-text)"
-              }}/>
-            {search&&<button onClick={()=>setSearch("")} style={{background:"none",border:"none",cursor:"pointer",color:"var(--tp-textTer)"}}>
-              <X size={14}/>
-            </button>}
+              placeholder="Search products..."/>
+            {search&&<button onClick={()=>setSearch("")}><X size={14}/></button>}
           </div>
-
-          <select value={category} onChange={e=>setCategory(e.target.value)} style={{
-            height:40,background:"var(--tp-surface)",border:"1px solid var(--tp-border)",
-            borderRadius:12,padding:"0 12px",fontSize:13,color:"var(--tp-text)",
-            outline:"none",cursor:"pointer",minWidth:140
-          }}>
+          <select value={category} onChange={e=>setCategory(e.target.value)} className="total-products-select">
             {cats.map(c=><option key={c} value={c}>{c==="all"?"All Categories":c}</option>)}
           </select>
-
-          <select value={dateRange} onChange={e=>setDateRange(e.target.value)} style={{
-            height:40,background:"var(--tp-surface)",border:"1px solid var(--tp-border)",
-            borderRadius:12,padding:"0 12px",fontSize:13,color:"var(--tp-text)",
-            outline:"none",cursor:"pointer",minWidth:130
-          }}>
+          <select value={dateRange} onChange={e=>setDateRange(e.target.value)} className="total-products-select">
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
             <option value="90d">Last 90 days</option>
@@ -878,97 +695,55 @@ export default function TotalProductsPage({ products=[], onBack }) {
         </div>
 
         {/* ─ KPI Grid ─ */}
-        <div style={{
-          display:"grid",
-          gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))",
-          gap:12,marginBottom:"1.5rem"
-        }}>
+        <div className="total-products-kpi-grid">
           {kpiCards.map((k,i)=><KpiCard key={k.label} {...k} />)}
         </div>
 
         {/* ─ AI Panel ─ */}
         {(alerts.length>0||insights.length>0)&&(
-          <div style={{
-            display:"grid",
-            gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",
-            gap:12,marginBottom:"1.5rem"
-          }}>
+          <div className="total-products-ai-panel">
             {alerts.length>0&&(
-              <div style={{
-                background:"var(--tp-surface)",border:"1px solid var(--tp-border)",
-                borderRadius:16,padding:"1rem"
-              }}>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-                  <div style={{
-                    width:28,height:28,borderRadius:8,
-                    background:"var(--tp-accentBg)",
-                    display:"flex",alignItems:"center",justifyContent:"center",
-                    color:"var(--tp-accent)"
-                  }}><AlertTriangle size={14}/></div>
-                  <div style={{fontSize:13,fontWeight:600,color:"var(--tp-text)"}}>Alerts</div>
-                  <div style={{
-                    marginLeft:"auto",background:"var(--tp-dangerBg)",color:"var(--tp-danger)",
-                    borderRadius:20,padding:"1px 8px",fontSize:11,fontWeight:700
-                  }}>{alerts.length}</div>
+              <div className="total-products-ai-section">
+                <div className="total-products-ai-header">
+                  <div className="total-products-ai-icon"><AlertTriangle size={14}/></div>
+                  <div className="total-products-ai-title">Alerts</div>
+                  <div className="total-products-ai-badge">{alerts.length}</div>
                 </div>
-                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                <div className="total-products-ai-list">
                   {alerts.map((a,i)=><AlertBadge key={i} alert={a}/>)}
                 </div>
               </div>
             )}
 
             {insights.length>0&&(
-              <div style={{
-                background:"var(--tp-surface)",border:"1px solid var(--tp-border)",
-                borderRadius:16,padding:"1rem"
-              }}>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-                  <div style={{
-                    width:28,height:28,borderRadius:8,
-                    background:"var(--tp-accentBg)",
-                    display:"flex",alignItems:"center",justifyContent:"center",
-                    color:"var(--tp-accent)"
-                  }}><Brain size={14}/></div>
-                  <div style={{fontSize:13,fontWeight:600,color:"var(--tp-text)"}}>AI Insights</div>
-                  <div style={{
-                    marginLeft:"auto",fontSize:11,color:"var(--tp-textSec)",
-                    display:"flex",alignItems:"center",gap:4
-                  }}>
-                    <div style={{width:6,height:6,borderRadius:"50%",background:"var(--tp-success)",animation:"pulse 2s infinite"}}/>
+              <div className="total-products-ai-section">
+                <div className="total-products-ai-header">
+                  <div className="total-products-ai-icon"><Brain size={14}/></div>
+                  <div className="total-products-ai-title">AI Insights</div>
+                  <div className="total-products-ai-live">
+                    <div className="total-products-ai-live-dot"/>
                     Live
                   </div>
                 </div>
-                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                <div className="total-products-ai-list">
                   {insights.map((ins,i)=><InsightCard key={i} ins={ins}/>)}
                 </div>
               </div>
             )}
 
             {anomalies.length>0&&(
-              <div style={{
-                background:"var(--tp-surface)",border:"1px solid var(--tp-border)",
-                borderRadius:16,padding:"1rem"
-              }}>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-                  <div style={{
-                    width:28,height:28,borderRadius:8,
-                    background:"var(--tp-warningBg)",
-                    display:"flex",alignItems:"center",justifyContent:"center",
-                    color:"var(--tp-warning)"
-                  }}><Zap size={14}/></div>
-                  <div style={{fontSize:13,fontWeight:600,color:"var(--tp-text)"}}>Anomalies</div>
+              <div className="total-products-ai-section">
+                <div className="total-products-ai-header">
+                  <div className="total-products-ai-icon"><Zap size={14}/></div>
+                  <div className="total-products-ai-title">Anomalies</div>
                 </div>
-                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                <div className="total-products-ai-list">
                   {anomalies.map((a,i)=>(
-                    <div key={i} style={{
-                      display:"flex",gap:10,padding:"10px 12px",
-                      background:"var(--tp-warningBg)",borderRadius:12,
-                      border:"1px solid #fcd34d"
-                    }}>
-                      <a.icon size={14} style={{color:"var(--tp-warning)",flexShrink:0,paddingTop:1}}/>
+                    <div key={i} className="total-products-anomaly-item">
+                      <a.icon size={14} className="total-products-anomaly-icon"/>
                       <div>
-                        <div style={{fontSize:12,fontWeight:600,color:"var(--tp-warning)"}}>{a.title}</div>
-                        <div style={{fontSize:11,color:"var(--tp-textSec)",marginTop:1}}>{a.text}</div>
+                        <div className="total-products-anomaly-title">{a.title}</div>
+                        <div className="total-products-anomaly-text">{a.text}</div>
                       </div>
                     </div>
                   ))}
@@ -979,7 +754,7 @@ export default function TotalProductsPage({ products=[], onBack }) {
         )}
 
         {/* ─ Charts ─ */}
-        <div style={{marginBottom:"1.5rem"}}>
+        <div className="total-products-charts-section">
           <ChartSection products={filtered}/>
         </div>
 
@@ -992,7 +767,7 @@ export default function TotalProductsPage({ products=[], onBack }) {
         *{box-sizing:border-box}
         select option{background:var(--tp-surface);color:var(--tp-text)}
         @media(max-width:640px){
-          .tp-filters{grid-template-columns:1fr!important}
+          .total-products-filters{grid-template-columns:1fr!important}
         }
       `}</style>
     </div>
